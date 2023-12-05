@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/beneficiary_model.dart';
 import 'package:one_million_app/core/model/calculator_model.dart';
@@ -35,19 +36,23 @@ class ApiService {
       "gender": dropdownValue,
       "dateOfBirth": dateOfBirthController
     });
-print("Request URL: $url");
-      print("Request Headers: $headers");
-      print("Request Body: $body");
+
+
 
     final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-      print("Request URL: $url");
-      print("Request Headers: $headers");
-      print("Request Body: $body");
-    } else {
-      throw Exception('Unexpected error occured!');
-    }
+
+      if (response.statusCode == 200) {
+      print("Response Body: ${response.body}");
+
+      
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
     } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
       log(e.toString());
     }
   }

@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/components/signin/login_screen.dart';
@@ -231,7 +232,7 @@ class _BasicDetailsState extends State<BasicDetails> {
                           lastDate: DateTime(2050));
 
                       if (pickedDate != null) {
-                        dateOfBirthController.text = pickedDate.toString();
+                        dateOfBirthController.text = DateFormat("yyyy-MM-dd HH:mm:ss").format(pickedDate);
                       }
                     },
                   ),
