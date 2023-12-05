@@ -17,43 +17,39 @@ class ApiService {
   Future<List<UserRegistrationModal>?> addUsers(
       nameController,
       emailController,
-      phoneController,
+      phoneNo,
       dateOfBirthController,
       dropdownValue,
       passwordConfirmController,
       passwordontroller) async {
-    // try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.registrationEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "msisdn": phoneController,
-        // "name": nameController,
-        // "pin": passwordontroller,
-        // "confirmPin": passwordConfirmController,
-        // "email": emailController,
-        // "gender": dropdownValue,
-        // "dateOfBirth": dateOfBirthController
-        "msisdn": "+254717295570",
-        "name": "Lexi Wewa",
-        "pin": "1234",
-        "confirmPin": "1234",
-        "email": "jimmywewa@gmail.com",
-        "gender": "female",
-        // "dateOfBirth": "1996-11-16 18:54:27"
-      });
-       
-      final response = await http.post(url, headers: headers, body: body);
-      if (response.statusCode == 200) {
-        print("Request URL: $url");
-        print("Request Headers: $headers");
-        print("Request Body: $body");
-      } else {
-        throw Exception('Unexpected error occured!');
-      }
-    // } catch (e) {
-    //   log(e.toString());
-    // }
+    try {
+    var url =
+        Uri.parse(ApiConstants.baseUrl + ApiConstants.registrationEndpoint);
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      "msisdn": phoneNo,
+      "name": nameController,
+      "pin": passwordontroller,
+      "confirmPin": passwordConfirmController,
+      "email": emailController,
+      "gender": dropdownValue,
+      "dateOfBirth": dateOfBirthController
+    });
+print("Request URL: $url");
+      print("Request Headers: $headers");
+      print("Request Body: $body");
+
+    final response = await http.post(url, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      print("Request URL: $url");
+      print("Request Headers: $headers");
+      print("Request Body: $body");
+    } else {
+      throw Exception('Unexpected error occured!');
+    }
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<List<UserRegistrationOTPModal>?> sendOTP() async {

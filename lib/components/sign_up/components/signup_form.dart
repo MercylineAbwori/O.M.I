@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 const buttonTextStyle = TextStyle(
   color: Colors.white,
   fontWeight: FontWeight.w900,
-  
 );
 
 class SignUpForm extends StatelessWidget {
@@ -63,14 +62,13 @@ class BasicDetails extends StatefulWidget {
 class _BasicDetailsState extends State<BasicDetails> {
   GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
 
-   TextEditingController nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController genderController = TextEditingController();
   TextEditingController passwordontroller = TextEditingController();
   TextEditingController passwordConfirmController = TextEditingController();
   TextEditingController dateOfBirthController = TextEditingController();
-
 
   String initialCountry = 'KE';
 
@@ -83,6 +81,8 @@ class _BasicDetailsState extends State<BasicDetails> {
   FocusNode dateOfBirthNode = FocusNode();
 
   String? dropdownValue;
+
+  String? phoneNo;
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +106,8 @@ class _BasicDetailsState extends State<BasicDetails> {
                     decoration: InputDecoration(
                       labelText: "Your Name",
                       labelStyle: TextStyle(
-                      color:  nameNode.hasFocus ? kPrimaryColor : Colors.grey   
-                      ),
+                          color:
+                              nameNode.hasFocus ? kPrimaryColor : Colors.grey),
                       prefixIcon: const Padding(
                         padding: EdgeInsets.all(defaultPadding),
                         child: Icon(Icons.person, color: kPrimaryColor),
@@ -133,8 +133,9 @@ class _BasicDetailsState extends State<BasicDetails> {
                       decoration: InputDecoration(
                         labelText: "Your email",
                         labelStyle: TextStyle(
-                          color:  emailNode.hasFocus ? kPrimaryColor : Colors.grey   
-                        ),
+                            color: emailNode.hasFocus
+                                ? kPrimaryColor
+                                : Colors.grey),
                         prefixIcon: const Padding(
                           padding: EdgeInsets.all(defaultPadding),
                           child: Icon(Icons.mail, color: kPrimaryColor),
@@ -156,34 +157,36 @@ class _BasicDetailsState extends State<BasicDetails> {
                   padding: const EdgeInsets.symmetric(vertical: defaultPadding),
                   child: IntlPhoneField(
                     keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.next, 
+                    textInputAction: TextInputAction.next,
                     cursorColor: kPrimaryColor,
                     controller: phoneController,
                     onSaved: (phone) {},
                     focusNode: phoneNode,
                     decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        labelStyle: TextStyle(
-                          color:  phoneNode.hasFocus ? kPrimaryColor : Colors.grey   
-                        ),
-                        prefixIcon: const Padding(
+                      labelText: 'Phone Number',
+                      labelStyle: TextStyle(
+                          color:
+                              phoneNode.hasFocus ? kPrimaryColor : Colors.grey),
+                      prefixIcon: const Padding(
                         padding: EdgeInsets.all(defaultPadding),
-                        child: Icon(Icons.phone, color: kPrimaryColor,),
+                        child: Icon(
+                          Icons.phone,
+                          color: kPrimaryColor,
+                        ),
                       ),
-                        border: myinputborder(),
-                        enabledBorder: myinputborder(),
-                        focusedBorder: myfocusborder(),
+                      border: myinputborder(),
+                      enabledBorder: myinputborder(),
+                      focusedBorder: myfocusborder(),
                     ),
                     initialCountryCode: 'KE',
                     onChanged: (phone) {
+                      phoneNo = phone.completeNumber;
                       print(phoneController);
                     },
-                    validator: (value){
-                          //allow upper and lower case alphabets and space
-                          return "Enter your phone number should not start with a 0";
-                      
+                    validator: (value) {
+                      //allow upper and lower case alphabets and space
+                      return "Enter your phone number should not start with a 0";
                     },
-
                   ),
                   // TextFormField(
                   //     keyboardType: TextInputType.emailAddress,
@@ -211,66 +214,66 @@ class _BasicDetailsState extends State<BasicDetails> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: defaultPadding),
                   child: TextFormField(
-                        focusNode: dateOfBirthNode,
-                        decoration:  InputDecoration(
-                          labelText: 'Date of Birth',
-                          border: myinputborder(),
-                          enabledBorder: myinputborder(),
-                          focusedBorder: myfocusborder(),
-                        ),
-                        controller: dateOfBirthController,
-                        readOnly: true,
-                        onTap: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1950),
-                              lastDate: DateTime(2050));
+                    focusNode: dateOfBirthNode,
+                    decoration: InputDecoration(
+                      labelText: 'Date of Birth',
+                      border: myinputborder(),
+                      enabledBorder: myinputborder(),
+                      focusedBorder: myfocusborder(),
+                    ),
+                    controller: dateOfBirthController,
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1950),
+                          lastDate: DateTime(2050));
 
-                          if (pickedDate != null) {
-                            dateOfBirthController.text =pickedDate.toString();
-                          }
-                        },
-                      ),
+                      if (pickedDate != null) {
+                        dateOfBirthController.text = pickedDate.toString();
+                      }
+                    },
+                  ),
                 ),
-                SizedBox(width: 20,),
+                SizedBox(
+                  width: 20,
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: defaultPadding),
                   child: DropdownButtonFormField<String>(
-                    
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                          hint: const Text(
-                            'Gender',
-                            style: TextStyle(fontSize: 17),
-                          ),
-                          value: dropdownValue,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownValue = newValue!;
-                            });
-                          },
-                          validator: (value) => value == null
-                              ? 'field required'
-                              : null,
-                          items: <String>['female', 'male']
-                              .map<DropdownMenuItem<String>>(
-                                  (String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  
-                                  Text(
-                                    value,
-                                  ),
-                                ],
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      hint: const Text(
+                        'Gender',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                      value: dropdownValue,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                        });
+                      },
+                      validator: (value) =>
+                          value == null ? 'field required' : null,
+                      items: <String>['female', 'male']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Row(
+                            children: [
+                              Text(
+                                value,
                               ),
-                            );
-                          }).toList()),
+                            ],
+                          ),
+                        );
+                      }).toList()),
                 ),
-                SizedBox(width: 20,),
+                SizedBox(
+                  width: 20,
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: defaultPadding),
                   child: Column(
@@ -284,8 +287,9 @@ class _BasicDetailsState extends State<BasicDetails> {
                         decoration: InputDecoration(
                           labelText: "Your password",
                           labelStyle: TextStyle(
-                            color:  passwordNode.hasFocus ? kPrimaryColor : Colors.grey   
-                          ),
+                              color: passwordNode.hasFocus
+                                  ? kPrimaryColor
+                                  : Colors.grey),
                           prefixIcon: const Padding(
                             padding: EdgeInsets.all(defaultPadding),
                             child: Icon(Icons.lock, color: kPrimaryColor),
@@ -294,13 +298,15 @@ class _BasicDetailsState extends State<BasicDetails> {
                           enabledBorder: myinputborder(),
                           focusedBorder: myfocusborder(),
                         ),
-                        
+
                         // validator: MinLengthValidator(
                         //   6,
                         //   errorText: "Min 6 characters required",
                         // ),
                       ),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       TextFormField(
                         textInputAction: TextInputAction.done,
                         obscureText: true,
@@ -310,8 +316,9 @@ class _BasicDetailsState extends State<BasicDetails> {
                         decoration: InputDecoration(
                           labelText: "Confirm password",
                           labelStyle: TextStyle(
-                            color:  passwordConfirmNode.hasFocus ? kPrimaryColor : Colors.grey   
-                          ),
+                              color: passwordConfirmNode.hasFocus
+                                  ? kPrimaryColor
+                                  : Colors.grey),
                           prefixIcon: const Padding(
                             padding: EdgeInsets.all(defaultPadding),
                             child: Icon(Icons.lock, color: kPrimaryColor),
@@ -324,13 +331,13 @@ class _BasicDetailsState extends State<BasicDetails> {
                         //   6, errorText: "Min 6 characters required",
                         // ),
                         validator: (value) {
-                            if (passwordontroller != passwordConfirmController) {
+                          if (passwordontroller != passwordConfirmController) {
                             return 'The password does not match';
-                            }
-                            MinLengthValidator(
-                              6, errorText: "Min 6 characters required",
-                            );
-                          
+                          }
+                          MinLengthValidator(
+                            6,
+                            errorText: "Min 6 characters required",
+                          );
                         },
                       ),
                     ],
@@ -351,18 +358,16 @@ class _BasicDetailsState extends State<BasicDetails> {
                     //     modal.changeStep(1);
                     //   }
                     // },
-                    onPressed: () async {
+                    onPressed: () 
+                    async {
                       await ApiService().addUsers(
-                          nameController,
-                          emailController,
-                          phoneController,
-                          dateOfBirthController,
+                          nameController.text,
+                          emailController.text,
+                          phoneNo,
+                          dateOfBirthController.text,
                           dropdownValue,
-                          passwordConfirmController,
-                          passwordontroller
-                          
-                    );
-
+                          passwordConfirmController.text,
+                          passwordontroller.text);
                     },
                     child: const Text(
                       "Next",
@@ -399,24 +404,21 @@ class _BasicDetailsState extends State<BasicDetails> {
     });
   }
 
-  OutlineInputBorder myinputborder(){ //return type is OutlineInputBorder
+  OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: Colors.black, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: Colors.black, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
-  OutlineInputBorder myfocusborder(){
+  OutlineInputBorder myfocusborder() {
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: kPrimaryColor, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: kPrimaryColor, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 }
 
@@ -467,7 +469,7 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
   //   }
   // }
 
-  // Future<File> saveFilePermanently(String imagePath) async 
+  // Future<File> saveFilePermanently(String imagePath) async
   // {
   //   final directory = await getApplicationDocumentsDirectory();
   //   final name = basename(imagePath);
@@ -513,13 +515,28 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
                           child: Center(
                             child: Column(
                               children: [
-                                SizedBox(height: 20,),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(20.0),
-                                  child: _imageFrontId != null ? Image.file(_imageFrontId!, width: 300, height: 250, fit: BoxFit.cover,) 
-                                  : Image.asset('assets/images/upload_logo.png', width: 300, height: 250, fit: BoxFit.cover,),
+                                  child: _imageFrontId != null
+                                      ? Image.file(
+                                          _imageFrontId!,
+                                          width: 300,
+                                          height: 250,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          'assets/images/upload_logo.png',
+                                          width: 300,
+                                          height: 250,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
-                                SizedBox(height: 20,),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Column(
                                   children: [
                                     // CustomButton(
@@ -533,10 +550,11 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
                                     //   icon: Icons.camera,
                                     //   onClick: () => getImageFrontID(ImageSource.camera),
                                     // ),
-                                    SizedBox(height: 20,),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
                                   ],
                                 ),
-                                
                               ],
                             ),
                           ),
@@ -571,13 +589,28 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
                           child: Center(
                             child: Column(
                               children: [
-                                SizedBox(height: 20,),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(20.0),
-                                  child: _imageBackId != null ? Image.file(_imageBackId!, width: 300, height: 250, fit: BoxFit.cover,) 
-                                  : Image.asset('assets/images/upload_logo.png', width: 300, height: 250, fit: BoxFit.cover,),
+                                  child: _imageBackId != null
+                                      ? Image.file(
+                                          _imageBackId!,
+                                          width: 300,
+                                          height: 250,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          'assets/images/upload_logo.png',
+                                          width: 300,
+                                          height: 250,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
-                                SizedBox(height: 20,),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Column(
                                   children: [
                                     // CustomButton(
@@ -591,10 +624,11 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
                                     //   icon: Icons.camera,
                                     //   onClick: () => getImageBackID(ImageSource.camera),
                                     // ),
-                                    SizedBox(height: 20,),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
                                   ],
                                 ),
-                                
                               ],
                             ),
                           ),
@@ -642,27 +676,22 @@ class _IDUploadDetailsState extends State<IDUploadDetails> {
     });
   }
 
-  OutlineInputBorder myinputborder(){ //return type is OutlineInputBorder
+  OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: Colors.black, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: Colors.black, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
-  OutlineInputBorder myfocusborder(){
+  OutlineInputBorder myfocusborder() {
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: kPrimaryColor, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: kPrimaryColor, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
-
-  
 }
 
 //Class for Driving lincense
@@ -695,7 +724,7 @@ class _DrivingLincenseDetailsState extends State<DrivingLincenseDetails> {
   //   }
   // }
 
-  // Future<File> saveFilePermanently(String imagePath) async 
+  // Future<File> saveFilePermanently(String imagePath) async
   // {
   //   final directory = await getApplicationDocumentsDirectory();
   //   final name = basename(imagePath);
@@ -731,7 +760,6 @@ class _DrivingLincenseDetailsState extends State<DrivingLincenseDetails> {
                                 fontWeight: FontWeight.bold, fontSize: 17),
                           ),
                         ),
-                        
                       ],
                     ),
                     SizedBox(
@@ -745,35 +773,51 @@ class _DrivingLincenseDetailsState extends State<DrivingLincenseDetails> {
                         radius: Radius.circular(30),
                         child: Center(
                           child: Column(
-                          children: [
-                            SizedBox(height: 20,),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: _image != null ? Image.file(_image!, width: 300, height: 250, fit: BoxFit.cover,) 
-                              : Image.asset('assets/images/upload_logo.png', width: 300, height: 250, fit: BoxFit.cover,),
-                            ),
-                            SizedBox(height: 20,),
-                            Column(
-                              children: [
-                                // CustomButton(
-                                //   title: 'Pick from Gallery',
-                                //   icon: Icons.image_outlined,
-                                //   onClick: () => getImage(ImageSource.gallery),
-                                // ),
-                                // SizedBox(height: 10,),
-                                // CustomButton(
-                                //   title: 'Pick from Camera',
-                                //   icon: Icons.camera,
-                                //   onClick: () => getImage(ImageSource.camera),
-                                // ),
-                                SizedBox(height: 20,),
-                              ],
-                            ),
-                            
-                          ],
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: _image != null
+                                    ? Image.file(
+                                        _image!,
+                                        width: 300,
+                                        height: 250,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/upload_logo.png',
+                                        width: 300,
+                                        height: 250,
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Column(
+                                children: [
+                                  // CustomButton(
+                                  //   title: 'Pick from Gallery',
+                                  //   icon: Icons.image_outlined,
+                                  //   onClick: () => getImage(ImageSource.gallery),
+                                  // ),
+                                  // SizedBox(height: 10,),
+                                  // CustomButton(
+                                  //   title: 'Pick from Camera',
+                                  //   icon: Icons.camera,
+                                  //   onClick: () => getImage(ImageSource.camera),
+                                  // ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     )
                   ],
                 ),
@@ -818,27 +862,22 @@ class _DrivingLincenseDetailsState extends State<DrivingLincenseDetails> {
     });
   }
 
-  OutlineInputBorder myinputborder(){ //return type is OutlineInputBorder
+  OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: Colors.black, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: Colors.black, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
-  OutlineInputBorder myfocusborder(){
+  OutlineInputBorder myfocusborder() {
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: kPrimaryColor, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: kPrimaryColor, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
-
-  
 }
 
 //Class for Driving lincense
@@ -872,7 +911,7 @@ class _LogbookDetailsState extends State<LogbookDetails> {
   //   }
   // }
 
-  // Future<File> saveFilePermanently(String imagePath) async 
+  // Future<File> saveFilePermanently(String imagePath) async
   // {
   //   final directory = await getApplicationDocumentsDirectory();
   //   final name = basename(imagePath);
@@ -885,7 +924,6 @@ class _LogbookDetailsState extends State<LogbookDetails> {
   Widget build(BuildContext context) {
     return Consumer<UserModal>(builder: (context, modal, child) {
       return Card(
-        
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Form(
@@ -922,7 +960,7 @@ class _LogbookDetailsState extends State<LogbookDetails> {
                               // SizedBox(height: 20,),
                               // Padding(
                               //   padding: const EdgeInsets.all(20.0),
-                              //   child: _image != null ? Image.file(_image!, width: 300, height: 250, fit: BoxFit.cover,) 
+                              //   child: _image != null ? Image.file(_image!, width: 300, height: 250, fit: BoxFit.cover,)
                               //   : Image.asset('assets/images/upload_logo.png', width: 300, height: 250, fit: BoxFit.cover,),
                               // ),
                               // SizedBox(height: 20,),
@@ -942,7 +980,6 @@ class _LogbookDetailsState extends State<LogbookDetails> {
                               //     SizedBox(height: 20,),
                               //   ],
                               // ),
-                              
                             ],
                           ),
                         ),
@@ -954,24 +991,24 @@ class _LogbookDetailsState extends State<LogbookDetails> {
                   width: 10,
                 ),
                 SizedBox(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor,
                         fixedSize: const Size(200, 40)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return LoginScreen();
-                        },
-                      ),
-                    );
-                    print('');
-                  },
-                  child: Text("Sign Up".toUpperCase()),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return LoginScreen();
+                          },
+                        ),
+                      );
+                      print('');
+                    },
+                    child: Text("Sign Up".toUpperCase()),
+                  ),
                 ),
-              ),
                 SizedBox(
                   height: 10,
                 ),
@@ -991,31 +1028,27 @@ class _LogbookDetailsState extends State<LogbookDetails> {
                 ),
               ],
             ),
-            
           ),
         ),
       );
     });
   }
 
-  OutlineInputBorder myinputborder(){ //return type is OutlineInputBorder
+  OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: Colors.black, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: Colors.black, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
-  OutlineInputBorder myfocusborder(){
+  OutlineInputBorder myfocusborder() {
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: kPrimaryColor, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: kPrimaryColor, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
   // void imageSelected() async {
@@ -1029,29 +1062,30 @@ class _LogbookDetailsState extends State<LogbookDetails> {
   //     _imageList.add(selectedImage);
   //   }
   //   setState(() {});
-  
 }
-Widget CustomButton({ 
-  required String title,
-  required IconData icon,
-  required VoidCallback onClick
-  }){
+
+Widget CustomButton(
+    {required String title,
+    required IconData icon,
+    required VoidCallback onClick}) {
   return Container(
-      width: 200,
-      child: ElevatedButton(
-        onPressed: onClick,
-        child: Row(
-          children: [
-            Icon(icon),
-            SizedBox(width: 10,),
-            Text(title)
-          ],
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: kPrimaryLightColor,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-        ),
+    width: 200,
+    child: ElevatedButton(
+      onPressed: onClick,
+      child: Row(
+        children: [
+          Icon(icon),
+          SizedBox(
+            width: 10,
+          ),
+          Text(title)
+        ],
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: kPrimaryLightColor,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+    ),
   );
 }
