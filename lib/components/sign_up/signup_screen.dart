@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/onbording_screens/background.dart';
-import 'package:one_million_app/components/sign_up/signup_form.dart';
+import 'package:one_million_app/components/sign_up/components/signup_form.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:one_million_app/shared/responsive.dart';
 import 'components/sign_up_top_image.dart';
-import 'components/signup_form.dart';
-import 'components/socal_sign_up.dart';
 
+//Hot reload. 🔥🔥🔥
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 

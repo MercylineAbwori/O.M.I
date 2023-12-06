@@ -1,11 +1,20 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
 import 'package:one_million_app/common_ui.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
+import 'package:one_million_app/components/sign_up/signup_screen.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/regisration_otp_model.dart';
+import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/shared/constants.dart';
+
 
 
 class LoginPage extends StatefulWidget {
@@ -23,6 +32,55 @@ class _LoginPageState extends State<LoginPage> {
 
   FocusNode phoneNode = new FocusNode();
   FocusNode pinNode = new FocusNode();
+
+  late String _statusMessage;
+  num? _statusCode;
+
+  Future<List<UserRegistrationOTPModal>?> sendOTP(
+    phoneNo
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "msisdn": phoneNo,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        throw sendOTPVerify();
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+      
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
+  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify() async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
+      var response = await http.post(url);
+      if (response.statusCode == 200) {
+        List jsonResponse = json.decode(response.body);
+        return jsonResponse
+            .map((data) => UserRegistrationOTPVerifyModal.fromJson(data))
+            .toList();
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 
   
 
@@ -160,14 +218,14 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: defaultPadding),
               AlreadyHaveAnAccountCheck(
                 press: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) {
-                  //       return SignUpScreen();
-                  //     },
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return SignUpScreen();
+                      },
+                    ),
+                  );
                 },
               ),
             ],

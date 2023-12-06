@@ -41,13 +41,18 @@ class ApiService {
 
     final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
-      print("Response Body: ${response.body}");
+    // print('Responce Status Code : ${response.statusCode}');
+    // print('Responce Body : ${response.body}');
 
       
-      } else {
-        throw Exception('Unexpected error occured!');
-      }
+
+      // if (response.statusCode == 200) {
+      // print("Response Body: ${response.body}");
+
+
+      // } else {
+      //   throw Exception('Unexpected error occured!');
+      // }
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -60,7 +65,7 @@ class ApiService {
   Future<List<UserRegistrationOTPModal>?> sendOTP() async {
     try {
       var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.registrationEndpointOTP);
+          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       var response = await http.post(url);
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
@@ -78,7 +83,7 @@ class ApiService {
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify() async {
     try {
       var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.registrationEndpointOTPVerify);
+          ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
       var response = await http.post(url);
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);

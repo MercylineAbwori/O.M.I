@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
-import 'package:one_million_app/components/sign_up/signup_form.dart';
+
 class MyHomePage extends StatefulWidget { 
   @override 
   _MyHomePageState createState() => _MyHomePageState(); 
@@ -15,8 +15,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
         (context) =>  
-        // WelcomeScreen()
-        const SignUpForm()
+        WelcomeScreen()
         ) 
       ) 
     ); 
