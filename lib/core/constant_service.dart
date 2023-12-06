@@ -98,7 +98,7 @@ class ApiService {
     }
   }
 
-  Future<List<UserLoginModal>?> Login() async {
+  Future<List<UserLoginModal>?> PostLogin() async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.loginEndpoint);
       var response = await http.post(url);

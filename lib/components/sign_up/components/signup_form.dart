@@ -70,6 +70,10 @@ class _SignUpFormState extends State<SignUpForm> {
   late String _statusMessage;
   num? _statusCode;
 
+  late String _userId;
+  late String _otp;
+
+
   
 
   // final ImagePicker _picker = ImagePicker();
@@ -240,14 +244,17 @@ class _SignUpFormState extends State<SignUpForm> {
       print(response.body);
 
       var obj = jsonDecode(response.body);
+
+      print(obj);
         
         obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
+          
+          _userId = obj["userId"];
+          _otp = obj["otp"];
         });
 
       if (response.statusCode == 200) {
-        // throw sendOTPVerify();
+        throw sendOTPVerify(_userId,_otp);
       } else {
         throw Exception('Unexpected error occured!');
       }
@@ -261,22 +268,45 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify() async {
-    // try {
-    //   var url = Uri.parse(
-    //       ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
-    //   var response = await http.post(url);
-    //   if (response.statusCode == 200) {
-    //     List jsonResponse = json.decode(response.body);
-    //     return jsonResponse
-    //         .map((data) => UserRegistrationOTPVerifyModal.fromJson(data))
-    //         .toList();
-    //   } else {
-    //     throw Exception('Unexpected error occured!');
-    //   }
-    // } catch (e) {
-    //   log(e.toString());
-    // }
+  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
+    _userId,_otp
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": _userId,
+        "otp": _otp,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      print(response.body);
+
+      var obj = jsonDecode(response.body);
+
+      print(obj);
+        
+        obj.forEach((key, value){
+          
+          _userId = obj["userId"];
+          _otp = obj["otp"];
+        });
+
+      if (response.statusCode == 200) {
+        throw Exception('OTP verified successfully');
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+      
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
   }
 
 

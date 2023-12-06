@@ -11,6 +11,7 @@ import 'package:one_million_app/common_ui.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/components/sign_up/signup_screen.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/login_model.dart';
 import 'package:one_million_app/core/model/regisration_otp_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/shared/constants.dart';
@@ -33,9 +34,56 @@ class _LoginPageState extends State<LoginPage> {
   FocusNode phoneNode = new FocusNode();
   FocusNode pinNode = new FocusNode();
 
+  String? phoneNo;
+
   late String _statusMessage;
   num? _statusCode;
 
+  Future<List<UserLoginModal>?> PostLogin(
+      phoneNo,
+      pinontroller,
+  ) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.loginEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "msisdn": phoneNo,
+        "pin": pinontroller,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+        
+        obj.forEach((key, value){
+          _statusCode = obj["statusCode"];
+          _statusMessage = obj["statusMessage"];
+        });
+
+
+      if (response.statusCode == 200) {
+        throw sendOTP(phoneNo);
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+
+
+        
+  
+      
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
   Future<List<UserRegistrationOTPModal>?> sendOTP(
     phoneNo
   ) async {
@@ -115,36 +163,39 @@ class _LoginPageState extends State<LoginPage> {
               //   ],
               // ),
               IntlPhoneField(
-                keyboardType: TextInputType.phone,
-                textInputAction: TextInputAction.next, 
-                cursorColor: kPrimaryColor,
-                controller: phoneController,
-                onSaved: (phone) {},
-                focusNode: phoneNode,
-                decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(
-                      color:  phoneNode.hasFocus ? kPrimaryColor : Colors.grey   
-                    ),
-                    prefixIcon: const Padding(
-                    padding: EdgeInsets.all(defaultPadding),
-                    child: Icon(Icons.phone, color: kPrimaryColor),
-                  ),
-                    border: myinputborder(),
-                    enabledBorder: myinputborder(),
-                    focusedBorder: myfocusborder(),
-                ),
-                initialCountryCode: 'KE',
-                onChanged: (phone) {
-                  print(phoneController);
-                },
-                validator: (value){
-                      //allow upper and lower case alphabets and space
-                      return "Enter your phone number should not start with a 0";
-                  
-                },
-
-              ),
+                              keyboardType: TextInputType.phone,
+                              textInputAction: TextInputAction.next,
+                              cursorColor: kPrimaryColor,
+                              controller: phoneController,
+                              onSaved: (phone) {},
+                              focusNode: phoneNode,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                labelStyle: TextStyle(
+                                    color: phoneNode.hasFocus
+                                        ? kPrimaryColor
+                                        : Colors.grey),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.all(defaultPadding),
+                                  child: Icon(
+                                    Icons.phone,
+                                    color: kPrimaryColor,
+                                  ),
+                                ),
+                                border: myinputborder(),
+                                enabledBorder: myinputborder(),
+                                focusedBorder: myfocusborder(),
+                              ),
+                              initialCountryCode: 'KE',
+                              onChanged: (phone) {
+                                phoneNo = phone.completeNumber;
+                                print(phoneController);
+                              },
+                              validator: (value) {
+                                //allow upper and lower case alphabets and space
+                                return "Enter your phone number should not start with a 0";
+                              },
+                            ),
               
               const SizedBox(height: defaultPadding),
               TextFormField(
@@ -196,17 +247,43 @@ class _LoginPageState extends State<LoginPage> {
                     backgroundColor: kPrimaryColor,
                     fixedSize: const Size(200, 40)
                   ),
-                  onPressed: () {
-                    debugPrint("Phone : " + phoneController.text);
-                    debugPrint("Pin : " + pinontroller.text);
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CommonUIPage();
-                      },
-                    ),
-                  );
+                  
+                  onPressed: () async {
+                                  
+                    await PostLogin(
+                            phoneNo,
+                            pinontroller.text,
+                      );
+
+                    (_statusCode == 5000)
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return  CommonUIPage();
+                              },
+                            ),
+                          )
+
+                          
+                        : Navigator.pop(context);
+                    setState(
+                      () {},
+                    );
+
+                    final snackBar = SnackBar(
+                      content: Text(_statusMessage),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          // Some code to undo the change.
+                        },
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                  
                   },
                   child: Text(
                     "Log in".toUpperCase(),
