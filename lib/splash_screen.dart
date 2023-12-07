@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:one_million_app/common_ui.dart';
 import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
 
 class MyHomePage extends StatefulWidget { 
@@ -15,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
         (context) =>  
-        WelcomeScreen()
+         CommonUIPage()
         ) 
       ) 
     ); 

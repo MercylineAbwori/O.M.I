@@ -13,6 +13,7 @@ import 'package:one_million_app/components/sign_up/signup_screen.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/login_model.dart';
 import 'package:one_million_app/core/model/regisration_otp_model.dart';
+import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/shared/constants.dart';
 
@@ -38,6 +39,11 @@ class _LoginPageState extends State<LoginPage> {
 
   late String _statusMessage;
   num? _statusCode;
+
+  late num _userId;
+  late num _otp;
+  late String _msisdn;
+
 
   Future<List<UserLoginModal>?> PostLogin(
       phoneNo,
@@ -67,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
       if (response.statusCode == 200) {
-        throw sendOTP(phoneNo);
+        await sendOTP(_msisdn);
       } else {
         throw Exception('Unexpected error occured!');
       }
@@ -84,21 +90,34 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
     }
   }
-  Future<List<UserRegistrationOTPModal>?> sendOTP(
-    phoneNo
+   Future<List<UserRegistrationModal>?> sendOTP(
+    _msisdn
   ) async {
     try {
+
       var url = Uri.parse(
           ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
-        "msisdn": phoneNo,
+        "msisdn": _msisdn,
       });
 
       final response = await http.post(url, headers: headers, body: body);
 
+      
+      var obj = jsonDecode(response.body);
+        
+        obj.forEach((key, value){
+          _statusCode = obj["statusCode"];
+          _statusMessage = obj["statusMessage"];
+          _otp = obj["result"]["data"]["otpId"];
+        });
+
+      // // print('Responce Status Code : ' + response.statusCode);
+
       if (response.statusCode == 200) {
-        throw sendOTPVerify();
+        
+       await sendOTPVerify(_userId,_otp); 
       } else {
         throw Exception('Unexpected error occured!');
       }
@@ -112,24 +131,38 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify() async {
+  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
+    _userId,_otp
+  ) async {
     try {
       var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
-      var response = await http.post(url);
+          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": _userId,
+        "otp": _otp,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      print('Responce Status Code : ${response.statusCode}');
+      print('Responce Body : ${response.body}');
+
+
       if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        return jsonResponse
-            .map((data) => UserRegistrationOTPVerifyModal.fromJson(data))
-            .toList();
+        throw Exception('OTP verified successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
+      
     } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
       log(e.toString());
     }
   }
-
   
 
   @override
@@ -141,61 +174,40 @@ class _LoginPageState extends State<LoginPage> {
           key: formKey,
           child: Column(
             children: [
-              // Row(
-              //   children: [
-                  
-              //     TextFormField(
-              //       keyboardType: TextInputType.phone,
-              //       textInputAction: TextInputAction.next,
-              //       cursorColor: kPrimaryColor,
-              //       onSaved: (phone) {},
-              //       decoration: InputDecoration(
-              //         labelText: "Your phone",
-              //         prefixIcon: Padding(
-              //           padding: const EdgeInsets.all(defaultPadding),
-              //           child: Icon(Icons.phone),
-              //         ),
-              //         border: myinputborder(),
-              //         enabledBorder: myinputborder(),
-              //         focusedBorder: myfocusborder(),
-              //       ),
-              //     ),
-              //   ],
-              // ),
               IntlPhoneField(
-                              keyboardType: TextInputType.phone,
-                              textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
-                              controller: phoneController,
-                              onSaved: (phone) {},
-                              focusNode: phoneNode,
-                              decoration: InputDecoration(
-                                labelText: 'Phone Number',
-                                labelStyle: TextStyle(
-                                    color: phoneNode.hasFocus
-                                        ? kPrimaryColor
-                                        : Colors.grey),
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(defaultPadding),
-                                  child: Icon(
-                                    Icons.phone,
-                                    color: kPrimaryColor,
-                                  ),
-                                ),
-                                border: myinputborder(),
-                                enabledBorder: myinputborder(),
-                                focusedBorder: myfocusborder(),
-                              ),
-                              initialCountryCode: 'KE',
-                              onChanged: (phone) {
-                                phoneNo = phone.completeNumber;
-                                print(phoneController);
-                              },
-                              validator: (value) {
-                                //allow upper and lower case alphabets and space
-                                return "Enter your phone number should not start with a 0";
-                              },
-                            ),
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.next,
+                cursorColor: kPrimaryColor,
+                controller: phoneController,
+                onSaved: (phone) {},
+                focusNode: phoneNode,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  labelStyle: TextStyle(
+                      color: phoneNode.hasFocus
+                          ? kPrimaryColor
+                          : Colors.grey),
+                  prefixIcon: const Padding(
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: Icon(
+                      Icons.phone,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  border: myinputborder(),
+                  enabledBorder: myinputborder(),
+                  focusedBorder: myfocusborder(),
+                ),
+                initialCountryCode: 'KE',
+                onChanged: (phone) {
+                  phoneNo = phone.completeNumber;
+                  print(phoneController);
+                },
+                validator: (value) {
+                  //allow upper and lower case alphabets and space
+                  return "Enter your phone number should not start with a 0";
+                },
+              ),
               
               const SizedBox(height: defaultPadding),
               TextFormField(

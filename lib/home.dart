@@ -1,8 +1,11 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
+import 'package:one_million_app/components/coverage/widget/scrollable_widget.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
+import 'package:one_million_app/components/upload_files/upload_files.dart';
 import 'package:one_million_app/shared/constants.dart';
 
 
@@ -26,6 +29,8 @@ class _HomePageState extends State<HomePage> {
     "Here is list 4 subtitle",
     "Here is list 5 subtitle",
   ];
+
+    
    
   int selectedPageIndex = 0;
 
@@ -33,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   final List _children = [];
 
 int count = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -272,6 +278,131 @@ int count = 0;
               ),
         
               const SizedBox(height: 10),
+
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child:  Card(
+                  elevation: 5,
+                  shadowColor: Colors.black,
+                  child: Center(
+                      child: Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryLightColor,
+                                        ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return BeneficiaryScreen();
+                                            },
+                                          ),
+                                        );
+                                        setState(
+                                          () {
+                                            count++;
+                                          },
+                                        );
+                                      },
+                                      child: Center(
+                                         child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(height: 5),
+                                            Image.asset('assets/icons/home_icons/claims.png', width: 50, height: 50, fit: BoxFit.cover,),
+                                            
+                                            const SizedBox(height: 5),
+                                            const Text(
+                                              'Add Beneficiary', 
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                              // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                            ),
+                                            const SizedBox(height: 5),
+                                          ]
+                                         ),
+                                        
+                                      ),
+                                    ),
+                                    
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryLightColor,
+                                        ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return UploadFiles();
+                                            },
+                                          ),
+                                        );
+                                        setState(
+                                          () {
+                                            count++;
+                                          },
+                                        );
+                                      },
+                                      child: Center(
+                                         child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(height: 5),
+                                            Image.asset('assets/icons/home_icons/coverage.png', width: 50, height: 50, fit: BoxFit.cover,),
+                                            
+                                            const SizedBox(height: 5),
+                                            const Text(
+                                              'Upload Documents', 
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                              // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                            ),
+                                            const SizedBox(height: 5),
+                                          ]
+                                         ),
+                                        
+                                      ),
+                                    ),
+                                    
+                                  ),
+                                ],
+                              ),
+                              // Icon(Icons.info, size: 100, color: kPrimaryColor,),
+                              // SizedBox(height: 20),
+                              // Text(
+                              //   'There are no recent activities', 
+                              //   style: TextStyle(
+                              //       fontSize: 15,
+                              //       color: Colors.black),
+                              //   // style: GoogleFonts.bebasNeue(fontSize: 72),
+                              // ),
+                          ],
+                          
+                        ),
+                      ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 10),
         
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -380,4 +511,7 @@ int count = 0;
       _currentIndex = index;
     });
   }
+  
+  
 }
+
