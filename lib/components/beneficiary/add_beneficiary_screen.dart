@@ -135,27 +135,35 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
                   const SizedBox(height: 20),
           
                 // welcome home
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Add Beneficiary",
-                        style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Add Beneficiary",
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          
+                        ],
                       ),
-                      
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    
+
+                  ],
                 ),
-          
+
                 const SizedBox(height: 10),
 
                 //Divider
-          
+              
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30.0),
                   child: Divider(
@@ -163,7 +171,7 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
                     color: Color.fromARGB(255, 204, 204, 204),
                   ),
                 ),
-          
+
                 const SizedBox(height: 20),
           
                   Padding(
@@ -217,7 +225,7 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
                         prefixIcon: const Padding(
                           padding: EdgeInsets.all(defaultPadding),
                           child:
-                              Icon(Icons.person, color: kPrimaryColor),
+                              Icon(Icons.card_membership, color: kPrimaryColor),
                         ),
                         border: myinputborder(),
                         enabledBorder: myinputborder(),
@@ -317,21 +325,23 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
                                     dropdownValue,
                               );
 
-                            (_statusCode == 5000)
-                                ? Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return CommonUIPage();
-                                      },
-                                    ),
-                                  )
+                            // (_statusCode == 5000)
+                            //     ? 
+                            //     // Navigator.push(
+                            //     //     context,
+                            //     //     MaterialPageRoute(
+                            //     //       builder: (context) {
+                            //     //         return CommonUIPage();
+                            //     //       },
+                            //     //     ),
+                            //     //   )
 
                                   
-                                : Navigator.pop(context);
-                            setState(
-                              () {},
-                            );
+                            //     // : 
+                            //     Navigator.pop(context)
+                            // // setState(
+                            // //   () {},
+                            // // );
 
                             final snackBar = SnackBar(
                               content: Text(_statusMessage),

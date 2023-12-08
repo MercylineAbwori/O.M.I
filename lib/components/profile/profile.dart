@@ -7,7 +7,16 @@ import 'package:one_million_app/shared/constants.dart';
 
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  final num userId;
+  final String userName;
+  final String phone;
+  final String email;
+  const ProfileScreen({
+    Key? key,
+    required this.userId,
+    required this.userName,
+    required this.phone,
+    required this.email,}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

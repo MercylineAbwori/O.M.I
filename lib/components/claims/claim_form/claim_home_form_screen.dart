@@ -22,9 +22,9 @@ import 'package:provider/provider.dart';
 
 class ClaimForm extends StatefulWidget {
   
-  // required this.claimTypeSelected
+ 
 
-  ClaimForm({
+  const ClaimForm({
     Key? key,
   }) : super(key: key);
   @override
@@ -121,7 +121,9 @@ class _ClaimFormState extends State<ClaimForm> {
                   case 1:
                     return const AccidentDetails();
                   case 2:
-                    return const MedicalDetails();
+                    return const MedicalDetails(
+                      
+                    );
           
                   default:
                     return const BasicDetails();
@@ -2177,14 +2179,19 @@ class _MedicalDetailsState extends State<MedicalDetails> {
                           backgroundColor: kPrimaryColor,
                           fixedSize: const Size(200, 40)),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ClaimHomePage();
-                          },
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) {
+                      //       return ClaimHomePage(
+                      //         userName: widget.name, 
+                      //         userId: widget.userId,
+                      //         phone: widget.msisdn, 
+                      //         email: widget.email,
+                      //       );
+                      //     },
+                      //   ),
+                      // );
                     },
                     child: Text("Sign Up".toUpperCase()),
                   ),

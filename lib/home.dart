@@ -10,7 +10,16 @@ import 'package:one_million_app/shared/constants.dart';
 
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  
+  final String userName;
+  final num userId;
+  final String phone;
+  final String email;
+  const HomePage({super.key, 
+  required this.userId,
+  required this.userName,
+    required this.phone,
+    required this.email,});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -60,7 +69,12 @@ int count = 0;
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return ProfileScreen();
+                      return ProfileScreen(
+                        userName: widget.userName, 
+                        userId: widget.userId,
+                        phone: widget.phone, 
+                        email: widget.email,
+                      );
                     },
                   ),
                 );

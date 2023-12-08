@@ -16,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
         (context) =>  
-         CommonUIPage()
+         const WelcomeScreen()
         ) 
       ) 
     ); 

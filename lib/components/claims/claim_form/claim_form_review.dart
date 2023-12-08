@@ -2113,14 +2113,14 @@ class _MedicalDetailsState extends State<MedicalDetails> {
                           backgroundColor: kPrimaryColor,
                           fixedSize: const Size(200, 40)),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ClaimHomePage();
-                          },
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) {
+                      //       return ClaimHomePage();
+                      //     },
+                      //   ),
+                      // );
                     },
                     child: Text("Sign Up".toUpperCase()),
                   ),

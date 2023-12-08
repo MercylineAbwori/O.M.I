@@ -17,15 +17,12 @@ import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/shared/constants.dart';
 
-
-
 class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController phoneController = TextEditingController();
   TextEditingController pinontroller = TextEditingController();
@@ -40,18 +37,22 @@ class _LoginPageState extends State<LoginPage> {
   late String _statusMessage;
   num? _statusCode;
 
-  late num _userId;
-  late num _otp;
+  //User Details
+  late String _email;
   late String _msisdn;
+  late String _name;
 
+
+  late num _userId;
+
+  late num _otp;
 
   Future<List<UserLoginModal>?> PostLogin(
-      phoneNo,
-      pinontroller,
+    phoneNo,
+    pinontroller,
   ) async {
     try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.loginEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.loginEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "msisdn": phoneNo,
@@ -60,28 +61,25 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-
-      // print('Responce Status Code : ${response.statusCode}');
-      // print('Responce Body : ${response.body}');
+      print('Responce Status Code : ${response.statusCode}');
+      print('Responce Body : ${response.body}');
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-        });
 
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+        _userId = obj["result"]["data"]["UserDetails"]["userId"];
+        _name = obj["result"]["data"]["UserDetails"]["name"];
+        _email = obj["result"]["data"]["UserDetails"]["email"];
+        _msisdn = obj["result"]["data"]["UserDetails"]["userId"];
+      });
 
       if (response.statusCode == 200) {
         await sendOTP(_msisdn);
       } else {
         throw Exception('Unexpected error occured!');
       }
-
-
-        
-  
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -90,13 +88,10 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
     }
   }
-   Future<List<UserRegistrationModal>?> sendOTP(
-    _msisdn
-  ) async {
-    try {
 
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "msisdn": _msisdn,
@@ -104,24 +99,21 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-          _otp = obj["result"]["data"]["otpId"];
-        });
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+        _otp = obj["result"]["data"]["otpId"];
+      });
 
       // // print('Responce Status Code : ' + response.statusCode);
 
       if (response.statusCode == 200) {
-        
-       await sendOTPVerify(_userId,_otp); 
+        await sendOTPVerify(_userId, _otp);
       } else {
         throw Exception('Unexpected error occured!');
       }
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -132,11 +124,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
-    _userId,_otp
-  ) async {
+      _userId, _otp) async {
     try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "userId": _userId,
@@ -145,16 +135,11 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Responce Status Code : ${response.statusCode}');
-      print('Responce Body : ${response.body}');
-
-
       if (response.statusCode == 200) {
         throw Exception('OTP verified successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -163,7 +148,6 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                   labelStyle: TextStyle(
-                      color: phoneNode.hasFocus
-                          ? kPrimaryColor
-                          : Colors.grey),
+                      color: phoneNode.hasFocus ? kPrimaryColor : Colors.grey),
                   prefixIcon: const Padding(
                     padding: EdgeInsets.all(defaultPadding),
                     child: Icon(
@@ -208,32 +190,33 @@ class _LoginPageState extends State<LoginPage> {
                   return "Enter your phone number should not start with a 0";
                 },
               ),
-              
+
               const SizedBox(height: defaultPadding),
               TextFormField(
                 textInputAction: TextInputAction.done,
-                    obscureText: true,
-                    cursorColor: kPrimaryColor,
+                obscureText: true,
+                cursorColor: kPrimaryColor,
                 keyboardType: TextInputType.number,
                 controller: pinontroller,
                 focusNode: pinNode,
                 onSaved: (pin) {},
-                
                 decoration: InputDecoration(
                   labelText: "Pin",
                   labelStyle: TextStyle(
-                      color:  pinNode.hasFocus ? kPrimaryColor : Colors.grey  
-                    ),
+                      color: pinNode.hasFocus ? kPrimaryColor : Colors.grey),
                   prefixIcon: const Padding(
                     padding: EdgeInsets.all(defaultPadding),
-                    child: Icon(Icons.lock, color: kPrimaryColor,),
+                    child: Icon(
+                      Icons.lock,
+                      color: kPrimaryColor,
+                    ),
                   ),
                   border: myinputborder(),
                   enabledBorder: myinputborder(),
                   focusedBorder: myfocusborder(),
                 ),
                 validator: RequiredValidator(
-                      errorText: "Required *",
+                  errorText: "Required *",
                 ),
               ),
               // Padding(
@@ -256,28 +239,27 @@ class _LoginPageState extends State<LoginPage> {
                 tag: "login_btn",
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kPrimaryColor,
-                    fixedSize: const Size(200, 40)
-                  ),
-                  
+                      backgroundColor: kPrimaryColor,
+                      fixedSize: const Size(200, 40)),
                   onPressed: () async {
-                                  
                     await PostLogin(
-                            phoneNo,
-                            pinontroller.text,
-                      );
+                      phoneNo,
+                      pinontroller.text,
+                    );
 
                     (_statusCode == 5000)
                         ? Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return  CommonUIPage();
+                                return CommonUIPage(
+                                  userId: _userId,
+                                  name: _name,
+                                  msisdn: _msisdn,
+                                  email: _email);
                               },
                             ),
                           )
-
-                          
                         : Navigator.pop(context);
                     setState(
                       () {},
@@ -294,14 +276,10 @@ class _LoginPageState extends State<LoginPage> {
                     );
 
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                  
                   },
                   child: Text(
                     "Log in".toUpperCase(),
                   ),
-                  
-                  
                 ),
               ),
               const SizedBox(height: defaultPadding),
@@ -324,23 +302,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  OutlineInputBorder myinputborder(){ //return type is OutlineInputBorder
+  OutlineInputBorder myinputborder() {
+    //return type is OutlineInputBorder
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: Colors.black, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: Colors.black, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 
-  OutlineInputBorder myfocusborder(){
+  OutlineInputBorder myfocusborder() {
     return const OutlineInputBorder(
-        borderSide: BorderSide(
-            color: kPrimaryColor, width: 0),
-            borderRadius: BorderRadius.all(
-            Radius.circular(8),
-          )
-        );
+        borderSide: BorderSide(color: kPrimaryColor, width: 0),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ));
   }
 }

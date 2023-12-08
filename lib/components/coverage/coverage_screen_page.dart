@@ -10,7 +10,16 @@ import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/shared/constants.dart';
 class CoveragePage extends StatefulWidget {
-  const CoveragePage({Key? key}) : super(key: key);
+  final num userId;
+  final String userName;
+  final String phone;
+  final String email;
+  const CoveragePage({Key? key,
+  required this.userId,
+  required this.userName,
+    required this.phone,
+    required this.email,}) : super(key: key);
+
 
   @override
   State<CoveragePage> createState() => _CoverageState();
@@ -98,7 +107,7 @@ class _CoverageState extends State<CoveragePage> {
             child: IconButton(
               iconSize: 100,
               icon: Ink.image(
-                image: AssetImage('assets/icons/profile_icons/profile.jpg'),
+                image: const AssetImage('assets/icons/profile_icons/profile.jpg'),
               ),
               // the method which is called
               // when button is pressed
@@ -107,7 +116,12 @@ class _CoverageState extends State<CoveragePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return ProfileScreen();
+                      return ProfileScreen(
+                        userName: widget.userName, 
+                        userId: widget.userId,
+                        phone: widget.phone, 
+                        email: widget.email,
+                      );
                     },
                   ),
                 );

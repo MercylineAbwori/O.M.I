@@ -10,6 +10,16 @@ import 'package:one_million_app/shared/constants.dart';
 
 
 class ClaimHomePage extends StatefulWidget {
+  final num userId;
+  final String userName;
+  final String phone;
+  final String email;
+
+  const ClaimHomePage({Key? key,
+  required this.userId,
+  required this.userName,
+    required this.phone,
+    required this.email,}) : super(key: key);
   @override
   _ClaimHomePageState createState() => _ClaimHomePageState();
 }
@@ -112,7 +122,12 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return ProfileScreen();
+                      return ProfileScreen(
+                        userName: widget.userName, 
+                        userId: widget.userId,
+                        phone: widget.phone, 
+                        email: widget.email,
+                      );
                     },
                   ),
                 );

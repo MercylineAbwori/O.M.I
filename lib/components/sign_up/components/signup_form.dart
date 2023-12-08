@@ -179,8 +179,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Responce Status Code : ${response.statusCode}');
-      print('Responce Body : ${response.body}');
+      
 
 
       if (response.statusCode == 200) {
