@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +11,8 @@ import 'package:one_million_app/components/coverage/widget/scrollable_widget.dar
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/components/upload_files/upload_files.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 
 
@@ -47,6 +54,48 @@ class _HomePageState extends State<HomePage> {
   final List _children = [];
 
 int count = 0;
+
+    String? _statusMessage;
+    num? _statusCode;
+
+    late List<String> message =[];
+
+Future<List<NotificationModal>?> getNotification(userId) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": userId
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+        message = obj["result"]["data"]["message"];
+      });
+
+      print('Responce Body : ${message}');
+
+      if (response.statusCode == 200) {
+        
+      } else {
+        throw Exception('Unexpected Login error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,21 +148,37 @@ int count = 0;
                 ),
               // the method which is called
               // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationPage();
-                    },
-                  ),
-                );
-                setState(
-                  () {
-                    count++;
+              onPressed: () async {
+                    await getNotification(
+                      widget.userId
+                    );
+
+                    (_statusCode == 5000)
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NotificationPage(message: message);
+                              },
+                            ),
+                          )
+                        : Navigator.pop(context);
+                    setState(
+                      () {},
+                    );
+
+                    // final snackBar = SnackBar(
+                    //   content: Text(_statusMessage!),
+                    //   action: SnackBarAction(
+                    //     label: 'Undo',
+                    //     onPressed: () {
+                    //       // Some code to undo the change.
+                    //     },
+                    //   ),
+                    // );
+
+                    // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                );
-              },
             ),
           ),
 
@@ -130,18 +195,18 @@ int count = 0;
               // welcome home
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: const Column(
+                child:  Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hello Name,",
-                      style: TextStyle(
+                      "Hello "+ widget.userName,
+                      style: const TextStyle(
                           fontSize: 25,
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 5),
-                    Text(
+                    const SizedBox(height: 5),
+                    const Text(
                       'Happy to see you back! ',
                       // style: GoogleFonts.bebasNeue(fontSize: 72),
                     ),
@@ -172,121 +237,6 @@ int count = 0;
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
                     color: Colors.black,
-                  ),
-                ),
-              ),
-        
-              const SizedBox(height: 10),
-        
-              Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      CarouselSlider(
-                        items: [
-                          //1st Image of Slider
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_one.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_two.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_three.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_four.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_five.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Card(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: kPrimaryWhiteColor,
-                              ),
-                              child: Image.asset(
-                                'assets/images/adverts/slide_six.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-
-                        ],
-        
-                        //Slider Container properties
-                        options: CarouselOptions(
-                            height: 200,
-                            enlargeCenterPage: true,
-                            autoPlay: true,
-                            aspectRatio: 16 / 9,
-                            autoPlayCurve: Curves.fastOutSlowIn,
-                            enableInfiniteScroll: true,
-                            autoPlayAnimationDuration:
-                                Duration(milliseconds: 800),
-                            viewportFraction: 0.8,
-                            onPageChanged: (index, reason) {}),
-                      ),
-                      // DotsIndicator(
-                      //   dotsCount: contents.length,
-                      //   position: _current.toInt(),
-                      //   decorator: DotsDecorator(
-                      //     shape: const Border(),
-                      //     activeShape:
-                      //         RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.circular(35.0),),
-                      //         color: kPrimaryColor,
-                      //     size: Size(10, 10),
-                      //   ),
-                      // )
-                    ],
                   ),
                 ),
               ),
@@ -466,6 +416,39 @@ int count = 0;
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    (message.isEmpty) ?
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Card(
+                            elevation: 5,
+                            shadowColor: Colors.black,
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(40.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.info,
+                                      size: 100,
+                                      color: kPrimaryColor,
+                                    ),
+                                    SizedBox(height: 20),
+                                    Text(
+                                      'You have no activities',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                      // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                    ),
+                                    SizedBox(height: 20),
+                                    
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ):
                     Container(
                       child: ListView.separated(
                           shrinkWrap: true,
@@ -481,23 +464,8 @@ int count = 0;
                                 children: <Widget>[
                                   ListTile(
                                     leading: const Icon(Icons.notifications),
-                                    title: Text(titles[index]),
-                                    subtitle: Text(subtitles[index]),
+                                    title: Text(message[index]),
                                   ),
-                                  // Row(
-                                  //   mainAxisAlignment: MainAxisAlignment.end,
-                                  //   children: <Widget>[
-                                  //     TextButton(
-                                  //       child: const Text('Dail'),
-                                  //       onPressed: () {/* ... */},
-                                  //     ),
-                                  //     const SizedBox(width: 8),
-                                  //     TextButton(
-                                  //       child: const Text('Call History'),
-                                  //       onPressed: () {/* ... */},
-                                  //     ),
-                                  //   ],
-                                  // ),
                                 ],
                               ),
                             );

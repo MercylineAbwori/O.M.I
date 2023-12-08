@@ -1,6 +1,18 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/notification_model.dart';
+import 'package:http/http.dart' as http;
+import 'package:one_million_app/shared/constants.dart';
 
 class NotificationPage extends StatefulWidget {
+
+  final List<String> message;
+  const NotificationPage({super.key, 
+  required this.message,});
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -11,28 +23,18 @@ class _NotificationPageState extends State<NotificationPage> {
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
 
-  final titles = ["List 1", "List 2", "List 3", "List 4", "List 5", "List 6",  "List 7", "List 8", "List 9", "List 10"];
-  final subtitles = [
-    "Here is list 1 subtitle",
-    "Here is list 2 subtitle",
-    "Here is list 3 subtitle",
-    "Here is list 4 subtitle",
-    "Here is list 5 subtitle",
-    "Here is list 6 subtitle",
-    "Here is list 7 subtitle",
-    "Here is list 8 subtitle",
-    "Here is list 9 subtitle",
-    "Here is list 10 subtitle",
-  ];
-  final icons = [Icons.notifications, Icons.notifications, Icons.notifications, Icons.notifications, Icons.notifications, Icons.notifications,Icons.notifications,Icons.notifications,Icons.notifications,Icons.notifications];
-
+  final message = [];
+  
    
   int selectedPageIndex = 0;
 
   int _currentIndex = 0;
   final List _children = [];
 
-int count = 0;
+
+  int count = 0;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,7 @@ int count = 0;
             padding: const EdgeInsets.all(4.0),
             child: IconButton(
               iconSize: 100,
-              icon: Icon(Icons.arrow_back,
+              icon: const Icon(Icons.arrow_back,
               color: Colors.black,
               size: 20,),
               // the method which is called
@@ -69,7 +71,7 @@ int count = 0;
                 // welcome home
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -108,45 +110,66 @@ int count = 0;
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        (message.isEmpty) ?
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Card(
+                            elevation: 5,
+                            shadowColor: Colors.black,
+                            child: Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(40.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.info,
+                                      size: 100,
+                                      color: kPrimaryColor,
+                                    ),
+                                    SizedBox(height: 20),
+                                    Text(
+                                      'You have no activities',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                      // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                    ),
+                                    SizedBox(height: 20),
+                                    
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ):
                         Container(
                           child: ListView.separated(
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.all(8),
-                              itemCount: titles.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Card(
-                                  color: Colors.white,
-                                  borderOnForeground: true,
-                                  elevation: 6,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: const Icon(Icons.notifications),
-                                        title: Text(titles[index]),
-                                        subtitle: Text(subtitles[index]),
-                                      ),
-                                      // Row(
-                                      //   mainAxisAlignment: MainAxisAlignment.end,
-                                      //   children: <Widget>[
-                                      //     TextButton(
-                                      //       child: const Text('Dail'),
-                                      //       onPressed: () {/* ... */},
-                                      //     ),
-                                      //     const SizedBox(width: 8),
-                                      //     TextButton(
-                                      //       child: const Text('Call History'),
-                                      //       onPressed: () {/* ... */},
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (BuildContext context, int index) => const Divider(),
-                            ),
-                        ),
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(8),
+                            itemCount: message.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Card(
+                                color: Colors.white,
+                                borderOnForeground: true,
+                                elevation: 6,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ListTile(
+                                      leading: const Icon(Icons.notifications),
+                                      title: Text(message[index]),
+                                    ),
+                                    
+                                  ],
+                                ),
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) => const Divider(),
+                          ),
+                          
+                        )
+                        
                       ],
                     ),
                   ),
@@ -159,11 +182,19 @@ int count = 0;
         ),
       ),
     );
+
+    
+
+    
   }
+
+
 
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
+
+
 }

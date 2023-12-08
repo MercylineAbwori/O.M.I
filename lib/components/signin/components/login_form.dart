@@ -61,8 +61,8 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Responce Status Code : ${response.statusCode}');
-      print('Responce Body : ${response.body}');
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
 
       var obj = jsonDecode(response.body);
 
@@ -72,13 +72,13 @@ class _LoginPageState extends State<LoginPage> {
         _userId = obj["result"]["data"]["UserDetails"]["userId"];
         _name = obj["result"]["data"]["UserDetails"]["name"];
         _email = obj["result"]["data"]["UserDetails"]["email"];
-        _msisdn = obj["result"]["data"]["UserDetails"]["userId"];
+        _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
       });
 
       if (response.statusCode == 200) {
         await sendOTP(_msisdn);
       } else {
-        throw Exception('Unexpected error occured!');
+        throw Exception('Unexpected Login error occured!');
       }
     } catch (e) {
       print("Error: $e");
@@ -109,10 +109,12 @@ class _LoginPageState extends State<LoginPage> {
 
       // // print('Responce Status Code : ' + response.statusCode);
 
+      
+
       if (response.statusCode == 200) {
         await sendOTPVerify(_userId, _otp);
       } else {
-        throw Exception('Unexpected error occured!');
+        throw Exception('Unexpected OTP error occured!');
       }
     } catch (e) {
       print("Error: $e");
@@ -125,8 +127,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
       _userId, _otp) async {
+
+        
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "userId": _userId,
@@ -135,10 +139,17 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
+      print('Responce Status Code : ${response.statusCode}');
+      print('Responce Body : ${response.body}');
+
+      print(_userId);
+        print(_otp);
+      
+
       if (response.statusCode == 200) {
         throw Exception('OTP verified successfully');
       } else {
-        throw Exception('Unexpected error occured!');
+        throw Exception('Unexpected verify OTP error occured!');
       }
     } catch (e) {
       print("Error: $e");

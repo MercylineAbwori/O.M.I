@@ -1,5 +1,9 @@
 
 import 'dart:io';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +11,62 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/claims/claims_home_page_screen.dart';
 import 'package:one_million_app/components/notification/notification.dart';
+import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/claim_model.dart';
+import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 
 class ClaimFormReview extends StatefulWidget {
-  
+  final num userId;
+  const ClaimFormReview({Key? key,
+  required this.userId,}) : super(key: key);
   @override
   _ClaimFormReviewState createState() => _ClaimFormReviewState();
 }
+
+late String _statusMessage;
+    num? _statusCode;
+
+    late List<String> message =[];
+
+Future<List<NotificationModal>?> getNotification(userId) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": userId
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      print('Responce Status Code : ${response.statusCode}');
+      print('Responce Body : ${response.body}');
+
+      // var obj = jsonDecode(response.body);
+
+      // obj.forEach((key, value) {
+      //   _statusCode = obj["statusCode"];
+      //   _statusMessage = obj["statusMessage"];
+      //   _userId = obj["result"]["data"]["UserDetails"]["userId"];
+      //   _name = obj["result"]["data"]["UserDetails"]["name"];
+      //   _email = obj["result"]["data"]["UserDetails"]["email"];
+      //   _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
+      // });
+
+      if (response.statusCode == 200) {
+        print('checking');
+      } else {
+        throw Exception('Unexpected Login error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
 
 class _ClaimFormReviewState extends State<ClaimFormReview > {
   int _currentStep = 0;
@@ -77,19 +128,37 @@ class _ClaimFormReviewState extends State<ClaimFormReview > {
               ),
               // the method which is called
               // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationPage();
-                    },
-                  ),
-                );
-                setState(
-                  () {},
-                );
-              },
+              onPressed: () async {
+                    await getNotification(
+                      message
+                    );
+
+                    (_statusCode == 5000)
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NotificationPage(message: message);
+                              },
+                            ),
+                          )
+                        : Navigator.pop(context);
+                    setState(
+                      () {},
+                    );
+
+                    final snackBar = SnackBar(
+                      content: Text(_statusMessage),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          // Some code to undo the change.
+                        },
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
             ),
           ),
         ],

@@ -55,8 +55,7 @@ class _CommonUIPageState extends State<CommonUIPage> {
           email: widget.email,
         );
 
-      default:
-        return new HomePage(
+      default: HomePage(
           userName: widget.name, 
           userId: widget.userId,
           phone: widget.msisdn, 
