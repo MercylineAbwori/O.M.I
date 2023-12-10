@@ -1,20 +1,17 @@
 class Coverage{
-  final String benefits;
+  final String name;
   final String sumInsured ;
-  final String balance ;
 
   Coverage({
-    required this.benefits,
+    required this.name,
     required this.sumInsured,
-    required this.balance,
   });
 
 
  factory Coverage.fromJson(Map<String, dynamic> json) {
     return Coverage(
-      benefits: json['benefits'],
+      name: json['name'],
       sumInsured: json['sumInsured'],
-      balance: json['balance']
     );
   }
 }

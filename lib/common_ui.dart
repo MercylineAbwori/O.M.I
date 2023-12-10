@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/claims/claims_home_page_screen.dart';
+import 'package:one_million_app/components/coverage/coverage_screen.dart';
 import 'package:one_million_app/components/coverage/coverage_screen_page.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/home.dart';
@@ -11,12 +12,15 @@ class CommonUIPage extends StatefulWidget {
   final String msisdn;
   final String email;
 
+  final List<String> message;
+
   CommonUIPage({
     Key? key,
     required this.userId,
     required this.name,
     required this.msisdn,
     required this.email,
+    required this.message
   }) : super(key: key);
   @override
   _CommonUIPageState createState() => _CommonUIPageState();
@@ -25,41 +29,49 @@ class CommonUIPage extends StatefulWidget {
 class _CommonUIPageState extends State<CommonUIPage> {
   int _selectedIndex = 0;
 
-
   _getDrawerItemWidget(int pos) {
     switch (pos) {
       case 0:
-        return HomePage(userName: widget.name, 
+        return HomePage(
+          userName: widget.name,
           userId: widget.userId,
-          phone: widget.msisdn, 
-          email: widget.email,);
+          phone: widget.msisdn,
+          email: widget.email,
+          message: widget.message
+        );
       case 1:
         return CoveragePage(
-          userName: widget.name, 
+          userName: widget.name,
           userId: widget.userId,
-          phone: widget.msisdn, 
+          phone: widget.msisdn,
           email: widget.email,
+          message: widget.message
         );
       case 2:
         return ClaimHomePage(
-          userName: widget.name, 
+          userName: widget.name,
           userId: widget.userId,
-          phone: widget.msisdn, 
+          phone: widget.msisdn,
           email: widget.email,
+          message: widget.message
         );
       case 3:
         return ProfileScreen(
-          userName: widget.name, 
+          userName: widget.name,
           userId: widget.userId,
-          phone: widget.msisdn, 
+          phone: widget.msisdn,
           email: widget.email,
+          message: widget.message
         );
 
-      default: HomePage(
-          userName: widget.name, 
+      default:
+        HomePage(
+          userName: widget.name,
           userId: widget.userId,
-          phone: widget.msisdn, 
-          email: widget.email,);
+          phone: widget.msisdn,
+          email: widget.email,
+          message: widget.message,
+        );
     }
   }
 

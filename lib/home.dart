@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
@@ -15,18 +14,20 @@ import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 
-
 class HomePage extends StatefulWidget {
-  
   final String userName;
   final num userId;
   final String phone;
   final String email;
-  const HomePage({super.key, 
-  required this.userId,
-  required this.userName,
-    required this.phone,
-    required this.email,});
+  final List<String> message;
+
+  const HomePage(
+      {super.key,
+      required this.userId,
+      required this.userName,
+      required this.phone,
+      required this.email,
+      required this.message});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -46,70 +47,26 @@ class _HomePageState extends State<HomePage> {
     "Here is list 5 subtitle",
   ];
 
-    
-   
   int selectedPageIndex = 0;
 
   int _currentIndex = 0;
   final List _children = [];
 
-int count = 0;
+  int count = 0;
 
-    String? _statusMessage;
-    num? _statusCode;
-
-    late List<String> message =[];
-
-Future<List<NotificationModal>?> getNotification(userId) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": userId
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      // print('Responce Status Code : ${response.statusCode}');
-      // print('Responce Body : ${response.body}');
-
-      var obj = jsonDecode(response.body);
-
-      obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
-        _statusMessage = obj["statusMessage"];
-        message = obj["result"]["data"]["message"];
-      });
-
-      print('Responce Body : ${message}');
-
-      if (response.statusCode == 200) {
-        
-      } else {
-        throw Exception('Unexpected Login error occured!');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      log(e.toString());
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.white,
-
         leading: Container(
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: IconButton(
               iconSize: 100,
               icon: Ink.image(
-                  image:  AssetImage('assets/icons/profile_icons/profile.jpg'),
+                image: AssetImage('assets/icons/profile_icons/profile.jpg'),
               ),
               // the method which is called
               // when button is pressed
@@ -119,10 +76,11 @@ Future<List<NotificationModal>?> getNotification(userId) async {
                   MaterialPageRoute(
                     builder: (context) {
                       return ProfileScreen(
-                        userName: widget.userName, 
+                        userName: widget.userName,
                         userId: widget.userId,
-                        phone: widget.phone, 
+                        phone: widget.phone,
                         email: widget.email,
+                        message: widget.message,
                       );
                     },
                   ),
@@ -137,51 +95,29 @@ Future<List<NotificationModal>?> getNotification(userId) async {
           ),
         ),
         actions: <Widget>[
-      
           // notification icon
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
               iconSize: 30,
               icon: const Icon(
-                  Icons.notifications, color: kPrimaryColor,
-                ),
+                Icons.notifications,
+                color: kPrimaryColor,
+              ),
               // the method which is called
               // when button is pressed
-              onPressed: () async {
-                    await getNotification(
-                      widget.userId
-                    );
-
-                    (_statusCode == 5000)
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return NotificationPage(message: message);
-                              },
-                            ),
-                          )
-                        : Navigator.pop(context);
-                    setState(
-                      () {},
-                    );
-
-                    // final snackBar = SnackBar(
-                    //   content: Text(_statusMessage!),
-                    //   action: SnackBarAction(
-                    //     label: 'Undo',
-                    //     onPressed: () {
-                    //       // Some code to undo the change.
-                    //     },
-                    //   ),
-                    // );
-
-                    // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return NotificationPage(message: widget.message);
+                    },
+                  ),
+                );
+              },
             ),
           ),
-
         ],
       ),
       body: SafeArea(
@@ -189,17 +125,16 @@ Future<List<NotificationModal>?> getNotification(userId) async {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               const SizedBox(height: 20),
-        
+
               // welcome home
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child:  Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hello "+ widget.userName,
+                      "Hello " + widget.userName,
                       style: const TextStyle(
                           fontSize: 25,
                           color: Colors.black,
@@ -213,11 +148,11 @@ Future<List<NotificationModal>?> getNotification(userId) async {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 10),
-              
+
               //Divider
-        
+
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Divider(
@@ -225,9 +160,9 @@ Future<List<NotificationModal>?> getNotification(userId) async {
                   color: Color.fromARGB(255, 204, 204, 204),
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               //Home title
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -240,134 +175,139 @@ Future<List<NotificationModal>?> getNotification(userId) async {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 10),
 
               Padding(
                 padding: EdgeInsets.all(8.0),
-                child:  Card(
+                child: Card(
                   elevation: 5,
                   shadowColor: Colors.black,
                   child: Center(
-                      child: Container(
-                        padding: EdgeInsets.all(15.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Container(
+                      padding: EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: kPrimaryLightColor,
-                                        ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return BeneficiaryScreen();
-                                            },
-                                          ),
-                                        );
-                                        setState(
-                                          () {
-                                            count++;
-                                          },
-                                        );
-                                      },
-                                      child: Center(
-                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            const SizedBox(height: 5),
-                                            Image.asset('assets/icons/home_icons/claims.png', width: 50, height: 50, fit: BoxFit.cover,),
-                                            
-                                            const SizedBox(height: 5),
-                                            const Text(
-                                              'Add Beneficiary', 
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black),
-                                              // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                            ),
-                                            const SizedBox(height: 5),
-                                          ]
-                                         ),
-                                        
-                                      ),
-                                    ),
-                                    
+                              Container(
+                                padding: EdgeInsets.all(10.0),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryLightColor,
                                   ),
-                                  Container(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: kPrimaryLightColor,
-                                        ),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return UploadFiles();
-                                            },
-                                          ),
-                                        );
-                                        setState(
-                                          () {
-                                            count++;
-                                          },
-                                        );
-                                      },
-                                      child: Center(
-                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            const SizedBox(height: 5),
-                                            Image.asset('assets/icons/home_icons/coverage.png', width: 50, height: 50, fit: BoxFit.cover,),
-                                            
-                                            const SizedBox(height: 5),
-                                            const Text(
-                                              'Upload Documents', 
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black),
-                                              // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                            ),
-                                            const SizedBox(height: 5),
-                                          ]
-                                         ),
-                                        
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return BeneficiaryScreen();
+                                        },
                                       ),
-                                    ),
-                                    
+                                    );
+                                    setState(
+                                      () {
+                                        count++;
+                                      },
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(height: 5),
+                                          Image.asset(
+                                            'assets/icons/home_icons/claims.png',
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          const SizedBox(height: 5),
+                                          const Text(
+                                            'Add Beneficiary',
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black),
+                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                          ),
+                                          const SizedBox(height: 5),
+                                        ]),
                                   ),
-                                ],
+                                ),
                               ),
-                              // Icon(Icons.info, size: 100, color: kPrimaryColor,),
-                              // SizedBox(height: 20),
-                              // Text(
-                              //   'There are no recent activities', 
-                              //   style: TextStyle(
-                              //       fontSize: 15,
-                              //       color: Colors.black),
-                              //   // style: GoogleFonts.bebasNeue(fontSize: 72),
-                              // ),
-                          ],
-                          
-                        ),
+                              Container(
+                                padding: EdgeInsets.all(10.0),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryLightColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return UploadFiles();
+                                        },
+                                      ),
+                                    );
+                                    setState(
+                                      () {
+                                        count++;
+                                      },
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(height: 5),
+                                          Image.asset(
+                                            'assets/icons/home_icons/coverage.png',
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          const SizedBox(height: 5),
+                                          const Text(
+                                            'Upload Documents',
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black),
+                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                          ),
+                                          const SizedBox(height: 5),
+                                        ]),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Icon(Icons.info, size: 100, color: kPrimaryColor,),
+                          // SizedBox(height: 20),
+                          // Text(
+                          //   'There are no recent activities',
+                          //   style: TextStyle(
+                          //       fontSize: 15,
+                          //       color: Colors.black),
+                          //   // style: GoogleFonts.bebasNeue(fontSize: 72),
+                          // ),
+                        ],
                       ),
+                    ),
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 10),
-        
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: const Text(
@@ -379,108 +319,82 @@ Future<List<NotificationModal>?> getNotification(userId) async {
                   ),
                 ),
               ),
-        
-              const SizedBox(height: 10),
-              (titles.isEmpty) ? 
 
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child:  Card(
-                  elevation: 5,
-                  shadowColor: Colors.black,
-                  child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(40.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(Icons.info, size: 100, color: kPrimaryColor,),
-                              SizedBox(height: 20),
-                              Text(
-                                'There are no recent activities', 
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.black),
-                                // style: GoogleFonts.bebasNeue(fontSize: 72),
-                              ),
-                          ],
-                          
-                        ),
-                      ),
-                  ),
-                ),
-              ) :
+              const SizedBox(height: 10),
+
               Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    (message.isEmpty) ?
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Card(
-                            elevation: 5,
-                            shadowColor: Colors.black,
-                            child: Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(40.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.info,
-                                      size: 100,
-                                      color: kPrimaryColor,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      (widget.message.isEmpty)
+                          ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Card(
+                                elevation: 5,
+                                shadowColor: Colors.black,
+                                child: Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(40.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.info,
+                                          size: 100,
+                                          color: kPrimaryColor,
+                                        ),
+                                        SizedBox(height: 20),
+                                        Text(
+                                          'You have no activities',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
+                                          // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                        ),
+                                        SizedBox(height: 20),
+                                      ],
                                     ),
-                                    SizedBox(height: 20),
-                                    Text(
-                                      'You have no activities',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-                                      // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                    ),
-                                    SizedBox(height: 20),
-                                    
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ):
-                    Container(
-                      child: ListView.separated(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(8),
-                          itemCount: 5,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Card(
-                              color: Colors.white,
-                              borderOnForeground: true,
-                              elevation: 6,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: const Icon(Icons.notifications),
-                                    title: Text(message[index]),
-                                  ),
-                                ],
+                            )
+                          : Container(
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.all(8),
+                                itemCount: 5,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Card(
+                                    color: Colors.white,
+                                    borderOnForeground: true,
+                                    elevation: 6,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        ListTile(
+                                          leading:
+                                              const Icon(Icons.notifications),
+                                          title: Text(widget.message[index]),
+                                          // title: Text('Notification'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        const Divider(),
                               ),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) => const Divider(),
-                        ),
-                    ),
-                  ],
+                            ),
+                    ],
+                  ),
                 ),
-              ),
-                
               )
-
-              
-                
             ],
           ),
         ),
@@ -493,7 +407,4 @@ Future<List<NotificationModal>?> getNotification(userId) async {
       _currentIndex = index;
     });
   }
-  
-  
 }
-

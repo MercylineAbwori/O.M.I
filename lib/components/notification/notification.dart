@@ -23,7 +23,6 @@ class _NotificationPageState extends State<NotificationPage> {
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
 
-  final message = [];
   
    
   int selectedPageIndex = 0;
@@ -110,7 +109,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        (message.isEmpty) ?
+                        (widget.message.isEmpty) ?
                         const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Card(
@@ -142,12 +141,13 @@ class _NotificationPageState extends State<NotificationPage> {
                               ),
                             ),
                           ),
-                        ):
+                        )
+                        :
                         Container(
                           child: ListView.separated(
                             shrinkWrap: true,
                             padding: const EdgeInsets.all(8),
-                            itemCount: message.length,
+                            itemCount: widget.message.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Card(
                                 color: Colors.white,
@@ -158,7 +158,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                   children: <Widget>[
                                     ListTile(
                                       leading: const Icon(Icons.notifications),
-                                      title: Text(message[index]),
+                                      title: Text(widget.message[index]),
                                     ),
                                     
                                   ],

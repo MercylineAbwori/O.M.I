@@ -15,6 +15,10 @@ import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
 
 class ApiService {
+
+  late String _statusMessage;
+  num? _statusCode;
+
   Future<List<UserRegistrationModal>?> addUsers(
       nameController,
       emailController,
@@ -98,6 +102,8 @@ class ApiService {
     }
   }
 
+
+
   Future<List<UserLoginModal>?> PostLogin() async {
     try {
       var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.loginEndpoint);
@@ -115,41 +121,85 @@ class ApiService {
     }
   }
 
-  Future<List<CalculatorModal>?> calculatePremium() async {
+  Future<List<CalculatorModal>?> calculatePremium(suminsured) async {
     try {
       var url =
           Uri.parse(ApiConstants.baseUrl + ApiConstants.calculatorEndpoint);
-      var response = await http.get(url);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "sumInsured": suminsured,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      print('Responce Status Code : ${response.statusCode}');
+      print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
       if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        return jsonResponse
-            .map((data) => CalculatorModal.fromJson(data))
-            .toList();
+        print("generated");
       } else {
-        throw Exception('Unexpected error occured!');
+        throw Exception('Unexpected Calculator error occured!');
       }
     } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
       log(e.toString());
     }
   }
 
-  Future<List<coverageSelectionModal>?> postCoverageSelection() async {
+
+  Future<List<coverageSelectionModal>?> postCoverageSelection(
+    userId,
+    sumInsured,
+    paymentPeriod,
+    paymentAmount,
+  ) async {
     try {
       var url = Uri.parse(
           ApiConstants.baseUrl + ApiConstants.coverageSelectionEndpoint);
-      var response = await http.post(url);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": userId,
+        "sumInsured": sumInsured,
+        "paymentPeriod": paymentPeriod,
+        "paymentAmount": paymentAmount,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
       if (response.statusCode == 200) {
-        List jsonResponse = json.decode(response.body);
-        return jsonResponse
-            .map((data) => coverageSelectionModal.fromJson(data))
-            .toList();
+        print("Subscribed successfully");
       } else {
-        throw Exception('Unexpected error occured!');
+        throw Exception('Unexpected Login error occured!');
       }
     } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
       log(e.toString());
     }
   }
+
 
   Future<List<NotificationModal>?> getNotification() async {
     try {

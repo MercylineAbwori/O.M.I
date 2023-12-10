@@ -19,12 +19,14 @@ class ClaimHomePage extends StatefulWidget {
   final String userName;
   final String phone;
   final String email;
+  final List<String> message;
 
   const ClaimHomePage({Key? key,
   required this.userId,
   required this.userName,
     required this.phone,
-    required this.email,}) : super(key: key);
+    required this.email,
+    required this.message}) : super(key: key);
   @override
   _ClaimHomePageState createState() => _ClaimHomePageState();
 }
@@ -87,45 +89,6 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
     num? _statusCode;
 
     late List<String> message =[];
-
-     Future<List<NotificationModal>?> getNotification(userId) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": userId
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      print('Responce Status Code : ${response.statusCode}');
-      print('Responce Body : ${response.body}');
-
-      // var obj = jsonDecode(response.body);
-
-      // obj.forEach((key, value) {
-      //   _statusCode = obj["statusCode"];
-      //   _statusMessage = obj["statusMessage"];
-      //   _userId = obj["result"]["data"]["UserDetails"]["userId"];
-      //   _name = obj["result"]["data"]["UserDetails"]["name"];
-      //   _email = obj["result"]["data"]["UserDetails"]["email"];
-      //   _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
-      // });
-
-      if (response.statusCode == 200) {
-        print('checking');
-      } else {
-        throw Exception('Unexpected Login error occured!');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      log(e.toString());
-    }
-  }
-
     
 
   @override
@@ -175,6 +138,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                         userId: widget.userId,
                         phone: widget.phone, 
                         email: widget.email,
+                        message: widget.message,
                       );
                     },
                   ),
@@ -200,36 +164,17 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                 ),
               // the method which is called
               // when button is pressed
-              onPressed: () async {
-                    await getNotification(
-                      message
-                    );
-
-                    (_statusCode == 5000)
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return NotificationPage(message: message);
-                              },
-                            ),
-                          )
-                        : Navigator.pop(context);
-                    setState(
-                      () {},
-                    );
-
-                    final snackBar = SnackBar(
-                      content: Text(_statusMessage),
-                      action: SnackBarAction(
-                        label: 'Undo',
-                        onPressed: () {
-                          // Some code to undo the change.
+              onPressed: () {
+                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return NotificationPage(message: widget.message);
                         },
                       ),
+                          
                     );
-
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
             ),
           ),

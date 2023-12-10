@@ -6,6 +6,8 @@ class ApiConstants {
   static String loginEndpoint = '/login';
   static String calculatorEndpoint = '/calculator';
   static String coverageSelectionEndpoint = '/coverageSelection';
+  static String claimEndpoint = '/initiateClaim';
+  static String claimListEndpoint = '/listClaim';
   static String notificationEndpoint = '/notification';
   static String beneficiaryEndpoint = '/beneficiary';
   static String uploadDocumentEndpoint = '/uploadDocument';

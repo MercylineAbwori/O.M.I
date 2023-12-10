@@ -12,6 +12,7 @@ import 'package:one_million_app/components/onbording_screens/already_have_an_acc
 import 'package:one_million_app/components/sign_up/signup_screen.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/login_model.dart';
+import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/core/model/regisration_otp_model.dart';
 import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
@@ -46,6 +47,8 @@ class _LoginPageState extends State<LoginPage> {
   late num _userId;
 
   late num _otp;
+
+  late List<String> message =[];
 
   Future<List<UserLoginModal>?> PostLogin(
     phoneNo,
@@ -160,6 +163,54 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  
+
+  Future<List<NotificationModal>?> getNotification(userId) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId
+        "userId": 1
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+
+        var objs = obj["result"]["data"];
+
+        for(var item in objs){
+          message.add(item["message"]);
+        }
+          print('Responce Body : ${message}');
+
+        
+      });
+
+      if (response.statusCode == 200) {
+      } else {
+        throw Exception('Unexpected Login error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -258,6 +309,10 @@ class _LoginPageState extends State<LoginPage> {
                       pinontroller.text,
                     );
 
+                    await getNotification(
+                      _userId,
+                    );
+
                     (_statusCode == 5000)
                         ? Navigator.push(
                             context,
@@ -267,7 +322,8 @@ class _LoginPageState extends State<LoginPage> {
                                   userId: _userId,
                                   name: _name,
                                   msisdn: _msisdn,
-                                  email: _email);
+                                  email: _email,
+                                  message: message);
                               },
                             ),
                           )

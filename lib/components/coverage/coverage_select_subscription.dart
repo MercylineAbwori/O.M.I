@@ -1,9 +1,20 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/coverage_selection_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 
 class SubscriptionSelect extends StatefulWidget {
+  final num userId;
+  final String suminsured;
+  final num amountPayed;
   final List<dynamic> itemSelected;
-  const SubscriptionSelect({Key? key, required this.itemSelected}) : super(key: key);
+  const SubscriptionSelect({Key? key, required this.itemSelected, required this.userId, required this.amountPayed, required this.suminsured})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SubscriptionSelectState();
@@ -11,8 +22,13 @@ class SubscriptionSelect extends StatefulWidget {
 
 class _SubscriptionSelectState extends State<SubscriptionSelect> {
   // this variable holds the selected items
-   List<String> _selectedItems = [];
-   String? dropdownValue;
+  List<String> _selectedItems = [];
+  String? dropdownValue;
+
+  String? _currentValue;
+
+  late String _statusMessage;
+  num? _statusCode;
 
 // This function is triggered when a checkbox is checked or unchecked
   void _itemChange(String itemValue, bool isSelected) {
@@ -43,13 +59,12 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                               onTap: () {
                                 Navigator.of(context).pop();
                               },
-                              child: const Icon(Icons
-                                  .arrow_back) // the arrow back icon
+                              child: const Icon(
+                                  Icons.arrow_back) // the arrow back icon
                               ),
                         ),
                         title: const Center(
-                            child: Text(
-                                "Select payment") // Your desired title
+                            child: Text("Select payment") // Your desired title
                             )),
                     Padding(
                       padding: EdgeInsets.all(40),
@@ -67,12 +82,10 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                               dropdownValue = newValue!;
                             });
                           },
-                          validator: (value) => value == null
-                              ? 'field required'
-                              : null,
+                          validator: (value) =>
+                              value == null ? 'field required' : null,
                           items: <String>['MPESA', 'Bank']
-                              .map<DropdownMenuItem<String>>(
-                                  (String value) {
+                              .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Row(
@@ -103,23 +116,27 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                       width: 200,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          fixedSize: const Size(200, 40)
-                        ),
-                        onPressed: () {
-                          // (dropdownValue == "MPESA")
-                          //     ? Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //             builder: (context) =>
-                          //                 const MpesaHomePage()),
-                          //       )
-                          //     : Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //             builder: (context) =>
-                          //                 const BankHomePage()),
-                          //       );
+                            backgroundColor: kPrimaryColor,
+                            fixedSize: const Size(200, 40)),
+                        onPressed: () async{
+                          await postCoverageSelection(
+                              widget.userId,
+                              widget.suminsured,
+                              _currentValue,
+                              widget.amountPayed,
+                            );
+
+                          final snackBar = SnackBar(
+                            content: Text(_statusMessage),
+                            action: SnackBarAction(
+                              label: 'Undo',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         },
                         child: const Text(
                           "Submit",
@@ -135,9 +152,6 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
         );
       },
     );
-
-
-
   }
 
   // this function is called when the Cancel button is pressed
@@ -147,35 +161,94 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
 
   // this function is called when the Submit button is tapped
   void _submit() {
-    
     // // Navigator.pop(context, _selectedItems);
     // Navigator.push(
     //   context,
     //   MaterialPageRoute(builder: (context) =>  PaymentHomePage()),
     // );
-    _showMultiPaymentSelect(context);
 
+    print(_currentValue);
+    _showMultiPaymentSelect(context);
+  }
+
+  Future<List<coverageSelectionModal>?> postCoverageSelection(
+    userId,
+    sumInsured,
+    paymentPeriod,
+    paymentAmount,
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.coverageSelectionEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": userId,
+        "sumInsured": sumInsured,
+        "paymentPeriod": paymentPeriod,
+        "paymentAmount": paymentAmount,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
+      if (response.statusCode == 200) {
+        print("Subscribed successfully");
+      } else {
+        throw Exception('Unexpected Login error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Center(
-        child: const Text('Select Subscription'),
+      title: const Center(
+        child: Text('Select Subscription'),
       ),
       content: SingleChildScrollView(
         child: Container(
           width: 700,
           child: Column(
             children: [
+              // ListBody(
+              //   children: widget.itemSelected
+              //       .map((item) => CheckboxListTile(
+              //             value: _selectedItems.contains(item),
+              //             title: Text(item),
+              //             controlAffinity: ListTileControlAffinity.leading,
+              //             onChanged: (isChecked) =>
+              //                 _itemChange(item, isChecked!),
+              //           ))
+              //       .toList(),
+              // ),
               ListBody(
+                mainAxis: Axis.vertical,
                 children: widget.itemSelected
-                    .map((item) => CheckboxListTile(
-                          value: _selectedItems.contains(item),
-                          title: Text(item),
+                    .map((item) => RadioListTile<String>(
+                          groupValue: _currentValue,
+                          value: item,
+                          title: Text('${item}'),
                           controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (isChecked) =>
-                              _itemChange(item, isChecked!),
+                          onChanged: (isvalue) {
+                            setState(() {
+                              _currentValue = isvalue;
+                            });
+                          },
                         ))
                     .toList(),
               ),
@@ -184,29 +257,29 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
         ),
       ),
       actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                fixedSize: const Size(100, 40)
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    fixedSize: const Size(100, 40)),
+                onPressed: _cancel,
+                child: const Text('Cancel'),
               ),
-              onPressed: _cancel,
-              child: const Text('Cancel'),
-            ),
-            SizedBox(width: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                fixedSize: const Size(100, 40)
+              const SizedBox(width: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    fixedSize: const Size(100, 40)),
+                onPressed: _submit,
+                child: const Text('Submit'),
               ),
-              onPressed: _submit,
-              child: const Text('Submit'),
-            ),
-          ],
+            ],
+          ),
         ),
-        
       ],
     );
   }
