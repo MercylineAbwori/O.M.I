@@ -1,16 +1,12 @@
-import 'dart:io';
-import 'dart:convert';
-import 'dart:developer';
-import 'package:http/http.dart' as http;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:one_million_app/components/claims/claim_form/claim_form.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
 import 'package:one_million_app/components/claims/claim_select_page.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
-import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 
 
@@ -32,7 +28,7 @@ class ClaimHomePage extends StatefulWidget {
 }
 
 class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProviderStateMixin {
-  GlobalKey<FormState> _formState = GlobalKey<FormState>();
+  
 
     // padding constants
   final double horizontalPadding = 40;
@@ -66,15 +62,6 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
         }
       ];
 
-      // list of smart devices
-  List serviceBox = [
-    ["Coverage", "assets/icons/home_icons/coverage.png", false],
-    ["Payment", "assets/icons/home_icons/payment.png", false],
-    ["Claims", "assets/icons/home_icons/reporting.png", false],
-    ["Claims", "assets/icons/home_icons/claims.png", false],
-  ];
-
-
     //Claim LISTS
   
      List<String>  claimType = <String>[
@@ -85,9 +72,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
     ];
      List<String> selectedClaimType = [];
 
-     late String _statusMessage;
-    num? _statusCode;
-
+  
     late List<String> message =[];
     
 
@@ -254,14 +239,14 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                                       backgroundColor: kPrimaryColor,
                                       fixedSize: const Size(200, 40)),
                                   onPressed: () {
-                                   //  Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) {
-                                    //       return ClaimForm();
-                                    //     },
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return ClaimForm(userId: widget.userId,);
+                                        },
+                                      ),
+                                    );
                                     // _showDialog();
                                   },
                                   child: Text(
@@ -305,7 +290,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                                       title: Text(itemsTitles[index]),
                                       subtitle: Text(
                                         itemsDate[index], 
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                               fontSize: 12, 
                                               fontWeight: FontWeight.w400,)),
                                       trailing:Padding(
@@ -332,7 +317,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                             separatorBuilder: (BuildContext context, int index) => const Divider(),
                           ),
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Divider(
                           thickness: 1,
