@@ -1,17 +1,14 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'package:http/http.dart' as http;
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
-import 'package:one_million_app/components/coverage/widget/scrollable_widget.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/components/upload_files/upload_files.dart';
+import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/notification_model.dart';
+import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 import 'package:one_million_app/shared/constants.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +17,9 @@ class HomePage extends StatefulWidget {
   final String phone;
   final String email;
   final List<String> message;
+  final String uptoDatePaymentData;
+  final String promotionCode;
+  final bool buttonClaimStatus;
 
   const HomePage(
       {super.key,
@@ -27,7 +27,10 @@ class HomePage extends StatefulWidget {
       required this.userName,
       required this.phone,
       required this.email,
-      required this.message});
+      required this.message,
+      required this.uptoDatePaymentData,
+      required this.promotionCode,
+      required this.buttonClaimStatus});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -53,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   final List _children = [];
 
   int count = 0;
-
+  
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +69,8 @@ class _HomePageState extends State<HomePage> {
             child: IconButton(
               iconSize: 100,
               icon: Ink.image(
-                image: AssetImage('assets/icons/profile_icons/profile.jpg'),
+                image:
+                    const AssetImage('assets/icons/profile_icons/profile.jpg'),
               ),
               // the method which is called
               // when button is pressed
@@ -130,22 +134,54 @@ class _HomePageState extends State<HomePage> {
               // welcome home
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Hello " + widget.userName,
-                      style: const TextStyle(
-                          fontSize: 25,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      'Happy to see you back! ',
-                      // style: GoogleFonts.bebasNeue(fontSize: 72),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Hello " + widget.userName,
+                              style: const TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 5),
+                            const Text(
+                              'Happy to see you back! ',
+                              // style: GoogleFonts.bebasNeue(fontSize: 72),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Center(
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Card(
+                                  elevation: 5,
+                                  shadowColor: Colors.black,
+                                  color: (widget.uptoDatePaymentData ==
+                                          'payment up to date')
+                                      ? Colors.green
+                                      : Colors.red,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Center(
+                                      child: Text(widget.uptoDatePaymentData),
+                                    ),
+                                  ))
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -192,8 +228,9 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Row(
                             children: [
+                              //Add Beneficiary
                               Container(
-                                padding: EdgeInsets.all(10.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryLightColor,
@@ -223,15 +260,15 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(height: 5),
                                           Image.asset(
                                             'assets/icons/home_icons/claims.png',
-                                            width: 50,
-                                            height: 50,
+                                            width: 30,
+                                            height: 30,
                                             fit: BoxFit.cover,
                                           ),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Add Beneficiary',
                                             style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 color: Colors.black),
                                             // style: GoogleFonts.bebasNeue(fontSize: 72),
                                           ),
@@ -240,8 +277,9 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ),
+                              //Upload Documents
                               Container(
-                                padding: EdgeInsets.all(10.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryLightColor,
@@ -271,15 +309,15 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(height: 5),
                                           Image.asset(
                                             'assets/icons/home_icons/coverage.png',
-                                            width: 50,
-                                            height: 50,
+                                            width: 30,
+                                            height: 30,
                                             fit: BoxFit.cover,
                                           ),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Upload Documents',
                                             style: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 color: Colors.black),
                                             // style: GoogleFonts.bebasNeue(fontSize: 72),
                                           ),
@@ -290,15 +328,123 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-                          // Icon(Icons.info, size: 100, color: kPrimaryColor,),
-                          // SizedBox(height: 20),
-                          // Text(
-                          //   'There are no recent activities',
-                          //   style: TextStyle(
-                          //       fontSize: 15,
-                          //       color: Colors.black),
-                          //   // style: GoogleFonts.bebasNeue(fontSize: 72),
-                          // ),
+                          Row(
+                            children: [
+                              //Share Promo Code
+                              Container(
+                                padding: EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryLightColor,
+                                  ),
+                                  onPressed: () async {
+                                    await ApiService().shareApp();
+                                    setState(
+                                      () {
+                                        count++;
+                                      },
+                                    );
+                                  },
+                                  child: Center(
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const SizedBox(height: 5),
+                                          Image.asset(
+                                            'assets/icons/home_icons/payment.png',
+                                            width: 30,
+                                            height: 30,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          const SizedBox(height: 5),
+                                          const Text(
+                                            'Overdue Bonus',
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.black),
+                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                          ),
+                                          const SizedBox(height: 5),
+                                        ]),
+                                  ),
+                                ),
+                              ),
+                              //Default Claim
+                              Container(
+                                padding: EdgeInsets.all(8.0),
+                                child: (widget.buttonClaimStatus == false)
+                                    ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryLightColor,
+                                        ),
+                                        onPressed: null,
+                                        child: Center(
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(height: 5),
+                                                Image.asset(
+                                                  'assets/icons/home_icons/payment.png',
+                                                  width: 30,
+                                                  height: 30,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                const SizedBox(height: 5),
+                                                const Text(
+                                                  'Default Claims',
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.black),
+                                                  // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                                ),
+                                                const SizedBox(height: 5),
+                                              ]),
+                                        ),
+                                      )
+                                    : ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryLightColor,
+                                        ),
+                                        onPressed: () async {
+                                          await ApiService().claimDefault(
+                                              widget.userId,
+                                              widget.promotionCode);
+                                        },
+                                        child: Center(
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                const SizedBox(height: 5),
+                                                Image.asset(
+                                                  'assets/icons/home_icons/payment.png',
+                                                  width: 30,
+                                                  height: 30,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                const SizedBox(height: 5),
+                                                const Text(
+                                                  'Default Claims',
+                                                  style: TextStyle(
+                                                      fontSize: 10,
+                                                      color: Colors.black),
+                                                  // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                                ),
+                                                const SizedBox(height: 5),
+                                              ]),
+                                        ),
+                                      ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),

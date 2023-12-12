@@ -19,7 +19,7 @@ class LoginAndSignupBtn extends StatelessWidget {
       child: Column(
         
         children: [
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           Hero(
             tag: "login_btn",
             child: ElevatedButton(
@@ -32,7 +32,7 @@ class LoginAndSignupBtn extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return LoginScreen();
+                      return LoginScreen(promotionCode: '',);
                     },
                   ),
                 );

@@ -1,24 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:carousel_slider/carousel_options.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:one_million_app/components/coverage/coverage_select_page.dart';
-import 'package:one_million_app/components/coverage/coverage_select_subscription.dart';
-import 'package:one_million_app/components/coverage/data/coverage_data.dart';
-import 'package:one_million_app/components/coverage/model/coverage_model.dart';
+import 'package:one_million_app/common_ui.dart';
+import 'package:one_million_app/core/model/coverage_model.dart';
 import 'package:one_million_app/components/coverage/widget/scrollable_widget.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/calculator_model.dart';
-import 'package:one_million_app/core/model/notification_model.dart';
+
 import 'package:one_million_app/shared/constants.dart';
 
 class CoveragePage extends StatefulWidget {
@@ -27,13 +22,26 @@ class CoveragePage extends StatefulWidget {
   final String phone;
   final String email;
   final List<String> message;
+
+  final String nextPayment;
+  final num paymentAmount;
+  final String paymentPeriod;
+  final String policyNumber;
+  final num sumInsured;
+
   const CoveragePage(
       {Key? key,
       required this.userId,
       required this.userName,
       required this.phone,
       required this.email,
-      required this.message})
+      required this.message,
+      required this.nextPayment,
+      required this.paymentAmount,
+      required this.paymentPeriod,
+      required this.policyNumber,
+      required this.sumInsured
+      })
       : super(key: key);
 
   @override
@@ -43,7 +51,6 @@ class CoveragePage extends StatefulWidget {
 class _CoverageState extends State<CoveragePage> {
   List<String> _coverages = ['Benefits', 'Sum Insured'];
   List<String> _selectedItems = [];
-  List<String> _selectedItemsSubscription = [];
   List<dynamic> _selectedItemsValues = [];
   int? sortColumnIndex;
   bool isAscending = false;
@@ -66,6 +73,15 @@ class _CoverageState extends State<CoveragePage> {
 //premiumSelected
 
   num? _premiumSelected;
+
+  //Other Data
+  num? addStampDuty;
+  num? annualPremium;
+  num? basicPremium;
+  num? dailyPremium;
+  num? monthlyPremium;
+  num? totalPremium;
+  num? weeklyPremium;
 
   //Tableo
   //data rom back end
@@ -111,6 +127,13 @@ class _CoverageState extends State<CoveragePage> {
       obj.forEach((key, value) {
         _statusCode = obj["statusCode"];
         _statusMessage = obj["statusMessage"];
+        addStampDuty = obj["result"]["data"]["addStampDuty"];
+        annualPremium = obj["result"]["data"]["annualPremium"];
+        basicPremium = obj["result"]["data"]["basicPremium"];
+        dailyPremium = obj["result"]["data"]["dailyPremium"];
+        monthlyPremium = obj["result"]["data"]["monthlyPremium"];
+        totalPremium = obj["result"]["data"]["totalPremium"];
+        weeklyPremium = obj["result"]["data"]["weeklyPremium"];
         var objs = obj["result"]["data"];
 
         for (var item in objs) {
@@ -315,8 +338,7 @@ class _CoverageState extends State<CoveragePage> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor,
                         fixedSize: const Size(100, 40)),
-                    onPressed: () {},
-                    // onPressed: _showMultiPaymentSelect(context),
+                    onPressed: _showMultiPaymentSelect(context),
                     child: const Text('Submit'),
                   ),
                 ],
@@ -328,7 +350,7 @@ class _CoverageState extends State<CoveragePage> {
     );
   }
 
-  void _showMultiPaymentSelect(BuildContext context) async {
+  _showMultiPaymentSelect(BuildContext context) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -399,40 +421,77 @@ class _CoverageState extends State<CoveragePage> {
                           }).toList()),
                     ),
                     SizedBox(
-                      height: 45.0,
-                      width: 200,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                            fixedSize: const Size(200, 40)),
-                        onPressed: () async {
-                          await ApiService().postCoverageSelection(
-                            widget.userId,
-                            _currentSumInsuredValue,
-                            _currentSubcriptionValue,
-                            _premiumSelected,
-                          );
+                        height: 45.0,
+                        width: 200,
+                        child: (dropdownValue == "MPESA")
+                            ? ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryColor,
+                                    fixedSize: const Size(200, 40)),
+                                onPressed: () async {
+                                  await ApiService().mpesaPayment(
+                                      _premiumSelected,
+                                      widget.userId,
+                                      widget.phone);
+                                  await ApiService().postCoverageSelection(
+                                    widget.userId,
+                                    _currentSumInsuredValue,
+                                    _currentSubcriptionValue,
+                                    _premiumSelected,
+                                  );
 
-                          final snackBar = SnackBar(
-                            content: Text(_statusMessage),
-                            action: SnackBarAction(
-                              label: 'Undo',
-                              onPressed: () {
-                                // Some code to undo the change.
-                              },
-                            ),
-                          );
+                                  final snackBar = SnackBar(
+                                    content: Text(_statusMessage),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        // Some code to undo the change.
+                                      },
+                                    ),
+                                  );
 
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        },
-                        child: const Text(
-                          "Submit",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                          ),
-                        ),
-                      ),
-                    ),
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                },
+                                child: const Text(
+                                  "Submit",
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                              )
+                            : ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryColor,
+                                    fixedSize: const Size(200, 40)),
+                                onPressed: () async {
+                                  await ApiService().postCoverageSelection(
+                                    widget.userId,
+                                    _currentSumInsuredValue,
+                                    _currentSubcriptionValue,
+                                    _premiumSelected,
+                                  );
+
+                                  final snackBar = SnackBar(
+                                    content: Text(_statusMessage),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        // Some code to undo the change.
+                                      },
+                                    ),
+                                  );
+
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
+                                },
+                                child: const Text(
+                                  "Submit",
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                              )),
                   ])),
             ),
           ),
@@ -617,119 +676,251 @@ class _CoverageState extends State<CoveragePage> {
                     )
                   : Column(
                       children: [
+                        // Container(
+                        //   child: SingleChildScrollView(
+                        //     child: Column(
+                        //       children: [
+                        //         const SizedBox(height: 10),
+                        //         CarouselSlider(
+                        //           items: [
+                        //             //1st Image of Slider
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_one.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_two.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_three.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_four.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_five.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //             Card(
+                        //               child: Container(
+                        //                 decoration: BoxDecoration(
+                        //                   borderRadius:
+                        //                       BorderRadius.circular(12.0),
+                        //                   color: kPrimaryWhiteColor,
+                        //                 ),
+                        //                 child: Image.asset(
+                        //                   'assets/images/adverts/slide_six.jpg',
+                        //                   fit: BoxFit.cover,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ],
+
+                        //           //Slider Container properties
+                        //           options: CarouselOptions(
+                        //               height: 200,
+                        //               enlargeCenterPage: true,
+                        //               autoPlay: true,
+                        //               aspectRatio: 16 / 9,
+                        //               autoPlayCurve: Curves.fastOutSlowIn,
+                        //               enableInfiniteScroll: true,
+                        //               autoPlayAnimationDuration:
+                        //                   Duration(milliseconds: 800),
+                        //               viewportFraction: 0.8,
+                        //               onPageChanged: (index, reason) {}),
+                        //         ),
+                        //         // DotsIndicator(
+                        //         //   dotsCount: contents.length,
+                        //         //   position: _current.toInt(),
+                        //         //   decorator: DotsDecorator(
+                        //         //     shape: const Border(),
+                        //         //     activeShape:
+                        //         //         RoundedRectangleBorder(
+                        //         //           borderRadius: BorderRadius.circular(35.0),),
+                        //         //         color: kPrimaryColor,
+                        //         //     size: Size(10, 10),
+                        //         //   ),
+                        //         // )
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+
                         Container(
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 const SizedBox(height: 10),
-                                CarouselSlider(
-                                  items: [
-                                    //1st Image of Slider
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_one.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
+                                Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Card(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        color: kPrimaryWhiteColor,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Next Payment: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                widget.nextPayment,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Payment Amount: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (widget.paymentAmount)
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Payment Period: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                widget.paymentPeriod,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Policy Number: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                widget.policyNumber,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Sum Insured: ',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (widget.sumInsured).toString(),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_two.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_three.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_four.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_five.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          color: kPrimaryWhiteColor,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/adverts/slide_six.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-
-                                  //Slider Container properties
-                                  options: CarouselOptions(
-                                      height: 200,
-                                      enlargeCenterPage: true,
-                                      autoPlay: true,
-                                      aspectRatio: 16 / 9,
-                                      autoPlayCurve: Curves.fastOutSlowIn,
-                                      enableInfiniteScroll: true,
-                                      autoPlayAnimationDuration:
-                                          Duration(milliseconds: 800),
-                                      viewportFraction: 0.8,
-                                      onPageChanged: (index, reason) {}),
-                                ),
-                                // DotsIndicator(
-                                //   dotsCount: contents.length,
-                                //   position: _current.toInt(),
-                                //   decorator: DotsDecorator(
-                                //     shape: const Border(),
-                                //     activeShape:
-                                //         RoundedRectangleBorder(
-                                //           borderRadius: BorderRadius.circular(35.0),),
-                                //         color: kPrimaryColor,
-                                //     size: Size(10, 10),
-                                //   ),
-                                // )
+                                  ),
+                                )
                               ],
                             ),
                           ),
@@ -739,7 +930,138 @@ class _CoverageState extends State<CoveragePage> {
                             elevation: 10,
                             shadowColor: Colors.black,
                             color: kPrimaryWhiteColor,
-                            child: ScrollableWidget(child: buildDataTable())),
+                            child: ScrollableWidget(
+                                child: Column(
+                              children: [
+                                buildDataTable(),
+                                const SizedBox(height: 20),
+                                Column(
+                                  children: [
+                                    Column(
+                                      children: [
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Annual Premium: ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (annualPremium).toString(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.normal,
+                                                    fontStyle: FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Basic Premium: ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (basicPremium).toString(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.normal,
+                                                    fontStyle: FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                            height: 10,
+                                          ),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'Daily Premium: ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              (dailyPremium).toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontStyle: FontStyle.italic),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'Monthly Premium: ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              (monthlyPremium).toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontStyle: FontStyle.italic),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'Weekly Premium: ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              (weeklyPremium).toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontStyle: FontStyle.italic),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text(
+                                              'Total Premium: ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              (totalPremium).toString(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.normal,
+                                                  fontStyle: FontStyle.italic),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ))),
                       ],
                     ),
             ],
@@ -803,10 +1125,7 @@ class _CoverageState extends State<CoveragePage> {
       .toList();
   List<DataRow> _createRows(List<Coverage> coverage) =>
       coverage.map((Coverage coverage) {
-        final cellbenefits = [
-          coverage.name,
-          coverage.sumInsured
-        ];
+        final cellbenefits = [coverage.name, coverage.sumInsured];
         final cells = new List.from(cellbenefits)..addAll(_selectedItemsValues);
 
         return DataRow(

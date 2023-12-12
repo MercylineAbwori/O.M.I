@@ -1,12 +1,19 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/claims/claims_home_page_screen.dart';
 import 'package:one_million_app/components/coverage/coverage_screen.dart';
-import 'package:one_million_app/components/coverage/coverage_screen_page.dart';
 import 'package:one_million_app/components/profile/profile.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/claim_list_model.dart';
+import 'package:one_million_app/core/model/policy_details.dart';
 import 'package:one_million_app/home.dart';
 import 'package:titled_navigation_bar/titled_navigation_bar.dart';
+import 'package:http/http.dart' as http;
 
 class CommonUIPage extends StatefulWidget {
+
   final num userId;
   final String name;
   final String msisdn;
@@ -14,17 +21,41 @@ class CommonUIPage extends StatefulWidget {
 
   final List<String> message;
 
-  CommonUIPage({
-    Key? key,
-    required this.userId,
-    required this.name,
-    required this.msisdn,
-    required this.email,
-    required this.message
-  }) : super(key: key);
+  final String uptoDatePaymentData;
+
+  final String promotionCode;
+
+  final bool buttonClaimStatus;
+
+    //Policy Details
+
+  final String nextPayment;
+  final num paymentAmount;
+  final String paymentPeriod;
+  final String policyNumber;
+  final num sumInsured;
+
+  CommonUIPage(
+      {Key? key,
+      required this.userId,
+      required this.name,
+      required this.msisdn,
+      required this.email,
+      required this.message,
+      required this.uptoDatePaymentData,
+      required this.promotionCode,
+      required this.buttonClaimStatus,
+      required this.nextPayment,
+      required this.paymentAmount,
+      required this.paymentPeriod,
+      required this.policyNumber,
+      required this.sumInsured
+      })
+      : super(key: key);
   @override
   _CommonUIPageState createState() => _CommonUIPageState();
 }
+
 
 class _CommonUIPageState extends State<CommonUIPage> {
   int _selectedIndex = 0;
@@ -33,52 +64,68 @@ class _CommonUIPageState extends State<CommonUIPage> {
     switch (pos) {
       case 0:
         return HomePage(
-          userName: widget.name,
-          userId: widget.userId,
-          phone: widget.msisdn,
-          email: widget.email,
-          message: widget.message
-        );
+            userName: widget.name,
+            userId: widget.userId,
+            phone: widget.msisdn,
+            email: widget.email,
+            message: widget.message,
+            uptoDatePaymentData: widget.uptoDatePaymentData,
+            promotionCode: widget.promotionCode,
+            buttonClaimStatus: widget.buttonClaimStatus);
       case 1:
         return CoveragePage(
           userName: widget.name,
           userId: widget.userId,
           phone: widget.msisdn,
           email: widget.email,
-          message: widget.message
+          message: widget.message,
+          nextPayment: widget.nextPayment,
+          paymentAmount: widget.paymentAmount,
+          paymentPeriod: widget.paymentPeriod,
+          policyNumber: widget.policyNumber,
+          sumInsured: widget.sumInsured,
         );
       case 2:
         return ClaimHomePage(
-          userName: widget.name,
-          userId: widget.userId,
-          phone: widget.msisdn,
-          email: widget.email,
-          message: widget.message
-        );
+            userName: widget.name,
+            userId: widget.userId,
+            phone: widget.msisdn,
+            email: widget.email,
+            message: widget.message);
       case 3:
         return ProfileScreen(
-          userName: widget.name,
-          userId: widget.userId,
-          phone: widget.msisdn,
-          email: widget.email,
-          message: widget.message
-        );
+            userName: widget.name,
+            userId: widget.userId,
+            phone: widget.msisdn,
+            email: widget.email,
+            message: widget.message);
 
       default:
         HomePage(
-          userName: widget.name,
-          userId: widget.userId,
-          phone: widget.msisdn,
-          email: widget.email,
-          message: widget.message,
-        );
+            userName: widget.name,
+            userId: widget.userId,
+            phone: widget.msisdn,
+            email: widget.email,
+            message: widget.message,
+            uptoDatePaymentData: widget.uptoDatePaymentData,
+            promotionCode: widget.promotionCode,
+            buttonClaimStatus: widget.buttonClaimStatus);
     }
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
+  void _onItemTapped(int index) async {
+
+    
+    setState(()  {
       _selectedIndex = index;
     });
+    // if(_selectedIndex == 1){
+    //   await getPolicyDetails(widget.userId);
+    // }else if(_selectedIndex == 2){
+    //   await getClaimList(widget.userId);
+    // }
+    // await getPolicyDetails(widget.userId);
+    // await getClaimList(widget.userId);
   }
 
   @override

@@ -6,7 +6,33 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-Future<File> generatePDF() async {
+Future<File> generatePDF(
+  final String nameInsuredController,
+  final String nameClaimantController,
+  final String postalAddressController,
+  final String postalCodeController,
+  final String emailController,
+  final String occupationController,
+  final String dateOfBirthInputController,
+  final String dateOfLastPremiumInputController,
+  final String agencyController,
+  final String policyNoController,
+  final String agencyPhoneNoController,
+  final String agencyEmailController,
+
+
+  final String textarea,
+  final String dateOfAccidentPremiumInputController,
+  final String locationOfAccidentController,
+  final String witnessOccupationController,
+  final String witnessTelephoneController,
+  final String witnessNameController,
+  final String witnessAddressController,
+
+  
+  final String claimantFullNameController,
+  final String claimantOccupationController
+) async {
   final pdf = pw.Document();
 
   final img = await rootBundle.load('assets/images.png');
@@ -84,7 +110,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          nameClaimantController,
                         ),
                     )
                   ),
@@ -103,7 +129,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          nameClaimantController,
                         ),
                     )
                   ),
@@ -127,7 +153,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          postalAddressController,
                         ),
                     )
                   ),
@@ -146,7 +172,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          postalCodeController,
                         ),
                     )
                   ),
@@ -170,7 +196,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          dateOfBirthInputController,
                         ),
                     )
                   ),
@@ -189,7 +215,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                         occupationController,
                         ),
                     )
                   ),
@@ -213,7 +239,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          emailController,
                         ),
                     )
                   ),
@@ -232,7 +258,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          dateOfLastPremiumInputController,
                         ),
                     )
                   ),
@@ -273,7 +299,7 @@ Future<File> generatePDF() async {
                       child: pw.Padding(
                       padding: pw.EdgeInsets.all(10),
                       child: pw.Text(
-                            "{Name of Isured}",
+                            agencyController,
                           ),
                       )
                     ),
@@ -295,7 +321,7 @@ Future<File> generatePDF() async {
                       child: pw.Padding(
                       padding: pw.EdgeInsets.all(10),
                       child: pw.Text(
-                            "{Name of Isured}",
+                            policyNoController,
                           ),
                       )
                     ),
@@ -322,7 +348,7 @@ Future<File> generatePDF() async {
                       child: pw.Padding(
                       padding: pw.EdgeInsets.all(10),
                       child: pw.Text(
-                            "{Name of Isured}",
+                            agencyPhoneNoController,
                           ),
                       )
                     ),
@@ -344,7 +370,7 @@ Future<File> generatePDF() async {
                       child: pw.Padding(
                       padding: pw.EdgeInsets.all(10),
                       child: pw.Text(
-                            "{Name of Isured}",
+                            agencyEmailController,
                           ),
                       )
                     ),
@@ -390,7 +416,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              dateOfAccidentPremiumInputController,
                             ),
                         )
                       ),
@@ -412,7 +438,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              locationOfAccidentController,
                             ),
                         )
                       ),
@@ -445,7 +471,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              witnessNameController,
                             ),
                         )
                       ),
@@ -467,7 +493,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              witnessOccupationController,
                             ),
                         )
                       ),
@@ -494,7 +520,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              witnessTelephoneController,
                             ),
                         )
                       ),
@@ -516,7 +542,7 @@ Future<File> generatePDF() async {
                         child: pw.Padding(
                         padding: pw.EdgeInsets.all(10),
                         child: pw.Text(
-                              "{Name of Isured}",
+                              witnessAddressController,
                             ),
                         )
                       ),
@@ -556,7 +582,7 @@ Future<File> generatePDF() async {
                     child: pw.Padding(
                     padding: pw.EdgeInsets.all(10),
                     child: pw.Text(
-                          "{Name of Isured}",
+                          textarea,
                           maxLines: 8,
                         ),
                     )

@@ -1,9 +1,10 @@
 
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_form.dart';
-import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
 import 'package:one_million_app/components/claims/claim_select_page.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
@@ -28,6 +29,82 @@ class ClaimHomePage extends StatefulWidget {
 }
 
 class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProviderStateMixin {
+
+  GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
+
+  List<File> selectedImages = [];
+    // final picker = ImagePicker();
+
+    // FilePickerResult? resultMedicalReport;
+
+    // FilePickerResult? resultMedicalCertificate;
+    // FilePickerResult? resultProofOfEarning;
+    // FilePickerResult? resultDeathCertificate;
+
+    // FilePickerResult? resultPostMortem;
+    // FilePickerResult? resultProofOfFuneralExpences;
+
+    // FilePickerResult? resultSickSheet;
+
+    // FilePickerResult? resultPostMortem;
+    // FilePickerResult? resultProofOfFuneralExpences;
+    // FilePickerResult? resultMedicalReport;
+    // FilePickerResult? resultSickSheet;
+    // FilePickerResult? resultPoliceAbstruct;
+
+    // FilePickerResult? resultMedicalCertificate;
+    // FilePickerResult? resultProofOfEarning;
+    // FilePickerResult? resultDeathCertificate;
+  String initialCountry = 'KE';
+
+  TextEditingController nameInsuredController = TextEditingController();
+  TextEditingController nameClaimantController = TextEditingController();
+  TextEditingController postalAddressController = TextEditingController();
+  TextEditingController postalCodeController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController occupationController = TextEditingController();
+  TextEditingController dateOfBirthInputController = TextEditingController();
+  TextEditingController dateOfLastPremiumInputController = TextEditingController();
+  TextEditingController agencyController = TextEditingController();
+  TextEditingController policyNoController = TextEditingController();
+  TextEditingController agencyPhoneNoController = TextEditingController();
+  TextEditingController agencyEmailController = TextEditingController();
+
+
+  TextEditingController textarea = TextEditingController();
+  TextEditingController dateOfAccidentPremiumInputController = TextEditingController();
+  TextEditingController locationOfAccidentController = TextEditingController();
+  TextEditingController witnessOccupationController = TextEditingController();
+  TextEditingController witnessTelephoneController = TextEditingController();
+  TextEditingController witnessNameController = TextEditingController();
+  TextEditingController witnessAddressController = TextEditingController();
+
+  
+  TextEditingController claimantFullNameController = TextEditingController();
+  TextEditingController claimantOccupationController = TextEditingController();
+  
+  FocusNode claimantFullNameNode = FocusNode();
+  FocusNode claimantOccupationNode = FocusNode();
+  FocusNode nameInsuredNode = FocusNode();
+  FocusNode nameClaimantNode = FocusNode();
+  FocusNode postalAddressNode = FocusNode();
+  FocusNode postalCodeNode = FocusNode();
+  FocusNode emailNode = FocusNode();
+  FocusNode occupationNode = FocusNode();
+  FocusNode dateOfBirthInputNode = FocusNode();
+  FocusNode dateOfLastPremiumInputNode = FocusNode();
+  FocusNode agencyNode = FocusNode();
+  FocusNode policyNoNode = FocusNode();
+  FocusNode agencyPhoneNoNode = FocusNode();
+  FocusNode agencyEmailNode = FocusNode();
+  FocusNode dateOfAccidentPremiumInputControllerNode = FocusNode();
+  FocusNode locationOfAccidentNode = FocusNode();
+  FocusNode witnessOccupationNode = FocusNode();
+  FocusNode witnessTelephoneNode = FocusNode();
+  FocusNode witnessNameNode = FocusNode();
+  FocusNode witnessAddressNode = FocusNode();
+
+  // final picker = ImagePicker();
   
 
     // padding constants
@@ -109,7 +186,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
             child: IconButton(
               iconSize: 100,
               icon: Ink.image(
-                  image:  AssetImage('assets/icons/profile_icons/profile.jpg'),
+                  image:  const AssetImage('assets/icons/profile_icons/profile.jpg'),
               ),
               // the method which is called
               // when button is pressed
@@ -179,7 +256,7 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Text(
+                    child: const Text(
                       "Claim",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -203,13 +280,13 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
         
         (_elements.isEmpty)
                   ? Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Card(
                         elevation: 5,
                         shadowColor: Colors.black,
                         child: Center(
                           child: Padding(
-                            padding: EdgeInsets.all(40.0),
+                            padding: const EdgeInsets.all(40.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -366,14 +443,5 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
       },
 
     );
-
-    
-
-    
-
   }
-
-  
-  
-
 }

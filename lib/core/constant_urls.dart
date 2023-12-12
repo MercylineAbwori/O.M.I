@@ -11,4 +11,10 @@ class ApiConstants {
   static String notificationEndpoint = '/notification';
   static String beneficiaryEndpoint = '/beneficiary';
   static String uploadDocumentEndpoint = '/uploadDocument';
+  static String mpesaPaymentEndpoint = '/lipa-na-mpesa';
+  static String uptoDatePaymentEndpoint = '/upto-date-payment';
+  static String promotionCodeEndpoint = '/promotionCode';
+  static String policyDetailsEndpoint = '/policyDetails';
+  static String defaultPolicyPayEndpoint = '/defaultPolicyPay';
+  static String claimDefaultEndpoint = '/claimDefault';
 }

@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:one_million_app/common_ui.dart';
-import 'package:one_million_app/components/coverage/coverage_screen_page.dart';
 import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
 
 class MyHomePage extends StatefulWidget { 

@@ -47,6 +47,7 @@ class _SignUpFormState extends State<SignUpForm> {
   TextEditingController passwordontroller = TextEditingController();
   TextEditingController passwordConfirmController = TextEditingController();
   TextEditingController dateOfBirthController = TextEditingController();
+  TextEditingController promotionCodeController = TextEditingController();
 
   String initialCountry = 'KE';
 
@@ -57,12 +58,11 @@ class _SignUpFormState extends State<SignUpForm> {
   FocusNode passwordNode = FocusNode();
   FocusNode passwordConfirmNode = FocusNode();
   FocusNode dateOfBirthNode = FocusNode();
+  FocusNode promotionCodeNode = FocusNode();
 
   String? dropdownValue;
 
   String? phoneNo;
-
-  
 
   late String _statusMessage;
   num? _statusCode;
@@ -71,9 +71,7 @@ class _SignUpFormState extends State<SignUpForm> {
   late num _otp;
   late String _msisdn;
 
-
-
-
+  late String promotionCode;
 
   Future<List<UserRegistrationModal>?> addUsers(
       nameController,
@@ -100,21 +98,20 @@ class _SignUpFormState extends State<SignUpForm> {
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-          _userId = obj["result"]["data"]["userId"];
-          _msisdn = obj["result"]["data"]["msisdn"];
-        });
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+        _userId = obj["result"]["data"]["userId"];
+        _msisdn = obj["result"]["data"]["msisdn"];
+        promotionCode = obj["result"]["data"]["promotionCode"];
+      });
 
       if (response.statusCode == 200) {
-
-          await sendOTP(_msisdn);
+        await sendOTP(_msisdn);
       } else {
         throw Exception('Unexpected error occured!');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -124,13 +121,9 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-  Future<List<UserRegistrationModal>?> sendOTP(
-    _msisdn
-  ) async {
+  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
     try {
-
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "msisdn": _msisdn,
@@ -138,24 +131,21 @@ class _SignUpFormState extends State<SignUpForm> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-          _otp = obj["result"]["data"]["otpId"];
-        });
+
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+        _otp = obj["result"]["data"]["otpId"];
+      });
 
       // // print('Responce Status Code : ' + response.statusCode);
 
       if (response.statusCode == 200) {
-        
-       await sendOTPVerify(_userId,_otp); 
+        await sendOTPVerify(_userId, _otp);
       } else {
         throw Exception('Unexpected error occured!');
       }
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -166,11 +156,9 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
-    _userId,_otp
-  ) async {
+      _userId, _otp) async {
     try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "userId": _userId,
@@ -179,15 +167,11 @@ class _SignUpFormState extends State<SignUpForm> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      
-
-
       if (response.statusCode == 200) {
         throw Exception('OTP verified successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -196,8 +180,6 @@ class _SignUpFormState extends State<SignUpForm> {
       log(e.toString());
     }
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -208,341 +190,354 @@ class _SignUpFormState extends State<SignUpForm> {
         child: Consumer<UserModal>(
           builder: (context, modal, child) {
             return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Form(
-                      key: basicFormKey,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: TextFormField(
-                              keyboardType: TextInputType.text,
-                              textInputAction: TextInputAction.next,
-                              cursorColor: kPrimaryColor,
-                              controller: nameController,
-                              focusNode: nameNode,
-                              onSaved: (name) {},
-                              decoration: InputDecoration(
-                                labelText: "Your Name",
-                                labelStyle: TextStyle(
-                                    color: nameNode.hasFocus
-                                        ? kPrimaryColor
-                                        : Colors.grey),
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(defaultPadding),
-                                  child:
-                                      Icon(Icons.person, color: kPrimaryColor),
-                                ),
-                                border: myinputborder(),
-                                enabledBorder: myinputborder(),
-                                focusedBorder: myfocusborder(),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: basicFormKey,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: TextFormField(
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          cursorColor: kPrimaryColor,
+                          controller: nameController,
+                          focusNode: nameNode,
+                          onSaved: (name) {},
+                          decoration: InputDecoration(
+                            labelText: "Your Name",
+                            labelStyle: TextStyle(
+                                color: nameNode.hasFocus
+                                    ? kPrimaryColor
+                                    : Colors.grey),
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(Icons.person, color: kPrimaryColor),
+                            ),
+                            border: myinputborder(),
+                            enabledBorder: myinputborder(),
+                            focusedBorder: myfocusborder(),
+                          ),
+                          validator: RequiredValidator(
+                            errorText: "Required *",
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: kPrimaryColor,
+                            controller: emailController,
+                            focusNode: emailNode,
+                            onSaved: (email) {},
+                            decoration: InputDecoration(
+                              labelText: "Your email",
+                              labelStyle: TextStyle(
+                                  color: emailNode.hasFocus
+                                      ? kPrimaryColor
+                                      : Colors.grey),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(Icons.mail, color: kPrimaryColor),
                               ),
-                              validator: RequiredValidator(
+                              border: myinputborder(),
+                              enabledBorder: myinputborder(),
+                              focusedBorder: myfocusborder(),
+                            ),
+                            validator: MultiValidator([
+                              RequiredValidator(
                                 errorText: "Required *",
                               ),
+                              EmailValidator(
+                                errorText: "Not Valid Email",
+                              ),
+                            ])),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: IntlPhoneField(
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          cursorColor: kPrimaryColor,
+                          controller: phoneController,
+                          onSaved: (phone) {},
+                          focusNode: phoneNode,
+                          decoration: InputDecoration(
+                            labelText: 'Phone Number',
+                            labelStyle: TextStyle(
+                                color: phoneNode.hasFocus
+                                    ? kPrimaryColor
+                                    : Colors.grey),
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(
+                                Icons.phone,
+                                color: kPrimaryColor,
+                              ),
                             ),
+                            border: myinputborder(),
+                            enabledBorder: myinputborder(),
+                            focusedBorder: myfocusborder(),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: TextFormField(
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                                cursorColor: kPrimaryColor,
-                                controller: emailController,
-                                focusNode: emailNode,
-                                onSaved: (email) {},
-                                decoration: InputDecoration(
-                                  labelText: "Your email",
-                                  labelStyle: TextStyle(
-                                      color: emailNode.hasFocus
-                                          ? kPrimaryColor
-                                          : Colors.grey),
-                                  prefixIcon: const Padding(
-                                    padding: EdgeInsets.all(defaultPadding),
-                                    child:
-                                        Icon(Icons.mail, color: kPrimaryColor),
-                                  ),
-                                  border: myinputborder(),
-                                  enabledBorder: myinputborder(),
-                                  focusedBorder: myfocusborder(),
+                          initialCountryCode: 'KE',
+                          onChanged: (phone) {
+                            phoneNo = phone.completeNumber;
+                            print(phoneController);
+                          },
+                          validator: (value) {
+                            //allow upper and lower case alphabets and space
+                            return "Enter your phone number should not start with a 0";
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: TextFormField(
+                          focusNode: dateOfBirthNode,
+                          decoration: InputDecoration(
+                            labelText: 'Date of Birth',
+                            border: myinputborder(),
+                            enabledBorder: myinputborder(),
+                            focusedBorder: myfocusborder(),
+                          ),
+                          controller: dateOfBirthController,
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1950),
+                                lastDate: DateTime(2050));
+
+                            if (pickedDate != null) {
+                              dateOfBirthController.text =
+                                  DateFormat("yyyy-MM-dd HH:mm:ss")
+                                      .format(pickedDate);
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: DropdownButtonFormField<String>(
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                            ),
+                            hint: const Text(
+                              'Gender',
+                              style: TextStyle(fontSize: 17),
+                            ),
+                            value: dropdownValue,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownValue = newValue!;
+                              });
+                            },
+                            validator: (value) =>
+                                value == null ? 'field required' : null,
+                            items: <String>['female', 'male']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      value,
+                                    ),
+                                  ],
                                 ),
-                                validator: MultiValidator([
-                                  RequiredValidator(
-                                    errorText: "Required *",
-                                  ),
-                                  EmailValidator(
-                                    errorText: "Not Valid Email",
-                                  ),
-                                ])),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: IntlPhoneField(
-                              keyboardType: TextInputType.phone,
-                              textInputAction: TextInputAction.next,
+                              );
+                            }).toList()),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              textInputAction: TextInputAction.done,
+                              obscureText: true,
                               cursorColor: kPrimaryColor,
-                              controller: phoneController,
-                              onSaved: (phone) {},
-                              focusNode: phoneNode,
+                              controller: passwordontroller,
+                              focusNode: passwordNode,
                               decoration: InputDecoration(
-                                labelText: 'Phone Number',
+                                labelText: "Your password",
                                 labelStyle: TextStyle(
-                                    color: phoneNode.hasFocus
+                                    color: passwordNode.hasFocus
                                         ? kPrimaryColor
                                         : Colors.grey),
                                 prefixIcon: const Padding(
                                   padding: EdgeInsets.all(defaultPadding),
-                                  child: Icon(
-                                    Icons.phone,
-                                    color: kPrimaryColor,
-                                  ),
+                                  child: Icon(Icons.lock, color: kPrimaryColor),
                                 ),
                                 border: myinputborder(),
                                 enabledBorder: myinputborder(),
                                 focusedBorder: myfocusborder(),
                               ),
-                              initialCountryCode: 'KE',
-                              onChanged: (phone) {
-                                phoneNo = phone.completeNumber;
-                                print(phoneController);
-                              },
-                              validator: (value) {
-                                //allow upper and lower case alphabets and space
-                                return "Enter your phone number should not start with a 0";
-                              },
+                              validator: MinLengthValidator(
+                                6,
+                                errorText: "Min 6 characters required",
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: TextFormField(
-                              focusNode: dateOfBirthNode,
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            TextFormField(
+                              textInputAction: TextInputAction.done,
+                              obscureText: true,
+                              cursorColor: kPrimaryColor,
+                              controller: passwordConfirmController,
+                              focusNode: passwordConfirmNode,
                               decoration: InputDecoration(
-                                labelText: 'Date of Birth',
+                                labelText: "Confirm password",
+                                labelStyle: TextStyle(
+                                    color: passwordConfirmNode.hasFocus
+                                        ? kPrimaryColor
+                                        : Colors.grey),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.all(defaultPadding),
+                                  child: Icon(Icons.lock, color: kPrimaryColor),
+                                ),
                                 border: myinputborder(),
                                 enabledBorder: myinputborder(),
                                 focusedBorder: myfocusborder(),
                               ),
-                              controller: dateOfBirthController,
-                              readOnly: true,
-                              onTap: () async {
-                                DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime(1950),
-                                    lastDate: DateTime(2050));
+                              // validator: MinLengthValidator(
+                              //   6, errorText: "Min 6 characters required",
+                              // ),
+                              // validator: (value) {
+                              //   if (passwordontroller !=
+                              //       passwordConfirmController) {
+                              //     return 'The password does not match';
+                              //   }
+                              //   MinLengthValidator(
+                              //     6,
+                              //     errorText: "Min 6 characters required",
+                              //   );
+                              // },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: defaultPadding / 2,
+                      ),
+                      SizedBox(
+                        height: 40.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor,
+                              fixedSize: const Size(200, 40)),
+                          onPressed: () async {
+                            await addUsers(
+                                nameController.text,
+                                emailController.text,
+                                phoneNo,
+                                dateOfBirthController.text,
+                                dropdownValue,
+                                passwordConfirmController.text,
+                                passwordontroller.text);
 
-                                if (pickedDate != null) {
-                                  dateOfBirthController.text =
-                                      DateFormat("yyyy-MM-dd HH:mm:ss")
-                                          .format(pickedDate);
-                                }
+                            (_statusCode == 5000)
+                                ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return LoginScreen(promotionCode: promotionCode);
+                                      },
+                                    ),
+                                  )
+                                : Navigator.pop(context);
+                            setState(
+                              () {},
+                            );
+
+                            final snackBar = SnackBar(
+                              content: Text(_statusMessage),
+                              action: SnackBarAction(
+                                label: 'Undo',
+                                onPressed: () {
+                                  // Some code to undo the change.
+                                },
+                              ),
+                            );
+
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          },
+                          child: const Text(
+                            "Next",
+                            style: TextStyle(
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: TextFormField(
+                          keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: kPrimaryColor,
+                            controller: promotionCodeController,
+                            focusNode: promotionCodeNode,
+                            onSaved: (email) {},
+                            decoration: InputDecoration(
+                              labelText: "Your Promo Code",
+                              labelStyle: TextStyle(
+                                  color: emailNode.hasFocus
+                                      ? kPrimaryColor
+                                      : Colors.grey),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(Icons.mail, color: kPrimaryColor),
+                              ),
+                              border: myinputborder(),
+                              enabledBorder: myinputborder(),
+                              focusedBorder: myfocusborder(),
+                            ),
+                          
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      AlreadyHaveAnAccountCheck(
+                        login: false,
+                        press: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return LoginScreen(promotionCode: promotionCode,);
                               },
                             ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                hint: const Text(
-                                  'Gender',
-                                  style: TextStyle(fontSize: 17),
-                                ),
-                                value: dropdownValue,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
-                                },
-                                validator: (value) =>
-                                    value == null ? 'field required' : null,
-                                items: <String>[
-                                  'female',
-                                  'male'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          value,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList()),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: defaultPadding),
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  textInputAction: TextInputAction.done,
-                                  obscureText: true,
-                                  cursorColor: kPrimaryColor,
-                                  controller: passwordontroller,
-                                  focusNode: passwordNode,
-                                  decoration: InputDecoration(
-                                    labelText: "Your password",
-                                    labelStyle: TextStyle(
-                                        color: passwordNode.hasFocus
-                                            ? kPrimaryColor
-                                            : Colors.grey),
-                                    prefixIcon: const Padding(
-                                      padding: EdgeInsets.all(defaultPadding),
-                                      child: Icon(Icons.lock,
-                                          color: kPrimaryColor),
-                                    ),
-                                    border: myinputborder(),
-                                    enabledBorder: myinputborder(),
-                                    focusedBorder: myfocusborder(),
-                                  ),
-
-                                  validator: MinLengthValidator(
-                                    6,
-                                    errorText: "Min 6 characters required",
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                TextFormField(
-                                  textInputAction: TextInputAction.done,
-                                  obscureText: true,
-                                  cursorColor: kPrimaryColor,
-                                  controller: passwordConfirmController,
-                                  focusNode: passwordConfirmNode,
-                                  decoration: InputDecoration(
-                                    labelText: "Confirm password",
-                                    labelStyle: TextStyle(
-                                        color: passwordConfirmNode.hasFocus
-                                            ? kPrimaryColor
-                                            : Colors.grey),
-                                    prefixIcon: const Padding(
-                                      padding: EdgeInsets.all(defaultPadding),
-                                      child: Icon(Icons.lock,
-                                          color: kPrimaryColor),
-                                    ),
-                                    border: myinputborder(),
-                                    enabledBorder: myinputborder(),
-                                    focusedBorder: myfocusborder(),
-                                  ),
-                                  // validator: MinLengthValidator(
-                                  //   6, errorText: "Min 6 characters required",
-                                  // ),
-                                  // validator: (value) {
-                                  //   if (passwordontroller !=
-                                  //       passwordConfirmController) {
-                                  //     return 'The password does not match';
-                                  //   }
-                                  //   MinLengthValidator(
-                                  //     6,
-                                  //     errorText: "Min 6 characters required",
-                                  //   );
-                                  // },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding / 2,
-                          ),
-                          SizedBox(
-                            height: 40.0,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPrimaryColor,
-                                  fixedSize: const Size(200, 40)),
-                              onPressed: () async {
-                                  
-                                  await addUsers(
-                                    nameController.text,
-                                            emailController.text,
-                                            phoneNo,
-                                            dateOfBirthController.text,
-                                            dropdownValue,
-                                            passwordConfirmController.text,
-                                            passwordontroller.text
-                                      );
-
-                                    (_statusCode == 5000)
-                                        ? Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) {
-                                                return const LoginScreen();
-                                              },
-                                            ),
-                                          )
-
-                                          
-                                        : Navigator.pop(context);
-                                    setState(
-                                      () {},
-                                    );
-
-                                    final snackBar = SnackBar(
-                                      content: Text(_statusMessage),
-                                      action: SnackBarAction(
-                                        label: 'Undo',
-                                        onPressed: () {
-                                          // Some code to undo the change.
-                                        },
-                                      ),
-                                    );
-
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                                  
-                                  },
-                              child: const Text(
-                                "Next",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: defaultPadding / 2,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AlreadyHaveAnAccountCheck(
-                            login: false,
-                            press: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const LoginScreen();
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
+                    ],
                   ),
-                );
-            
-            
+                ),
+              ),
+            );
           },
         ),
       ),
@@ -566,7 +561,6 @@ class _SignUpFormState extends State<SignUpForm> {
         ));
   }
 }
-
 
 Widget CustomButton(
     {required String title,
