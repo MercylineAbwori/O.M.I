@@ -436,6 +436,36 @@ class _SignUpFormState extends State<SignUpForm> {
                       const SizedBox(
                         height: defaultPadding / 2,
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: defaultPadding),
+                        child: TextFormField(
+                          keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: kPrimaryColor,
+                            controller: promotionCodeController,
+                            focusNode: promotionCodeNode,
+                            onSaved: (email) {},
+                            decoration: InputDecoration(
+                              labelText: "Your Promo Code",
+                              labelStyle: TextStyle(
+                                  color: emailNode.hasFocus
+                                      ? kPrimaryColor
+                                      : Colors.grey),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(Icons.mail, color: kPrimaryColor),
+                              ),
+                              border: myinputborder(),
+                              enabledBorder: myinputborder(),
+                              focusedBorder: myfocusborder(),
+                            ),
+                          
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       SizedBox(
                         height: 40.0,
                         child: ElevatedButton(
@@ -490,36 +520,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            controller: promotionCodeController,
-                            focusNode: promotionCodeNode,
-                            onSaved: (email) {},
-                            decoration: InputDecoration(
-                              labelText: "Your Promo Code",
-                              labelStyle: TextStyle(
-                                  color: emailNode.hasFocus
-                                      ? kPrimaryColor
-                                      : Colors.grey),
-                              prefixIcon: const Padding(
-                                padding: EdgeInsets.all(defaultPadding),
-                                child: Icon(Icons.mail, color: kPrimaryColor),
-                              ),
-                              border: myinputborder(),
-                              enabledBorder: myinputborder(),
-                              focusedBorder: myfocusborder(),
-                            ),
-                          
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      
                       AlreadyHaveAnAccountCheck(
                         login: false,
                         press: () {

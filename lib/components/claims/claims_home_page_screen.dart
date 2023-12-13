@@ -4,8 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:one_million_app/components/claims/claim_form/claim_form.dart';
-import 'package:one_million_app/components/claims/claim_select_page.dart';
+import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/shared/constants.dart';
@@ -422,7 +421,6 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
                 },
               ),
             );
-            // _showDialog();
 
             
             
@@ -432,16 +430,5 @@ class _ClaimHomePageState extends State<ClaimHomePage> with SingleTickerProvider
 
     );
    
-  }
-  void _showDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return  ClaimTypeSelect(
-          itemSelected: claimType);
-
-      },
-
-    );
   }
 }
