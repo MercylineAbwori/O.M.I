@@ -308,13 +308,13 @@ class _LoginPageState extends State<LoginPage> {
         sumInsured = obj["result"]["data"]["sumInsured"];
       });
 
-      print('Responce Policy Details Body: ${response.body}');
+      // print('Responce Policy Details Body: ${response.body}');
 
-      print('Next Payment: ${nextPayment}');
-      print('Payment Amount: ${paymentAmount}');
-      print('Payment Period: ${paymentPeriod}');
-      print('Policy Number: ${policyNumber}');
-      print('Sum Insured: ${sumInsured}');
+      // print('Next Payment: ${nextPayment}');
+      // print('Payment Amount: ${paymentAmount}');
+      // print('Payment Period: ${paymentPeriod}');
+      // print('Policy Number: ${policyNumber}');
+      // print('Sum Insured: ${sumInsured}');
 
       if (response.statusCode == 200) {
         throw Exception('Policy Details Displayed Successfully successfully');

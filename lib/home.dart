@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               "Hello " + widget.userName,
                               style: const TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 20,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
                             ),

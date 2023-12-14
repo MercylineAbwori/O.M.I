@@ -26,6 +26,8 @@ class _ClaimFormState extends State<ClaimForm>
   GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
 
   List<File> selectedImages = [];
+
+  List<File> selectedfiles = [];
   final picker = ImagePicker();
 
   FilePickerResult? resultMedicalReport;
@@ -118,6 +120,7 @@ class _ClaimFormState extends State<ClaimForm>
       }
     },
     );
+    
 
    
 }
@@ -863,6 +866,7 @@ class _ClaimFormState extends State<ClaimForm>
                                         padding: const EdgeInsets.all(10.0),
                                         child: Column(
                                           children: [
+                                            
                                             DottedBorder(
                                               color: Colors.black,
                                               strokeWidth: 1,
@@ -964,7 +968,9 @@ class _ClaimFormState extends State<ClaimForm>
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            SizedBox(
+                                            if(resultMedicalReport != null) ... [
+
+                                              SizedBox(
                                               height: 40.0,
                                               child: ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
@@ -984,6 +990,48 @@ class _ClaimFormState extends State<ClaimForm>
                                             const SizedBox(
                                               height: defaultPadding / 2,
                                             ),
+
+                                            ]else ...[
+                                              SizedBox(
+                                              height: 40.0,
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
+                                                child: const Text(
+                                                  "Submit Medical Report",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: defaultPadding / 2,
+                                            ),
+
+                                            ],
+                                            // SizedBox(
+                                            //   height: 40.0,
+                                            //   child: ElevatedButton(
+                                            //     style: ElevatedButton.styleFrom(
+                                            //         backgroundColor: kPrimaryColor,
+                                            //         fixedSize: const Size(200, 40)),
+                                            //     onPressed: () {
+                                                  
+                                            //     },
+                                            //     child: const Text(
+                                            //       "Submit Medical Report",
+                                            //       style: TextStyle(
+                                            //         fontSize: 12.0,
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                            // const SizedBox(
+                                            //   height: defaultPadding / 2,
+                                            // ),
                                           ],
                                         ),
                                       ),

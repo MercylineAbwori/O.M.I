@@ -85,10 +85,10 @@ class _CoverageState extends State<CoveragePage> {
 
   //Tableo
   //data rom back end
-  List<Coverage> tabledata = [];
+  List<dynamic> tabledata = [];
   //Rows from Backend
-  List<String> rowsBenefits = [];
-  List<String> rowsSumIsured = [];
+  List<dynamic> rowsBenefits = [];
+  List<dynamic> rowsSumIsured = [];
   //Rows from back
 
   //Notification messaGE
@@ -119,8 +119,8 @@ class _CoverageState extends State<CoveragePage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Responce Status Code : ${response.statusCode}');
-      print('Responce Body : ${response.body}');
+      // print('Responce Status Code : ${response.statusCode}');
+      // print('Responce Body : ${response.body}');
 
       var obj = jsonDecode(response.body);
 
@@ -134,11 +134,32 @@ class _CoverageState extends State<CoveragePage> {
         monthlyPremium = obj["result"]["data"]["monthlyPremium"];
         totalPremium = obj["result"]["data"]["totalPremium"];
         weeklyPremium = obj["result"]["data"]["weeklyPremium"];
-        var objs = obj["result"]["data"];
+        tabledata = obj["result"]["data"]["benefits"];
 
-        for (var item in objs) {
-          tabledata = item["benefits"];
-        }
+        var benefits = tabledata.map((e) => e['name']).toList();
+        var sumInsured = tabledata.map((e) => e['sumInsured']).toList();
+
+        // rowsBenefits.add(benefits);
+        // rowsSumIsured.add(sumInsured);
+
+          for (var item in benefits) {
+            rowsBenefits.add(item);
+          }
+
+          for (var items in sumInsured) {
+            rowsSumIsured.add(items);
+          }
+
+        print('Table Row Benefits Data: ${rowsBenefits}');
+
+        print('Table Row SumInsured Data: ${rowsBenefits}');
+
+
+        // print('Table Data: ${tabledata}');
+
+        
+
+        
 
         if (_currentSubcriptionValue == 'Annualy') {
           var objs = obj["result"]["data"];
@@ -181,12 +202,12 @@ class _CoverageState extends State<CoveragePage> {
     }
   }
 
-  void _showMultiSelect(BuildContext context) async {
+  Future<void> _showMultiSelect(BuildContext context) async {
     final myController = TextEditingController();
 
     NumberFormat Format = NumberFormat.decimalPattern('en_us');
 
-    final List<String>? results = await showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -266,6 +287,9 @@ class _CoverageState extends State<CoveragePage> {
                       }
 
                       await calculatePremium(_currentSumInsuredValue);
+                      
+
+                      Navigator.pop(context,tabledata);
                     },
                     child: const Text('Submit'),
                   ),
@@ -277,15 +301,10 @@ class _CoverageState extends State<CoveragePage> {
       },
     );
 
-    // Update UI
-    if (results != null) {
-      setState(() {
-        _selectedItems = results;
-      });
-    }
+    
   }
 
-  void _showMultiSelectSubscription(BuildContext context) async {
+  Future<void> _showMultiSelectSubscription(BuildContext context) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -503,6 +522,10 @@ class _CoverageState extends State<CoveragePage> {
   @override
   void initState() {
     super.initState();
+
+    
+
+    
   }
 
   @override
@@ -663,6 +686,11 @@ class _CoverageState extends State<CoveragePage> {
                                       fixedSize: const Size(200, 40)),
                                   onPressed: () {
                                     _showMultiSelect(context);
+                                    setState(
+                                      () {
+                                        print('After show $tabledata');
+                                      },
+                                    );
                                   },
                                   child: Text(
                                     "Subscribe".toUpperCase(),
@@ -808,115 +836,118 @@ class _CoverageState extends State<CoveragePage> {
                                             BorderRadius.circular(12.0),
                                         color: kPrimaryWhiteColor,
                                       ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                'Next Payment: ',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                widget.nextPayment,
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                'Payment Amount: ',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                (widget.paymentAmount)
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                'Payment Period: ',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                widget.paymentPeriod,
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                'Policy Number: ',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                widget.policyNumber,
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text(
-                                                'Sum Insured: ',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                (widget.sumInsured).toString(),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                        ],
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Next Payment: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  widget.nextPayment,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Payment Amount: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  (widget.paymentAmount)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Payment Period: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  widget.paymentPeriod,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Policy Number: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  widget.policyNumber,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Sum Insured: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  (widget.sumInsured).toString(),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -931,23 +962,66 @@ class _CoverageState extends State<CoveragePage> {
                             shadowColor: Colors.black,
                             color: kPrimaryWhiteColor,
                             child: ScrollableWidget(
-                                child: Column(
-                              children: [
-                                buildDataTable(),
-                                const SizedBox(height: 20),
-                                Column(
-                                  children: [
-                                    Column(
-                                      children: [
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Row(
+                                                              children: [
+                                  // buildDataTable(),
+                                  const SizedBox(height: 20),
+                                  Column(
+                                    children: [
+                                      Column(
+                                        children: [
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Annual Premium: ',
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  (annualPremium).toString(),
+                                                  style: const TextStyle(
+                                                      fontWeight: FontWeight.normal,
+                                                      fontStyle: FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Basic Premium: ',
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  (basicPremium).toString(),
+                                                  style: const TextStyle(
+                                                      fontWeight: FontWeight.normal,
+                                                      fontStyle: FontStyle.italic),
+                                                )
+                                              ],
+                                            ),
+                                            
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                              height: 10,
+                                            ),
+                                      Column(
+                                        children: [
                                           Row(
                                             children: [
                                               const Text(
-                                                'Annual Premium: ',
+                                                'Daily Premium: ',
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold),
                                               ),
                                               Text(
-                                                (annualPremium).toString(),
+                                                (dailyPremium).toString(),
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.normal,
                                                     fontStyle: FontStyle.italic),
@@ -960,108 +1034,68 @@ class _CoverageState extends State<CoveragePage> {
                                           Row(
                                             children: [
                                               const Text(
-                                                'Basic Premium: ',
+                                                'Monthly Premium: ',
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold),
                                               ),
                                               Text(
-                                                (basicPremium).toString(),
+                                                (monthlyPremium).toString(),
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.normal,
                                                     fontStyle: FontStyle.italic),
                                               )
                                             ],
                                           ),
-                                          
-                                      ],
-                                    ),
-                                    const SizedBox(
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Weekly Premium: ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (weeklyPremium).toString(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.normal,
+                                                    fontStyle: FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                          const SizedBox(
                                             height: 10,
                                           ),
-                                    Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Daily Premium: ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              (dailyPremium).toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontStyle: FontStyle.italic),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Monthly Premium: ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              (monthlyPremium).toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontStyle: FontStyle.italic),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Weekly Premium: ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              (weeklyPremium).toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontStyle: FontStyle.italic),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Total Premium: ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              (totalPremium).toString(),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontStyle: FontStyle.italic),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ))),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Total Premium: ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                (totalPremium).toString(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.normal,
+                                                    fontStyle: FontStyle.italic),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  )
+                                                              ],
+                                                            ),
+                                ))),
                       ],
                     ),
             ],
@@ -1109,44 +1143,65 @@ class _CoverageState extends State<CoveragePage> {
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 
   DataTable buildDataTable() {
-    final List<String> columns = new List.from(_coverages)
-      ..addAll(_selectedItems);
+    final List<String> columns = List.from(_coverages);
+    final cellbenefits = rowsBenefits;
+    final cellsumInsured = rowsSumIsured;
 
-    return DataTable(
-        columns: _createColumns(columns), rows: _createRows(tabledata));
+    // return DataTable(
+    //     columns: _createColumns(columns), rows: _createRows(tabledata));
     // return DataTable(columns: _createColumns(), rows: _createRows());
+    return DataTable( 
+            // Datatable widget that have the property columns and rows. 
+            columns: const [ 
+              // Set the name of the column 
+              DataColumn(label: Text('Benefits'),), 
+              // DataColumn(label: Text('Sum Insured'),), 
+            ], 
+            rows:  [ 
+              // Set the values to the columns  
+              DataRow(cells: getCells(cellbenefits, cellsumInsured)), 
+              
+              
+            ] 
+          );
   }
-
-  List<DataColumn> _createColumns(List<String> columns) => columns
-      .map((String column) => DataColumn(
-            label: Text(column),
-            onSort: onSort,
-          ))
-      .toList();
-  List<DataRow> _createRows(List<Coverage> coverage) =>
-      coverage.map((Coverage coverage) {
-        final cellbenefits = [coverage.name, coverage.sumInsured];
-        final cells = new List.from(cellbenefits)..addAll(_selectedItemsValues);
-
-        return DataRow(
-          cells: getCells(cellbenefits),
-        );
-      }).toList();
-
-  List<DataCell> getCells(List<dynamic> cells) =>
-      cells.map((data) => DataCell(Text('$data'))).toList();
-  void onSort(int columnIndex, bool ascending) {
-    // if (columnIndex == 0) {
-    //   coverage.sort((coverage1, coverage2) =>
-    //       compareString(ascending, coverage1.benefits, coverage2.benefits));
-    // } else if (columnIndex == 1) {
-    //   coverage.sort((coverage1, coverage2) =>
-    //       compareString(ascending, '${coverage1.optionsOne}', '${coverage2.optionsOne}'));
-    // }
-
-    setState(() {
-      this.sortColumnIndex = columnIndex;
-      this.isAscending = ascending;
-    });
+  List<DataCell> getCells(List<dynamic> cellsBenefits, List<dynamic> cellsumInsured) =>
+    cellsBenefits.map((data) => DataCell(Text('$data'))).toList();
+      // cellsumInsured.map((data) => DataCell(Text('$data'))).toList();
   }
-}
+  
+
+
+  // List<DataColumn> _createColumns(List<String> columns) => columns
+  //     .map((String column) => DataColumn(
+  //           label: Text(column),
+  //           onSort: onSort,
+  //         ))
+  //     .toList();
+  // List<DataRow> _createRows(List<Coverage> coverage) =>
+  //     coverage.map((Coverage coverage) {
+  //       final cellbenefits = [coverage.name, coverage.sumInsured];
+  //       final cells = new List.from(cellbenefits)..addAll(_selectedItemsValues);
+
+  //       return DataRow(
+  //         cells: getCells(cellbenefits),
+  //       );
+  //     }).toList();
+
+  // List<DataCell> getCells(List<dynamic> cells) =>
+  //     cells.map((data) => DataCell(Text('$data'))).toList();
+  // void onSort(int columnIndex, bool ascending) {
+  //   // if (columnIndex == 0) {
+  //   //   coverage.sort((coverage1, coverage2) =>
+  //   //       compareString(ascending, coverage1.benefits, coverage2.benefits));
+  //   // } else if (columnIndex == 1) {
+  //   //   coverage.sort((coverage1, coverage2) =>
+  //   //       compareString(ascending, '${coverage1.optionsOne}', '${coverage2.optionsOne}'));
+  //   // }
+
+  //   setState(() {
+  //     this.sortColumnIndex = columnIndex;
+  //     this.isAscending = ascending;
+  //   });
+  // }
+// }
