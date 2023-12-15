@@ -50,7 +50,9 @@ class _LoginPageState extends State<LoginPage> {
   late String _msisdn;
   late String _name;
 
-  late num _userId;
+  // late num _userId;
+
+  num _userId = 1;
 
   late num _otp;
 
@@ -480,6 +482,9 @@ class _LoginPageState extends State<LoginPage> {
                                   paymentPeriod: paymentPeriod,
                                   policyNumber: policyNumber,
                                   sumInsured: sumInsured,
+                                  tableData: [],
+                                  rowsBenefits: [],
+                                  rowsSumIsured: [],
                                 );
                               },
                             ),

@@ -12,9 +12,39 @@ import 'package:http/http.dart' as http;
 
 class PremiumSelect extends StatefulWidget {
   final List<dynamic> itemSelected;
+  final num userId;
+  final String userName;
+  final String phone;
+  final String email;
+  final List<String> message;
+
+  final String uptoDatePaymentData;
+
+  final String promotionCode;
+
+  final bool buttonClaimStatus;
+
+  final String nextPayment;
+  final num paymentAmount;
+  final String paymentPeriod;
+  final String policyNumber;
+  final num sumInsured;
   const PremiumSelect({
     Key? key, 
     required this.itemSelected,
+    required this.userId,
+      required this.userName,
+      required this.phone,
+      required this.email,
+      required this.message,
+      required this.nextPayment,
+      required this.paymentAmount,
+      required this.paymentPeriod,
+      required this.policyNumber,
+      required this.sumInsured,
+      required this.buttonClaimStatus,
+      required this.promotionCode,
+      required this.uptoDatePaymentData
     }) : super(key: key);
 
   @override
@@ -37,6 +67,9 @@ class _PremiumSelectState extends State<PremiumSelect> {
   //data rom back end
   List<dynamic> tabledata = [];
 
+  List<dynamic> rowsBenefits = [];
+  List<dynamic> rowsSumIsured = [];
+
   //Other Data
   num? addStampDuty;
   num? annualPremium;
@@ -51,30 +84,6 @@ class _PremiumSelectState extends State<PremiumSelect> {
 
 
 
-  // this function is called when the Cancel button is pressed
-  void _cancel() {
-    Navigator.pop(context);
-  }
-
-// this function is called when the Submit button is tapped
-  void _submit() {
-    
-    // // Navigator.pop(context);
-    // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CoveragePage(
-    //   userId: 0,
-    //   userName: '',
-    //   message: [],
-    //   phone: '',
-    //   email: '',
-    //   nextPayment: nextPayment;
-    //   paymentAmount : paymentAmount;
-    //   paymentPeriod : paymentPeriod;
-    //   policyNumber : policyNumber;
-    //   sumInsured;
-    //   message: [],
-    //   tabledata: tabledata)));
-  
-  }
 
   Future<List<CalculatorModal>?> calculatePremium(suminsured) async {
     try {
@@ -104,8 +113,30 @@ class _PremiumSelectState extends State<PremiumSelect> {
         weeklyPremium = obj["result"]["data"]["weeklyPremium"];
         tabledata = obj["result"]["data"]["benefits"];
 
+      
+        var benefits = tabledata.map((e) => e['name']).toList();
+        var sumInsured = tabledata.map((e) => e['sumInsured']).toList();
 
-        print('Table Data: ${tabledata}');
+        // rowsBenefits.add(benefits);
+        // rowsSumIsured.add(sumInsured);
+
+          for (var item in benefits) {
+            rowsBenefits.add(item);
+          }
+
+          for (var items in sumInsured) {
+            rowsSumIsured.add(items);
+          }
+
+        // print('Table Row Benefits Data: ${rowsBenefits}');
+
+        // print('Table Row SumInsured Data: ${rowsBenefits}');
+
+
+        // print('Table Data: ${tabledata}');
+
+
+        // print('Table Data: ${tabledata}');
 
         // if (_currentSubcriptionValue == 'Annualy') {
         //   var objs = obj["result"]["data"];
@@ -171,7 +202,7 @@ class _PremiumSelectState extends State<PremiumSelect> {
                               controlAffinity: ListTileControlAffinity.leading,
                               onChanged: (isvalue) {
                                 setState(() {
-                                  debugPrint('VAL = $isvalue');
+                                  // debugPrint('VAL = $isvalue');
                                   _currentSumInsuredValue = isvalue;
                                 });
                               },
@@ -228,6 +259,38 @@ class _PremiumSelectState extends State<PremiumSelect> {
                       }
 
                       await calculatePremium(_currentSumInsuredValue);
+
+                      Navigator.pop(context, tabledata);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => 
+                          CoveragePage(
+                            userId: widget.userId,
+                            userName: widget.userName,
+                            phone: widget.phone,
+                            email: widget.email,
+                            message: widget.message,
+
+                            nextPayment: widget.nextPayment,
+                            paymentAmount: widget.paymentAmount,
+                            paymentPeriod: widget.paymentPeriod,
+                            policyNumber: widget.policyNumber,
+                            sumInsured: int.parse(_currentSumInsuredValue!),
+
+                            uptoDatePaymentData: widget.uptoDatePaymentData,
+                            buttonClaimStatus: widget.buttonClaimStatus,
+                            promotionCode: widget.promotionCode,
+                            tableData: tabledata,
+                            rowsBenefits: rowsBenefits,
+                            rowsSumIsured: rowsSumIsured,
+                            addStampDuty: addStampDuty,
+                            annualPremium:annualPremium,
+                            basicPremium:basicPremium,
+                            dailyPremium: dailyPremium,
+                            monthlyPremium: monthlyPremium,
+                            totalPremium: totalPremium,
+                            weeklyPremium: weeklyPremium)),
+                      );
                     },
                     child: const Text('Submit'),
                   ),

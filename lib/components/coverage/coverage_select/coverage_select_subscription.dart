@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/calculator_model.dart';
 import 'package:one_million_app/core/model/coverage_model.dart';
@@ -10,8 +11,29 @@ import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
 
 class SubscriptionSelect extends StatefulWidget {
+
+  final num userId;
+  final String phone;
   final List<dynamic> itemSelected;
-  const SubscriptionSelect({Key? key, required this.itemSelected}) : super(key: key);
+  //Other Data
+  final num? annualPremium;
+  final num? basicPremium;
+  final num? dailyPremium;
+  final num? monthlyPremium;
+  final num? totalPremium;
+  final num? weeklyPremium;
+  final num sumInsured;
+  const SubscriptionSelect({Key? key, 
+  required this.userId,
+  required this.phone,
+  required this.itemSelected,
+  required this.annualPremium,
+  required this.basicPremium,
+  required this.dailyPremium,
+  required this.monthlyPremium,
+  required this.totalPremium,
+  required this.weeklyPremium,
+  required this.sumInsured}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SubscriptionSelectState();
@@ -35,14 +57,7 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
   //data rom back end
   List<Coverage> tabledata = [];
 
-  //Other Data
-  num? addStampDuty;
-  num? annualPremium;
-  num? basicPremium;
-  num? dailyPremium;
-  num? monthlyPremium;
-  num? totalPremium;
-  num? weeklyPremium;
+ 
 
   late String _statusMessage;
   num? _statusCode;
@@ -64,6 +79,24 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
   }
 
   _showMultiPaymentSelect(BuildContext context) async {
+
+    if (_currentSubcriptionValue == 'Annualy') {
+
+            _premiumSelected = widget.annualPremium;
+          
+        } else if (_currentSubcriptionValue == 'Mounthly') {
+          
+            _premiumSelected = widget.monthlyPremium;
+          
+        } else if (_currentSubcriptionValue == 'Weekly') {
+          
+            _premiumSelected = widget.weeklyPremium;
+          
+        } else if (_currentSubcriptionValue == 'Daily') {
+          
+            _premiumSelected = widget.dailyPremium;
+          
+        }
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -142,29 +175,29 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                                     backgroundColor: kPrimaryColor,
                                     fixedSize: const Size(200, 40)),
                                 onPressed: () async {
-                                  // await ApiService().mpesaPayment(
-                                  //     _premiumSelected,
-                                  //     widget.userId,
-                                  //     widget.phone);
-                                  // await ApiService().postCoverageSelection(
-                                  //   widget.userId,
-                                  //   _currentSumInsuredValue,
-                                  //   _currentSubcriptionValue,
-                                  //   _premiumSelected,
-                                  // );
+                                  await ApiService().mpesaPayment(
+                                      _premiumSelected,
+                                      widget.userId,
+                                      widget.phone);
+                                  await ApiService().postCoverageSelection(
+                                    widget.userId,
+                                    widget.sumInsured,
+                                    _currentSubcriptionValue,
+                                    _premiumSelected,
+                                  );
 
-                                  // final snackBar = SnackBar(
-                                  //   content: Text(_statusMessage),
-                                  //   action: SnackBarAction(
-                                  //     label: 'Undo',
-                                  //     onPressed: () {
-                                  //       // Some code to undo the change.
-                                  //     },
-                                  //   ),
-                                  // );
+                                  final snackBar = SnackBar(
+                                    content: Text(_statusMessage),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        // Some code to undo the change.
+                                      },
+                                    ),
+                                  );
 
-                                  // ScaffoldMessenger.of(context)
-                                  //     .showSnackBar(snackBar);
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
                                 },
                                 child: const Text(
                                   "Submit",
@@ -178,25 +211,25 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                                     backgroundColor: kPrimaryColor,
                                     fixedSize: const Size(200, 40)),
                                 onPressed: () async {
-                                  // await ApiService().postCoverageSelection(
-                                  //   widget.userId,
-                                  //   _currentSumInsuredValue,
-                                  //   _currentSubcriptionValue,
-                                  //   _premiumSelected,
-                                  // );
+                                  await ApiService().postCoverageSelection(
+                                    widget.userId,
+                                    widget.sumInsured,
+                                    _currentSubcriptionValue,
+                                    _premiumSelected,
+                                  );
 
-                                  // final snackBar = SnackBar(
-                                  //   content: Text(_statusMessage),
-                                  //   action: SnackBarAction(
-                                  //     label: 'Undo',
-                                  //     onPressed: () {
-                                  //       // Some code to undo the change.
-                                  //     },
-                                  //   ),
-                                  // );
+                                  final snackBar = SnackBar(
+                                    content: Text(_statusMessage),
+                                    action: SnackBarAction(
+                                      label: 'Undo',
+                                      onPressed: () {
+                                        // Some code to undo the change.
+                                      },
+                                    ),
+                                  );
 
-                                  // ScaffoldMessenger.of(context)
-                                  //     .showSnackBar(snackBar);
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackBar);
                                 },
                                 child: const Text(
                                   "Submit",

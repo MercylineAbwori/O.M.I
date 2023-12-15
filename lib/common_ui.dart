@@ -35,6 +35,13 @@ class CommonUIPage extends StatefulWidget {
   final String policyNumber;
   final num sumInsured;
 
+  final List<dynamic> tableData;
+
+  final List<dynamic> rowsBenefits;
+  final List<dynamic> rowsSumIsured;
+
+  
+
   CommonUIPage(
       {Key? key,
       required this.userId,
@@ -49,7 +56,10 @@ class CommonUIPage extends StatefulWidget {
       required this.paymentAmount,
       required this.paymentPeriod,
       required this.policyNumber,
-      required this.sumInsured
+      required this.sumInsured,
+      required this.tableData,
+      required this.rowsBenefits,
+      required this.rowsSumIsured
       })
       : super(key: key);
   @override
@@ -84,6 +94,19 @@ class _CommonUIPageState extends State<CommonUIPage> {
           paymentPeriod: widget.paymentPeriod,
           policyNumber: widget.policyNumber,
           sumInsured: widget.sumInsured,
+          uptoDatePaymentData: widget.uptoDatePaymentData,
+          buttonClaimStatus: widget.buttonClaimStatus,
+          promotionCode: widget.promotionCode,
+          tableData: [],
+          rowsBenefits: [],
+          rowsSumIsured: [],
+          addStampDuty: 0,
+          annualPremium: 0,
+          basicPremium: 0,
+          dailyPremium: 0,
+          monthlyPremium: 0,
+          totalPremium: 0,
+          weeklyPremium: 0
         );
       case 2:
         return ClaimHomePage(

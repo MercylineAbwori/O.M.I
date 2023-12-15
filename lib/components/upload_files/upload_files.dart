@@ -5,18 +5,9 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
-import 'package:one_million_app/components/signin/login_screen.dart';
-import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/regisration_otp_model.dart';
-import 'package:one_million_app/core/model/registration_model.dart';
-import 'package:one_million_app/core/model/registration_otp_verify.dart';
-import 'package:one_million_app/core/model/user_model.dart';
+import 'package:one_million_app/core/model/upload_document_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -40,10 +31,8 @@ class UploadFiles extends StatefulWidget {
   _UploadFilesState createState() => _UploadFilesState();
 }
 
-class _UploadFilesState extends State<UploadFiles> 
-
-with SingleTickerProviderStateMixin {
-  
+class _UploadFilesState extends State<UploadFiles>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final _selectedColor = kPrimaryColor;
@@ -58,84 +47,130 @@ with SingleTickerProviderStateMixin {
 
   File? _imageFrontId;
   File? _imageBackId;
-  
+
   File? _imageDrivingLincencs;
 
   File? _imageLogbook;
 
-  Future getImageDrivingLicence(ImageSource source) async {
-    try{
-    final image = await ImagePicker().pickImage(source: source);
+  //All File boolean
+  bool? _isButtonDisabledFID;
+  bool? _isButtonDisabledEID;
+  bool? _isButtonDisabledDL;
+  bool? _isButtonDisabledLog;
 
-    if(image == null) return;
+  //All file responce messages
+  String? messageFrontID;
+  String? messageEndID;
+  String? messageDrivingL;
+  String? messageLogBook;
 
-    // final imageTemporary = File(image.path);
-    final imagePermanent = await saveFilePermanently(image.path);
+  Future<List<UploadFileModal>?> pickerFiles(userId, documentName, file) async {
+    try {
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
 
-    setState(() {
-      this._imageDrivingLincencs = imagePermanent;
-    });
-    } on PlatformException catch (e){
-        print('Failed to pick image: $e');
+      request.files.add(http.MultipartFile(documentName,
+          File(file).readAsBytes().asStream(), File(file).lengthSync()));
+
+      var response = await request.send();
+      var responced = await http.Response.fromStream(response);
+
+      final responseData = json.decode(responced.body);
+
+      if (response.statusCode == 200) {
+        if (file == _imageFrontId) {
+          messageFrontID = responseData["result"]["message"];
+        } else if (file == _imageBackId) {
+          messageEndID = responseData["result"]["message"];
+        } else if (file == _imageDrivingLincencs) {
+          messageDrivingL = responseData["result"]["message"];
+        } else if (file == _imageLogbook) {
+          messageLogBook = responseData["result"]["message"];
+        }
+      } else {
+        throw Exception('Unexpected Calculator error occured!');
+      }
+    } on PlatformException catch (e) {
+      log('Unsupported operation' + e.toString());
+    } catch (e) {
+      log(e.toString());
     }
+    setState(() {
+      _isButtonDisabledFID = true;
+    });
   }
 
-  
+  Future getImageDrivingLicence(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+
+      if (image == null) return;
+
+      // final imageTemporary = File(image.path);
+      final imagePermanent = await saveFilePermanently(image.path);
+
+      setState(() {
+        this._imageDrivingLincencs = imagePermanent;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
 
   Future getImageLogbook(ImageSource source) async {
-    try{
-    final image = await ImagePicker().pickImage(source: source);
+    try {
+      final image = await ImagePicker().pickImage(source: source);
 
-    if(image == null) return;
+      if (image == null) return;
 
-    // final imageTemporary = File(image.path);
-    final imagePermanent = await saveFilePermanently(image.path);
+      // final imageTemporary = File(image.path);
+      final imagePermanent = await saveFilePermanently(image.path);
 
-    setState(() {
-      this._imageLogbook = imagePermanent;
-    });
-    } on PlatformException catch (e){
-        print('Failed to pick image: $e');
+      setState(() {
+        this._imageLogbook = imagePermanent;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
     }
   }
-
-  
 
   Future getImageFrontID(ImageSource source) async {
-    try{
-    final image = await ImagePicker().pickImage(source: source);
+    try {
+      final image = await ImagePicker().pickImage(source: source);
 
-    if(image == null) return;
+      if (image == null) return;
 
-    // final imageTemporary = File(image.path);
-    final imagePermanent = await saveFilePermanently(image.path);
+      // final imageTemporary = File(image.path);
+      final imagePermanent = await saveFilePermanently(image.path);
 
-    setState(() {
-      this._imageFrontId = imagePermanent;
-    });
-    } on PlatformException catch (e){
-        print('Failed to pick image: $e');
+      setState(() {
+        this._imageFrontId = imagePermanent;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
     }
   }
+
   Future getImageBackID(ImageSource source) async {
-    try{
-    final image = await ImagePicker().pickImage(source: source);
+    try {
+      final image = await ImagePicker().pickImage(source: source);
 
-    if(image == null) return;
+      if (image == null) return;
 
-    // final imageTemporary = File(image.path);
-    final imagePermanent = await saveFilePermanently(image.path);
+      // final imageTemporary = File(image.path);
+      final imagePermanent = await saveFilePermanently(image.path);
 
-    setState(() {
-      this._imageBackId = imagePermanent;
-    });
-    } on PlatformException catch (e){
-        print('Failed to pick image: $e');
+      setState(() {
+        this._imageBackId = imagePermanent;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
     }
   }
 
-  Future<File> saveFilePermanently(String imagePath) async
-  {
+  Future<File> saveFilePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = basename(imagePath);
     final image = File("${directory.path}/$name");
@@ -143,228 +178,278 @@ with SingleTickerProviderStateMixin {
     return File(imagePath).copy(image.path);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:AppBar(
-        backgroundColor: Colors.white,
-
-        leading: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: IconButton(
-              iconSize: 100,
-              icon: Icon(Icons.arrow_back,
-              color: Colors.black,
-              size: 20,),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.pop(context);
-                
-              },
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: IconButton(
+                iconSize: 100,
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                // the method which is called
+                // when button is pressed
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
         ),
-      ),
-      body: DefaultTabController(
-        length: 3,
-        child: Column(
-          children: <Widget>[
-            Container(
-              constraints: BoxConstraints.expand(height: 80),
-              padding: EdgeInsets.all(10),
-              child: Container(
-                
-              height: kToolbarHeight - 8.0,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: TabBar(
-                indicator: BoxDecoration(
+        body: DefaultTabController(
+          length: 3,
+          child: Column(
+            children: <Widget>[
+              Container(
+                constraints: BoxConstraints.expand(height: 80),
+                padding: EdgeInsets.all(10),
+                child: Container(
+                  height: kToolbarHeight - 8.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(8.0),
-                    color: _selectedColor),
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.black,
-                tabs: _tabs,
+                  ),
+                  child: TabBar(
+                    indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: _selectedColor),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.black,
+                    tabs: _tabs,
+                  ),
+                ),
               ),
-            ),
-            ),
-            Expanded(
-              child: Container(
-                child: TabBarView(children: [
-                  Container(
-                    child: SingleChildScrollView(
+              Expanded(
+                child: Container(
+                  child: TabBarView(children: [
+                    Container(
+                        child: SingleChildScrollView(
                       child: Card(
                         child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Form(
-                            child: Column(
-                              children: [
-                                // Capture Front ID upload
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(10.0),
-                                      child: Text(
-                                        'Front ID photo',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 17),
+                            padding: const EdgeInsets.all(20.0),
+                            child: Form(
+                              child: Column(
+                                children: [
+                                  // Capture Front ID upload
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: Text(
+                                          'Front ID photo',
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: DottedBorder(
-                                        color: Colors.black,
-                                        strokeWidth: 1,
-                                        radius: const Radius.circular(30),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(20.0),
-                                                child: _imageFrontId != null
-                                                    ? Image.file(
-                                                        _imageFrontId!,
-                                                        width: 300,
-                                                        height: 250,
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.asset(
-                                                        'assets/images/upload_logo.png',
-                                                        width: 300,
-                                                        height: 250,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                              ),
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              Column(
-                                                children: [
-                                                  CustomButton(
-                                                    title: 'Pick from Gallery',
-                                                    icon: Icons.image_outlined,
-                                                    onClick: () => getImageFrontID(ImageSource.gallery),
-                                                  ),
-                                                  const SizedBox(height: 10,),
-                                                  CustomButton(
-                                                    title: 'Pick from Camera',
-                                                    icon: Icons.camera,
-                                                    onClick: () => getImageFrontID(ImageSource.camera),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                      const SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: DottedBorder(
+                                          color: Colors.black,
+                                          strokeWidth: 1,
+                                          radius: const Radius.circular(30),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      20.0),
+                                                  child: _imageFrontId != null
+                                                      ? Image.file(
+                                                          _imageFrontId!,
+                                                          width: 300,
+                                                          height: 250,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.asset(
+                                                          'assets/images/upload_logo.png',
+                                                          width: 300,
+                                                          height: 250,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    CustomButton(
+                                                      title:
+                                                          'Pick from Gallery',
+                                                      icon:
+                                                          Icons.image_outlined,
+                                                      onClick: () =>
+                                                          getImageFrontID(
+                                                              ImageSource
+                                                                  .gallery),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    CustomButton(
+                                                      title: 'Pick from Camera',
+                                                      icon: Icons.camera,
+                                                      onClick: () =>
+                                                          getImageFrontID(
+                                                              ImageSource
+                                                                  .camera),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                //Capture End ID upload
-                                Column(
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(10.0),
-                                      child: Text(
-                                        'End ID photo',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 17),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: DottedBorder(
-                                        color: Colors.black,
-                                        strokeWidth: 1,
-                                        radius: const Radius.circular(30),
-                                        child: Center(
-                                          child: Column(
-                                            children: [
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.all(20.0),
-                                                child: _imageBackId != null
-                                                    ? Image.file(
-                                                        _imageBackId!,
-                                                        width: 300,
-                                                        height: 250,
-                                                        fit: BoxFit.cover,
-                                                      )
-                                                    : Image.asset(
-                                                        'assets/images/upload_logo.png',
-                                                        width: 300,
-                                                        height: 250,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                              ),
-                                              const SizedBox(
-                                                height: 20,
-                                              ),
-                                              Column(
-                                                children: [
-                                                  CustomButton(
-                                                    title: 'Pick from Gallery',
-                                                    icon: Icons.image_outlined,
-                                                    onClick: () => getImageBackID(ImageSource.gallery),
-                                                  ),
-                                                  const SizedBox(height: 10,),
-                                                  CustomButton(
-                                                    title: 'Pick from Camera',
-                                                    icon: Icons.camera,
-                                                    onClick: () => getImageBackID(ImageSource.camera),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                      const SizedBox(height: 10),
+                                      SizedBox(
+                                        height: 40.0,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: kPrimaryColor,
+                                              fixedSize: const Size(200, 40)),
+                                          onPressed: () {},
+                                          child: const Text(
+                                            "Submit Front ID",
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                
-                              ],
-                            ),
-                          )),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  //Capture End ID upload
+                                  Column(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: Text(
+                                          'Back ID photo',
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 17),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: DottedBorder(
+                                          color: Colors.black,
+                                          strokeWidth: 1,
+                                          radius: const Radius.circular(30),
+                                          child: Center(
+                                            child: Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      20.0),
+                                                  child: _imageBackId != null
+                                                      ? Image.file(
+                                                          _imageBackId!,
+                                                          width: 300,
+                                                          height: 250,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.asset(
+                                                          'assets/images/upload_logo.png',
+                                                          width: 300,
+                                                          height: 250,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    CustomButton(
+                                                      title:
+                                                          'Pick from Gallery',
+                                                      icon:
+                                                          Icons.image_outlined,
+                                                      onClick: () =>
+                                                          getImageBackID(
+                                                              ImageSource
+                                                                  .gallery),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    CustomButton(
+                                                      title: 'Pick from Camera',
+                                                      icon: Icons.camera,
+                                                      onClick: () =>
+                                                          getImageBackID(
+                                                              ImageSource
+                                                                  .camera),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      SizedBox(
+                                        height: 40.0,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: kPrimaryColor,
+                                              fixedSize: const Size(200, 40)),
+                                          onPressed: () {},
+                                          child: const Text(
+                                            "Submit Back ID",
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                ],
+                              ),
+                            )),
                       ),
-                    )
-                  ),
-                  Container(
-                    child: SingleChildScrollView(
+                    )),
+                    Container(
+                        child: SingleChildScrollView(
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -407,8 +492,10 @@ with SingleTickerProviderStateMixin {
                                                 height: 20,
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.all(20.0),
-                                                child: _imageDrivingLincencs != null
+                                                padding:
+                                                    const EdgeInsets.all(20.0),
+                                                child: _imageDrivingLincencs !=
+                                                        null
                                                     ? Image.file(
                                                         _imageDrivingLincencs!,
                                                         width: 300,
@@ -430,13 +517,20 @@ with SingleTickerProviderStateMixin {
                                                   CustomButton(
                                                     title: 'Pick from Gallery',
                                                     icon: Icons.image_outlined,
-                                                    onClick: () => getImageDrivingLicence(ImageSource.gallery),
+                                                    onClick: () =>
+                                                        getImageDrivingLicence(
+                                                            ImageSource
+                                                                .gallery),
                                                   ),
-                                                  const SizedBox(height: 10,),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
                                                   CustomButton(
                                                     title: 'Pick from Camera',
                                                     icon: Icons.camera,
-                                                    onClick: () => getImageDrivingLicence(ImageSource.camera),
+                                                    onClick: () =>
+                                                        getImageDrivingLicence(
+                                                            ImageSource.camera),
                                                   ),
                                                   const SizedBox(
                                                     height: 20,
@@ -447,22 +541,36 @@ with SingleTickerProviderStateMixin {
                                           ),
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    const SizedBox(height: 10),
+                                    SizedBox(
+                                      height: 40.0,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: kPrimaryColor,
+                                            fixedSize: const Size(200, 40)),
+                                        onPressed: () {},
+                                        child: const Text(
+                                          "Submit Driving License",
+                                          style: TextStyle(
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                
                               ],
                             ),
                           ),
                         ),
                       ),
-                    )
-                  ),
-                  Container(
-                    child: SingleChildScrollView(
+                    )),
+                    Container(
+                        child: SingleChildScrollView(
                       child: Card(
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -497,30 +605,71 @@ with SingleTickerProviderStateMixin {
                                         child: Center(
                                           child: Column(
                                             children: [
-                                              const SizedBox(height: 20,),
-                                              Padding(
-                                                padding: const EdgeInsets.all(20.0),
-                                                child: _imageLogbook != null ? Image.file(_imageLogbook!, width: 300, height: 250, fit: BoxFit.cover,)
-                                                : Image.asset('assets/images/upload_logo.png', width: 300, height: 250, fit: BoxFit.cover,),
+                                              const SizedBox(
+                                                height: 20,
                                               ),
-                                              const SizedBox(height: 20,),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(20.0),
+                                                child: _imageLogbook != null
+                                                    ? Image.file(
+                                                        _imageLogbook!,
+                                                        width: 300,
+                                                        height: 250,
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Image.asset(
+                                                        'assets/images/upload_logo.png',
+                                                        width: 300,
+                                                        height: 250,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
                                               Column(
                                                 children: [
                                                   CustomButton(
                                                     title: 'Pick from Gallery',
                                                     icon: Icons.image_outlined,
-                                                    onClick: () => getImageLogbook(ImageSource.gallery),
+                                                    onClick: () =>
+                                                        getImageLogbook(
+                                                            ImageSource
+                                                                .gallery),
                                                   ),
-                                                  const SizedBox(height: 10,),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
                                                   CustomButton(
                                                     title: 'Pick from Camera',
                                                     icon: Icons.camera,
-                                                    onClick: () => getImageLogbook(ImageSource.camera),
+                                                    onClick: () =>
+                                                        getImageLogbook(
+                                                            ImageSource.camera),
                                                   ),
-                                                  const SizedBox(height: 20,),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  ),
                                                 ],
                                               ),
                                             ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    SizedBox(
+                                      height: 40.0,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: kPrimaryColor,
+                                            fixedSize: const Size(200, 40)),
+                                        onPressed: () {},
+                                        child: const Text(
+                                          "Submit Logbook",
+                                          style: TextStyle(
+                                            fontSize: 12.0,
                                           ),
                                         ),
                                       ),
@@ -530,25 +679,20 @@ with SingleTickerProviderStateMixin {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                
                               ],
                             ),
                           ),
                         ),
                       ),
-                    )
-                  ),
-                ]),
-              ),
-            )
-          ],
-        ),
-      )
-    );
+                    )),
+                  ]),
+                ),
+              )
+            ],
+          ),
+        ));
+  }
 }
-
-}
- 
 
 Widget CustomButton(
     {required String title,

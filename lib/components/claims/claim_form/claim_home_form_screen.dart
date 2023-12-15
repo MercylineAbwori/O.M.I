@@ -1,14 +1,20 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/claims/generate_pdf.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/upload_document_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 class ClaimForm extends StatefulWidget {
   final num userId;
@@ -32,8 +38,8 @@ class _ClaimFormState extends State<ClaimForm>
 
   FilePickerResult? resultMedicalReport;
 
-  FilePickerResult? resultMedicalCertificate;
-  FilePickerResult? resultProofOfEarning;
+  // FilePickerResult? resultMedicalCertificate;
+  // FilePickerResult? resultProofOfEarning;
   FilePickerResult? resultDeathCertificate;
 
   FilePickerResult? resultPostMortem;
@@ -94,6 +100,29 @@ class _ClaimFormState extends State<ClaimForm>
   FocusNode witnessNameNode = FocusNode();
   FocusNode witnessAddressNode = FocusNode();
 
+  //All File boolean
+  bool? _isButtonDisabledResultMedicalReport;
+  bool? _isButtonDisabledResultMedicalCertificate;
+  bool? _isButtonDisabledResultProofOfEarning;
+  bool? _isButtonDisabledResultDeathCertificate;
+  bool? _isButtonDisabledResultPostMortem;
+  bool? _isButtonDisabledResultProofOfFuneralExpences;
+  bool? _isButtonDisabledResultSickSheet;
+  bool? _isButtonDisabledResultPoliceAbstruct;
+  bool? _isButtonDisabledClaimForm;
+
+  //All file responce messages
+  String? messageResultMedicalReport;
+  String? messageResultMedicalCertificate;
+  String? messageResultProofOfEarning;
+  String? messageResultDeathCertificate;
+  String? messageResultPostMortem;
+  String? messageResultProofOfFuneralExpences;
+  String? messageResultSickSheet;
+  String? messageResultPoliceAbstruct;
+  String? messageResultClaimForm;
+
+
   late TabController _tabController;
 
   final _selectedColor = kPrimaryColor;
@@ -121,6 +150,50 @@ class _ClaimFormState extends State<ClaimForm>
     },
     );
     
+    Future<List<UploadFileModal>?> pickerFiles(userId, documentName, file) async {
+    try {
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
+
+      request.files.add(http.MultipartFile(documentName,
+          File(file).readAsBytes().asStream(), File(file).lengthSync()));
+
+      var response = await request.send();
+      var responced = await http.Response.fromStream(response);
+
+      final responseData = json.decode(responced.body);
+
+      if (response.statusCode == 200) {
+        if (file == resultMedicalReport) {
+          messageResultMedicalReport = responseData["result"]["message"];
+        } else if (file == resultDeathCertificate) {
+          messageResultDeathCertificate = responseData["result"]["message"];
+        } else if (file == resultPostMortem) {
+          messageResultPostMortem = responseData["result"]["message"];
+        } else if (file == resultProofOfFuneralExpences) {
+          messageResultProofOfFuneralExpences = responseData["result"]["message"];
+        }else if (file == resultSickSheet) {
+          messageResultSickSheet = responseData["result"]["message"];
+        } else if (file == resultPoliceAbstruct) {
+          messageResultPoliceAbstruct = responseData["result"]["message"];
+        } 
+        // else if (file == claimForm) {
+        //   messageResultClaimForm = responseData["result"]["message"];
+        // }
+      } else {
+        throw Exception('Unexpected Calculator error occured!');
+      }
+    } on PlatformException catch (e) {
+      log('Unsupported operation' + e.toString());
+    } catch (e) {
+      log(e.toString());
+    }
+    setState(() {
+      _isButtonDisabledResultMedicalReport = true;
+    });
+  }
 
    
 }
