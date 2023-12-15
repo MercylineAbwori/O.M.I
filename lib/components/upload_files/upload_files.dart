@@ -25,7 +25,8 @@ const buttonTextStyle = TextStyle(
 //     Key? key,
 //   }) : super(key: key);
 class UploadFiles extends StatefulWidget {
-  const UploadFiles({Key? key}) : super(key: key);
+  final num userId;
+  const UploadFiles({Key? key, required this.userId}) : super(key: key);
 
   @override
   _UploadFilesState createState() => _UploadFilesState();
@@ -71,23 +72,29 @@ class _UploadFilesState extends State<UploadFiles>
           Uri.parse(
               ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
 
-      request.files.add(http.MultipartFile(documentName,
-          File(file).readAsBytes().asStream(), File(file).lengthSync()));
+      // request.files.add(http.MultipartFile(documentName,
+      //     File(file!.path).readAsBytes(), File(documentName).lengthSync()));
+      // request.fields["userId"] = userId.toString();
+      request.files.add(http.MultipartFile.fromBytes(
+        documentName, 
+        File(file!.path).readAsBytesSync(),filename: file!.path));
 
       var response = await request.send();
       var responced = await http.Response.fromStream(response);
 
       final responseData = json.decode(responced.body);
 
+      print('rESPONCE bODY : $responseData');
+
       if (response.statusCode == 200) {
         if (file == _imageFrontId) {
-          messageFrontID = responseData["result"]["message"];
+          messageFrontID = responseData["statusMessage"];
         } else if (file == _imageBackId) {
-          messageEndID = responseData["result"]["message"];
+          messageEndID = responseData["statusMessage"];
         } else if (file == _imageDrivingLincencs) {
-          messageDrivingL = responseData["result"]["message"];
+          messageDrivingL = responseData["statusMessage"];
         } else if (file == _imageLogbook) {
-          messageLogBook = responseData["result"]["message"];
+          messageLogBook = responseData["statusMessage"];
         }
       } else {
         throw Exception('Unexpected Calculator error occured!');
@@ -188,7 +195,7 @@ class _UploadFilesState extends State<UploadFiles>
               padding: const EdgeInsets.all(4.0),
               child: IconButton(
                 iconSize: 100,
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_back,
                   color: Colors.black,
                   size: 20,
@@ -207,8 +214,8 @@ class _UploadFilesState extends State<UploadFiles>
           child: Column(
             children: <Widget>[
               Container(
-                constraints: BoxConstraints.expand(height: 80),
-                padding: EdgeInsets.all(10),
+                constraints: const BoxConstraints.expand(height: 80),
+                padding: const EdgeInsets.all(10),
                 child: Container(
                   height: kToolbarHeight - 8.0,
                   decoration: BoxDecoration(
@@ -327,14 +334,33 @@ class _UploadFilesState extends State<UploadFiles>
                                           style: ElevatedButton.styleFrom(
                                               backgroundColor: kPrimaryColor,
                                               fixedSize: const Size(200, 40)),
-                                          onPressed: () {},
+                                          onPressed: () async{
+                                            await pickerFiles(widget.userId, 'Front National ID', _imageFrontId);
+
+
+                                            // final snackBar = SnackBar(
+                                            //   content: Text(messageFrontID!),
+                                            //   action: SnackBarAction(
+                                            //     label: 'Undo',
+                                            //     onPressed: () {
+                                            //       // Some code to undo the change.
+                                            //     },
+                                            //   ),
+                                            // );
+
+                                            // ScaffoldMessenger.of(context)
+                                            //     .showSnackBar(snackBar);
+                                            
+                                            
+                                          },
                                           child: const Text(
                                             "Submit Front ID",
                                             style: TextStyle(
                                               fontSize: 12.0,
                                             ),
                                           ),
-                                        ),
+                                        )
+                                        
                                       ),
                                     ],
                                   ),
@@ -425,11 +451,41 @@ class _UploadFilesState extends State<UploadFiles>
                                       const SizedBox(height: 10),
                                       SizedBox(
                                         height: 40.0,
-                                        child: ElevatedButton(
+                                        child: (messageFrontID != null)?
+                                        
+                                        ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                               backgroundColor: kPrimaryColor,
                                               fixedSize: const Size(200, 40)),
-                                          onPressed: () {},
+                                          onPressed: () async{
+                                            await pickerFiles(widget.userId, 'Back National ID' , _imageBackId);
+
+                                            // final snackBar = SnackBar(
+                                            //   content: Text(messageEndID!),
+                                            //   action: SnackBarAction(
+                                            //     label: 'Undo',
+                                            //     onPressed: () {
+                                            //       // Some code to undo the change.
+                                            //     },
+                                            //   ),
+                                            // );
+
+                                            // ScaffoldMessenger.of(context)
+                                            //     .showSnackBar(snackBar);
+                                            
+                                          },
+                                          child: const Text(
+                                            "Submit Back ID",
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                            ),
+                                          ),
+                                        ) :
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: kPrimaryColor,
+                                              fixedSize: const Size(200, 40)),
+                                          onPressed: null,
                                           child: const Text(
                                             "Submit Back ID",
                                             style: TextStyle(
@@ -545,11 +601,40 @@ class _UploadFilesState extends State<UploadFiles>
                                     const SizedBox(height: 10),
                                     SizedBox(
                                       height: 40.0,
-                                      child: ElevatedButton(
+                                      child: (messageEndID != null)?
+                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: kPrimaryColor,
                                             fixedSize: const Size(200, 40)),
-                                        onPressed: () {},
+                                        onPressed: () async{
+                                            await pickerFiles(widget.userId, 'Driving Licence' , _imageDrivingLincencs);
+                                            
+                                            // final snackBar = SnackBar(
+                                            //   content: Text(messageDrivingL!),
+                                            //   action: SnackBarAction(
+                                            //     label: 'Undo',
+                                            //     onPressed: () {
+                                            //       // Some code to undo the change.
+                                            //     },
+                                            //   ),
+                                            // );
+
+                                            // ScaffoldMessenger.of(context)
+                                            //     .showSnackBar(snackBar);
+                                            
+                                          },
+                                        child: const Text(
+                                          "Submit Driving License",
+                                          style: TextStyle(
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                      ):
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: kPrimaryColor,
+                                            fixedSize: const Size(200, 40)),
+                                        onPressed: null,
                                         child: const Text(
                                           "Submit Driving License",
                                           style: TextStyle(
@@ -661,11 +746,41 @@ class _UploadFilesState extends State<UploadFiles>
                                     const SizedBox(height: 10),
                                     SizedBox(
                                       height: 40.0,
-                                      child: ElevatedButton(
+                                      child: (messageDrivingL != null)?
+                                      
+                                      ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: kPrimaryColor,
                                             fixedSize: const Size(200, 40)),
-                                        onPressed: () {},
+                                        onPressed: () async{
+                                            await pickerFiles(widget.userId, 'Logbook' , _imageLogbook);
+                                            
+                                            // final snackBar = SnackBar(
+                                            //   content: Text(messageLogBook!),
+                                            //   action: SnackBarAction(
+                                            //     label: 'Undo',
+                                            //     onPressed: () {
+                                            //       // Some code to undo the change.
+                                            //     },
+                                            //   ),
+                                            // );
+
+                                            // ScaffoldMessenger.of(context)
+                                            //     .showSnackBar(snackBar);
+                                            
+                                          },
+                                        child: const Text(
+                                          "Submit Logbook",
+                                          style: TextStyle(
+                                            fontSize: 12.0,
+                                          ),
+                                        ),
+                                      ):
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: kPrimaryColor,
+                                            fixedSize: const Size(200, 40)),
+                                        onPressed: null,
                                         child: const Text(
                                           "Submit Logbook",
                                           style: TextStyle(

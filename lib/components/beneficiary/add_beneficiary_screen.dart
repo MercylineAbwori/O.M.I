@@ -126,253 +126,253 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
         ),
       ),
         body: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: basicFormKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-          
-                // welcome home
-                Row(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Form(
+                key: basicFormKey,
+                child: Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Add Beneficiary",
-                            style: TextStyle(
-                                fontSize: 25,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    
-
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                //Divider
-              
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Divider(
-                    thickness: 1,
-                    color: Color.fromARGB(255, 204, 204, 204),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-          
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: defaultPadding),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
-                      controller: beneficiaryNameController,
-                      focusNode: beneficiaryNameNode,
-                      decoration: InputDecoration(
-                        labelText: "Beneficiary Name",
-                        labelStyle: TextStyle(
-                            color: beneficiaryNameNode.hasFocus
-                                ? kPrimaryColor
-                                : Colors.grey),
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.all(defaultPadding),
-                          child:
-                              Icon(Icons.person, color: kPrimaryColor),
-                        ),
-                        border: myinputborder(),
-                        enabledBorder: myinputborder(),
-                        focusedBorder: myfocusborder(),
-                      ),
-                      validator: RequiredValidator(
-                        errorText: "Required *",
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: defaultPadding),
-                    child: TextFormField(
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      cursorColor: kPrimaryColor,
-                      controller: memeberIdController,
-                      focusNode: memeberIdNode,
-                      decoration: InputDecoration(
-                        labelText: "Member ID",
-                        labelStyle: TextStyle(
-                            color: memeberIdNode.hasFocus
-                                ? kPrimaryColor
-                                : Colors.grey),
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.all(defaultPadding),
-                          child:
-                              Icon(Icons.card_membership, color: kPrimaryColor),
-                        ),
-                        border: myinputborder(),
-                        enabledBorder: myinputborder(),
-                        focusedBorder: myfocusborder(),
-                      ),
-                      validator: RequiredValidator(
-                        errorText: "Required *",
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: defaultPadding),
-                    child: TextFormField(
-                      focusNode: dateOfBirthNode,
-                      decoration: InputDecoration(
-                        labelText: 'Date of Birth',
-                        border: myinputborder(),
-                        enabledBorder: myinputborder(),
-                        focusedBorder: myfocusborder(),
-                      ),
-                      controller: dateOfBirthController,
-                      readOnly: true,
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(1950),
-                            lastDate: DateTime(2050));
-
-                        if (pickedDate != null) {
-                          dateOfBirthController.text =
-                              DateFormat("yyyy-MM-dd HH:mm:ss")
-                                  .format(pickedDate);
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: defaultPadding),
-                    child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        hint: const Text(
-                          'Gender',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        value: dropdownValue,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                          });
-                        },
-                        validator: (value) =>
-                            value == null ? 'field required' : null,
-                        items: <String>[
-                          'female',
-                          'male'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Row(
-                              children: [
-                                Text(
-                                  value,
-                                ),
-                              ],
+                    const SizedBox(height: 20),
+            
+                  // welcome home
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Add Beneficiary",
+                              style: TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          );
-                        }).toList()),
+                            
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+          
+                      
+          
+                    ],
                   ),
-                  const SizedBox(
-                    width: 20,
+          
+                  const SizedBox(height: 10),
+          
+                  //Divider
+                
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Divider(
+                      thickness: 1,
+                      color: Color.fromARGB(255, 204, 204, 204),
+                    ),
                   ),
-                  
-                  SizedBox(
-                    height: 40.0,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          fixedSize: const Size(200, 40)),
-                      onPressed: () async {
-                          
-                          await addBeneficiary(
-                                    beneficiaryNameController.text,
-                                    memeberIdController.text,
-                                    dateOfBirthController.text,
-                                    dropdownValue,
-                              );
-
-                            // (_statusCode == 5000)
-                            //     ? 
-                            //     // Navigator.push(
-                            //     //     context,
-                            //     //     MaterialPageRoute(
-                            //     //       builder: (context) {
-                            //     //         return CommonUIPage();
-                            //     //       },
-                            //     //     ),
-                            //     //   )
-
-                                  
-                            //     // : 
-                            //     Navigator.pop(context)
-                            // // setState(
-                            // //   () {},
-                            // // );
-
-                            final snackBar = SnackBar(
-                              content: Text(_statusMessage),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () {
-                                  // Some code to undo the change.
-                                },
+          
+                  const SizedBox(height: 20),
+            
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: defaultPadding),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        cursorColor: kPrimaryColor,
+                        controller: beneficiaryNameController,
+                        focusNode: beneficiaryNameNode,
+                        decoration: InputDecoration(
+                          labelText: "Beneficiary Name",
+                          labelStyle: TextStyle(
+                              color: beneficiaryNameNode.hasFocus
+                                  ? kPrimaryColor
+                                  : Colors.grey),
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.all(defaultPadding),
+                            child:
+                                Icon(Icons.person, color: kPrimaryColor),
+                          ),
+                          border: myinputborder(),
+                          enabledBorder: myinputborder(),
+                          focusedBorder: myfocusborder(),
+                        ),
+                        validator: RequiredValidator(
+                          errorText: "Required *",
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: defaultPadding),
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        cursorColor: kPrimaryColor,
+                        controller: memeberIdController,
+                        focusNode: memeberIdNode,
+                        decoration: InputDecoration(
+                          labelText: "Member ID",
+                          labelStyle: TextStyle(
+                              color: memeberIdNode.hasFocus
+                                  ? kPrimaryColor
+                                  : Colors.grey),
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.all(defaultPadding),
+                            child:
+                                Icon(Icons.card_membership, color: kPrimaryColor),
+                          ),
+                          border: myinputborder(),
+                          enabledBorder: myinputborder(),
+                          focusedBorder: myfocusborder(),
+                        ),
+                        validator: RequiredValidator(
+                          errorText: "Required *",
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: defaultPadding),
+                      child: TextFormField(
+                        focusNode: dateOfBirthNode,
+                        decoration: InputDecoration(
+                          labelText: 'Date of Birth',
+                          border: myinputborder(),
+                          enabledBorder: myinputborder(),
+                          focusedBorder: myfocusborder(),
+                        ),
+                        controller: dateOfBirthController,
+                        readOnly: true,
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1950),
+                              lastDate: DateTime(2050));
+          
+                          if (pickedDate != null) {
+                            dateOfBirthController.text =
+                                DateFormat("yyyy-MM-dd HH:mm:ss")
+                                    .format(pickedDate);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: defaultPadding),
+                      child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          hint: const Text(
+                            'Gender',
+                            style: TextStyle(fontSize: 17),
+                          ),
+                          value: dropdownValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownValue = newValue!;
+                            });
+                          },
+                          validator: (value) =>
+                              value == null ? 'field required' : null,
+                          items: <String>[
+                            'female',
+                            'male'
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    value,
+                                  ),
+                                ],
                               ),
                             );
-
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                          
-                          },
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(
-                          fontSize: 20.0,
+                          }).toList()),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    
+                    SizedBox(
+                      height: 40.0,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                            fixedSize: const Size(200, 40)),
+                        onPressed: () async {
+                            
+                            await addBeneficiary(
+                                      beneficiaryNameController.text,
+                                      memeberIdController.text,
+                                      dateOfBirthController.text,
+                                      dropdownValue,
+                                );
+          
+                              // (_statusCode == 5000)
+                              //     ? 
+                              //     Navigator.push(
+                              //         context,
+                              //         MaterialPageRoute(
+                              //           builder: (context) {
+                              //             return CommonUIPage();
+                              //           },
+                              //         ),
+                              //       )
+          
+                                    
+                              //     : 
+                              Navigator.pop(context);
+                              
+          
+                              final snackBar = SnackBar(
+                                content: Text(_statusMessage),
+                                action: SnackBarAction(
+                                  label: 'Undo',
+                                  onPressed: () {
+                                    // Some code to undo the change.
+                                  },
+                                ),
+                              );
+          
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          
+                            
+                            },
+                        child: const Text(
+                          "Submit",
+                          style: TextStyle(
+                            fontSize: 20.0,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: defaultPadding / 2,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  
-                ],
+                    const SizedBox(
+                      height: defaultPadding / 2,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    
+                  ],
+                ),
               ),
             ),
           ),

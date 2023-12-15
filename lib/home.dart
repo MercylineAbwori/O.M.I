@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
@@ -8,8 +9,10 @@ import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/components/upload_files/upload_files.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/initiate_claim.dart';
 import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 import 'package:one_million_app/shared/constants.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -35,6 +38,10 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
+//policy Details Modal
+  
+
 
 class _HomePageState extends State<HomePage> {
   // padding constants
@@ -289,7 +296,9 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return UploadFiles();
+                                          return UploadFiles(
+                                            userId: widget.userId
+                                          );
                                         },
                                       ),
                                     );

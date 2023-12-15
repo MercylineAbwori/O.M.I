@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
   //User Details
   late String _email;
   late String _msisdn;
-  late String _name;
+  String? _name;
 
   // late num _userId;
 
@@ -120,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
         _statusCode = obj["statusCode"];
         _statusMessage = obj["statusMessage"];
         _otp = obj["result"]["data"]["otpId"];
+        // _userId = obj["result"]["data"]["userId"];
       });
 
       // // print('Responce Status Code : ' + response.statusCode);
@@ -470,7 +471,7 @@ class _LoginPageState extends State<LoginPage> {
                               builder: (context) {
                                 return CommonUIPage(
                                   userId: _userId,
-                                  name: _name,
+                                  name: _name!,
                                   msisdn: _msisdn,
                                   email: _email,
                                   message: message,

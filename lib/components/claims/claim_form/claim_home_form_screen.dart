@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/claims/generate_pdf.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/initiate_claim.dart';
 import 'package:one_million_app/core/model/upload_document_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:flutter/foundation.dart';
@@ -110,6 +111,7 @@ class _ClaimFormState extends State<ClaimForm>
   bool? _isButtonDisabledResultSickSheet;
   bool? _isButtonDisabledResultPoliceAbstruct;
   bool? _isButtonDisabledClaimForm;
+  bool? _isButtonDisabledPicturesOfAccident;
 
   //All file responce messages
   String? messageResultMedicalReport;
@@ -121,6 +123,7 @@ class _ClaimFormState extends State<ClaimForm>
   String? messageResultSickSheet;
   String? messageResultPoliceAbstruct;
   String? messageResultClaimForm;
+  String? messageResultPicturesOfAccident;
 
 
   late TabController _tabController;
@@ -149,6 +152,7 @@ class _ClaimFormState extends State<ClaimForm>
       }
     },
     );
+  }
     
     Future<List<UploadFileModal>?> pickerFiles(userId, documentName, file) async {
     try {
@@ -157,8 +161,9 @@ class _ClaimFormState extends State<ClaimForm>
           Uri.parse(
               ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
 
-      request.files.add(http.MultipartFile(documentName,
-          File(file).readAsBytes().asStream(), File(file).lengthSync()));
+     request.files.add(http.MultipartFile.fromBytes(
+        documentName, 
+        File(file!.path).readAsBytesSync(),filename: file!.path));
 
       var response = await request.send();
       var responced = await http.Response.fromStream(response);
@@ -167,21 +172,45 @@ class _ClaimFormState extends State<ClaimForm>
 
       if (response.statusCode == 200) {
         if (file == resultMedicalReport) {
-          messageResultMedicalReport = responseData["result"]["message"];
+          messageResultMedicalReport = responseData["statusMessage"];
         } else if (file == resultDeathCertificate) {
-          messageResultDeathCertificate = responseData["result"]["message"];
+          messageResultDeathCertificate = responseData["statusMessage"];
         } else if (file == resultPostMortem) {
-          messageResultPostMortem = responseData["result"]["message"];
+          messageResultPostMortem = responseData["statusMessage"];
         } else if (file == resultProofOfFuneralExpences) {
-          messageResultProofOfFuneralExpences = responseData["result"]["message"];
+          messageResultProofOfFuneralExpences = responseData["statusMessage"];
         }else if (file == resultSickSheet) {
-          messageResultSickSheet = responseData["result"]["message"];
+          messageResultSickSheet = responseData["statusMessage"];
         } else if (file == resultPoliceAbstruct) {
-          messageResultPoliceAbstruct = responseData["result"]["message"];
+          messageResultPoliceAbstruct = responseData["statusMessage"];
+        } else if (file == selectedImages) {
+          messageResultPicturesOfAccident = responseData["statusMessage"];
         } 
-        // else if (file == claimForm) {
-        //   messageResultClaimForm = responseData["result"]["message"];
-        // }
+        else if (file == generatePDF(
+          nameInsuredController.text,
+          nameClaimantController.text,
+          postalAddressController.text,
+          postalCodeController.text,
+          emailController.text,
+          occupationController.text,
+          dateOfBirthInputController.text,
+          dateOfLastPremiumInputController.text,
+          agencyController.text,
+          policyNoController.text,
+          agencyPhoneNoController.text,
+          agencyEmailController.text,
+          textarea.text,
+          dateOfAccidentPremiumInputController.text,
+          locationOfAccidentController.text,
+          witnessOccupationController.text,
+          witnessTelephoneController.text,
+          witnessNameController.text,
+          witnessAddressController.text,
+          claimantFullNameController.text,
+          claimantOccupationController.text,
+        )) {
+          messageResultClaimForm = responseData["result"]["message"];
+        }
       } else {
         throw Exception('Unexpected Calculator error occured!');
       }
@@ -195,8 +224,57 @@ class _ClaimFormState extends State<ClaimForm>
     });
   }
 
-   
-}
+  Future<List<InitiateClaimModal>?> initiateClaimForm(
+    userId,
+    claimForm,
+    medicalReport,
+    sickSheet,
+    policeAbstruct,
+    picturesOfAccident,
+    deathCertificate,
+    postMorterm,
+    proofOfFuneralExpences) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.claimEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId,
+        "userId": 1,
+
+        "claimForm": claimForm,
+        
+        "medicalReport": medicalReport,
+        "sickSheet": sickSheet,
+        "policeAbstruct": policeAbstruct,
+        "picturesOfAccident": picturesOfAccident,
+
+        "deathCertificate": deathCertificate,
+        "postMorterm": postMorterm,
+        "proofOfFuneralExpences": proofOfFuneralExpences,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      
+
+      print('Responce Policy Details Body: ${response.body}');
+
+
+      if (response.statusCode == 200) {
+        throw Exception('Policy Details Displayed Successfully successfully');
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -841,23 +919,54 @@ class _ClaimFormState extends State<ClaimForm>
                                     const SizedBox(
                                       height: defaultPadding / 2,
                                     ),
-                                    SizedBox(
-                                      height: 40.0,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
-                                            fixedSize: const Size(200, 40)),
-                                        onPressed: () {
-
-                                        },
-                                        child: const Text(
-                                          "SUBMIT",
-                                          style: TextStyle(
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    const SizedBox(
+                                              height: 10,
+                                            ),
+                                            SizedBox(
+                                              height: 40.0,
+                                              child: 
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: ()async {
+                                                    await pickerFiles(widget.userId, 'Claim Form' , generatePDF(
+                                                      nameInsuredController.text, 
+                                                      nameClaimantController.text, 
+                                                      postalAddressController.text, 
+                                                      postalCodeController.text, 
+                                                      emailController.text, 
+                                                      occupationController.text, 
+                                                      dateOfBirthInputController.text, 
+                                                      dateOfLastPremiumInputController.text, 
+                                                      agencyController.text, 
+                                                      policyNoController.text, 
+                                                      agencyPhoneNoController.text, 
+                                                      agencyEmailController.text, 
+                                                      textarea.text, 
+                                                      dateOfAccidentPremiumInputController.text, 
+                                                      locationOfAccidentController.text, 
+                                                      witnessOccupationController.text, 
+                                                      witnessTelephoneController.text, 
+                                                      witnessNameController.text, 
+                                                      witnessAddressController.text, 
+                                                      claimantFullNameController.text, 
+                                                      claimantOccupationController.text));
+                                                    
+                                                    
+                                                  },
+                                                child: const Text(
+                                                  "Submit claim form",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              )
+                                              
+                                            ),
+                                            const SizedBox(
+                                              height: defaultPadding / 2,
+                                            ),
                                     const SizedBox(
                                       height: defaultPadding / 2,
                                     ),
@@ -1045,11 +1154,13 @@ class _ClaimFormState extends State<ClaimForm>
 
                                               SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultClaimForm != null)?
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
+                                                onPressed: () async {
+                                                  await pickerFiles(widget.userId, 'Medical Report' ,resultDeathCertificate);
                                                   
                                                 },
                                                 child: const Text(
@@ -1057,7 +1168,19 @@ class _ClaimFormState extends State<ClaimForm>
                                                   style: TextStyle(
                                                     fontSize: 12.0,
                                                   ),
-                                                ),
+                                                )
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
+                                                child: const Text(
+                                                  "Submit Medical Report",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                )
                                               ),
                                             ),
                                             const SizedBox(
@@ -1235,13 +1358,27 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultMedicalReport != null)?
+                                              
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
-                                                  
+                                                onPressed: () async{
+                                                  await pickerFiles(widget.userId, 'Sick Sheet' ,resultSickSheet);
                                                 },
+                                                child: const Text(
+                                                  "Submit sick sheet",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
                                                 child: const Text(
                                                   "Submit sick sheet",
                                                   style: TextStyle(
@@ -1383,13 +1520,28 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                                 height: 40.0,
-                                                child: ElevatedButton(
+                                                child: (messageResultSickSheet != null)?
+                                                ElevatedButton(
                                                   style: ElevatedButton.styleFrom(
                                                       backgroundColor: kPrimaryColor,
                                                       fixedSize: const Size(200, 40)),
-                                                  onPressed: () {
+                                                  onPressed: ()async {
+                                                    await pickerFiles(widget.userId, 'Police Abstract' ,resultPoliceAbstruct);
+                                                    
                                                     
                                                   },
+                                                  child: const Text(
+                                                    "Submit Police Abstract",
+                                                    style: TextStyle(
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                ):
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                      backgroundColor: kPrimaryColor,
+                                                      fixedSize: const Size(200, 40)),
+                                                  onPressed: null,
                                                   child: const Text(
                                                     "Submit Police Abstract",
                                                     style: TextStyle(
@@ -1518,13 +1670,28 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultPoliceAbstruct != null)?
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
-                                                  
-                                                },
+                                                onPressed: ()async {
+                                                    await pickerFiles(widget.userId, 'Pictures of Accident' , selectedImages);
+                                                    
+                                                    
+                                                  },
+                                                child: const Text(
+                                                  "Submit pictures of the accident",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
                                                 child: const Text(
                                                   "Submit pictures of the accident",
                                                   style: TextStyle(
@@ -1663,13 +1830,28 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultPicturesOfAccident != null)?
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
-                                                  
-                                                },
+                                                onPressed: ()async {
+                                                    await pickerFiles(widget.userId, 'Death Certificate' , resultDeathCertificate);
+                                                    
+                                                    
+                                                  },
+                                                child: const Text(
+                                                  "Submit Death Certificate",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
                                                 child: const Text(
                                                   "Submit Death Certificate",
                                                   style: TextStyle(
@@ -1811,13 +1993,28 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultDeathCertificate != null)?
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
-                                                  
-                                                },
+                                                onPressed: ()async {
+                                                    await pickerFiles(widget.userId, 'Post Morterm' , resultPostMortem);
+                                                    
+                                                    
+                                                  },
+                                                child: const Text(
+                                                  "Submit Post Morterm",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
                                                 child: const Text(
                                                   "Submit Post Morterm",
                                                   style: TextStyle(
@@ -1959,13 +2156,29 @@ class _ClaimFormState extends State<ClaimForm>
                                             ),
                                             SizedBox(
                                               height: 40.0,
-                                              child: ElevatedButton(
+                                              child: (messageResultPostMortem != null)?
+                                              ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                     backgroundColor: kPrimaryColor,
                                                     fixedSize: const Size(200, 40)),
-                                                onPressed: () {
+                                                onPressed: () 
+                                                  async {
+                                                    await pickerFiles(widget.userId, 'Funeral Expences' , resultProofOfFuneralExpences);
+                                                    
                                                   
                                                 },
+                                                child: const Text(
+                                                  "Submit Proof of Funeral Expences",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ):
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor: kPrimaryColor,
+                                                    fixedSize: const Size(200, 40)),
+                                                onPressed: null,
                                                 child: const Text(
                                                   "Submit Proof of Funeral Expences",
                                                   style: TextStyle(
@@ -1981,6 +2194,59 @@ class _ClaimFormState extends State<ClaimForm>
                                         ),
                                       ),
                                     ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  SizedBox(
+                                    height: 40.0,
+                                    child:
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryColor,
+                                          fixedSize: const Size(200, 40)),
+                                      onPressed: () 
+                                        async {
+                                          await initiateClaimForm(widget.userId, 
+                                            generatePDF(
+                                            nameInsuredController.text,
+                                            nameClaimantController.text,
+                                            postalAddressController.text,
+                                            postalCodeController.text,
+                                            emailController.text,
+                                            occupationController.text,
+                                            dateOfBirthInputController.text,
+                                            dateOfLastPremiumInputController.text,
+                                            agencyController.text,
+                                            policyNoController.text,
+                                            agencyPhoneNoController.text,
+                                            agencyEmailController.text,
+                                            textarea.text,
+                                            dateOfAccidentPremiumInputController.text,
+                                            locationOfAccidentController.text,
+                                            witnessOccupationController.text,
+                                            witnessTelephoneController.text,
+                                            witnessNameController.text,
+                                            witnessAddressController.text,
+                                            claimantFullNameController.text,
+                                            claimantOccupationController.text,),
+                                            resultMedicalReport,
+                                            resultSickSheet,
+                                            resultPoliceAbstruct,
+                                            selectedImages,
+                                            resultDeathCertificate,
+                                            resultPostMortem,
+                                            resultProofOfFuneralExpences);
+                                          
+                                        
+                                      },
+                                      child: const Text(
+                                        "Initiate Form",
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
+                                    )
                                   ),
                                   
                                     const SizedBox(
@@ -2008,47 +2274,48 @@ class _ClaimFormState extends State<ClaimForm>
 
 
 
-Widget CustomButton(
-    {required String title,
-    required IconData icon,
-    required VoidCallback onClick}) {
-  return Container(
-    width: 200,
-    child: ElevatedButton(
-      onPressed: onClick,
-      child: Row(
-        children: [
-          Icon(icon),
-          SizedBox(
-            width: 10,
+    Widget CustomButton(
+        {required String title,
+        required IconData icon,
+        required VoidCallback onClick}) {
+      return Container(
+        width: 200,
+        child: ElevatedButton(
+          onPressed: onClick,
+          child: Row(
+            children: [
+              Icon(icon),
+              SizedBox(
+                width: 10,
+              ),
+              Text(title)
+            ],
           ),
-          Text(title)
-        ],
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: kPrimaryLightColor,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-    ),
-  );
-}
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kPrimaryLightColor,
+            foregroundColor: Colors.black,
+            elevation: 0,
+          ),
+        ),
+      );
+    }
 
-OutlineInputBorder myinputborder() {
-  //return type is OutlineInputBorder
-  return const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black, width: 0),
-      borderRadius: BorderRadius.all(
-        Radius.circular(8),
-      ));
-}
+    OutlineInputBorder myinputborder() {
+      //return type is OutlineInputBorder
+      return const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black, width: 0),
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ));
+    }
 
-OutlineInputBorder myfocusborder() {
-  return const OutlineInputBorder(
-      borderSide: BorderSide(color: kPrimaryColor, width: 0),
-      borderRadius: BorderRadius.all(
-        Radius.circular(8),
-      ));
-}
+    OutlineInputBorder myfocusborder() {
+      return const OutlineInputBorder(
+          borderSide: BorderSide(color: kPrimaryColor, width: 0),
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ));
+    }
 
-}
+
+  }
