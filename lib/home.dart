@@ -70,41 +70,41 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: IconButton(
-              iconSize: 100,
-              icon: Ink.image(
-                image:
-                    const AssetImage('assets/icons/profile_icons/profile.jpg'),
-              ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ProfileScreen(
-                        userName: widget.userName,
-                        userId: widget.userId,
-                        phone: widget.phone,
-                        email: widget.email,
-                        message: widget.message,
-                      );
-                    },
-                  ),
-                );
-                setState(
-                  () {
-                    count++;
-                  },
-                );
-              },
-            ),
-          ),
-        ),
+        // leading: Container(
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(4.0),
+        //     child: IconButton(
+        //       iconSize: 100,
+        //       icon: Ink.image(
+        //         image:
+        //             const AssetImage('assets/icons/profile_icons/profile.jpg'),
+        //       ),
+        //       // the method which is called
+        //       // when button is pressed
+        //       onPressed: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) {
+        //               return ProfileScreen(
+        //                 userName: widget.userName,
+        //                 userId: widget.userId,
+        //                 phone: widget.phone,
+        //                 email: widget.email,
+        //                 message: widget.message,
+        //               );
+        //             },
+        //           ),
+        //         );
+        //         setState(
+        //           () {
+        //             count++;
+        //           },
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
         actions: <Widget>[
           // notification icon
           Padding(
@@ -237,7 +237,9 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               //Add Beneficiary
                               Container(
-                                padding: EdgeInsets.all(8.0),
+                                width: 160,
+                                height: 100,
+                                padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryLightColor,
@@ -286,7 +288,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               //Upload Documents
                               Container(
-                                padding: EdgeInsets.all(8.0),
+                                width: 160,
+                                height: 100,
+                                padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryLightColor,
@@ -341,7 +345,9 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               //Share Promo Code
                               Container(
-                                padding: EdgeInsets.all(8.0),
+                                width: 160,
+                                height: 100,
+                                padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kPrimaryLightColor,
@@ -383,7 +389,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               //Default Claim
                               Container(
-                                padding: EdgeInsets.all(8.0),
+                                width: 160,
+                                height: 100,
+                                padding: EdgeInsets.all(10.0),
                                 child: (widget.buttonClaimStatus == false)
                                     ? ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -479,74 +487,76 @@ class _HomePageState extends State<HomePage> {
 
               Container(
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      (widget.message.isEmpty)
-                          ? const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Card(
-                                elevation: 5,
-                                shadowColor: Colors.black,
-                                child: Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(40.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.info,
-                                          size: 100,
-                                          color: kPrimaryColor,
-                                        ),
-                                        SizedBox(height: 20),
-                                        Text(
-                                          'You have no activities',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold),
-                                          // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                        ),
-                                        SizedBox(height: 20),
-                                      ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        (widget.message.isEmpty)
+                            ? const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Card(
+                                  elevation: 5,
+                                  shadowColor: Colors.black,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(40.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.info,
+                                            size: 100,
+                                            color: kPrimaryColor,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text(
+                                            'You have no activities',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                                          ),
+                                          SizedBox(height: 20),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
+                              )
+                            : Container(
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.all(8),
+                                  itemCount: 5,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return Card(
+                                      color: Colors.white,
+                                      borderOnForeground: true,
+                                      elevation: 6,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          ListTile(
+                                            leading:
+                                                const Icon(Icons.notifications),
+                                            title: Text(widget.message[index]),
+                                            // title: Text('Notification'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) =>
+                                          const Divider(),
+                                ),
                               ),
-                            )
-                          : Container(
-                              child: ListView.separated(
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.all(8),
-                                itemCount: 5,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: Colors.white,
-                                    borderOnForeground: true,
-                                    elevation: 6,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        ListTile(
-                                          leading:
-                                              const Icon(Icons.notifications),
-                                          title: Text(widget.message[index]),
-                                          // title: Text('Notification'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        const Divider(),
-                              ),
-                            ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               )

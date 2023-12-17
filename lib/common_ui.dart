@@ -13,7 +13,6 @@ import 'package:titled_navigation_bar/titled_navigation_bar.dart';
 import 'package:http/http.dart' as http;
 
 class CommonUIPage extends StatefulWidget {
-
   final num userId;
   final String name;
   final String msisdn;
@@ -27,7 +26,7 @@ class CommonUIPage extends StatefulWidget {
 
   final bool buttonClaimStatus;
 
-    //Policy Details
+  //Policy Details
 
   final String nextPayment;
   final num paymentAmount;
@@ -40,7 +39,9 @@ class CommonUIPage extends StatefulWidget {
   final List<dynamic> rowsBenefits;
   final List<dynamic> rowsSumIsured;
 
-  
+  final List<dynamic> claimListData;
+
+  final String profilePic;
 
   CommonUIPage(
       {Key? key,
@@ -59,13 +60,13 @@ class CommonUIPage extends StatefulWidget {
       required this.sumInsured,
       required this.tableData,
       required this.rowsBenefits,
-      required this.rowsSumIsured
-      })
+      required this.rowsSumIsured,
+      required this.claimListData,
+      required this.profilePic})
       : super(key: key);
   @override
   _CommonUIPageState createState() => _CommonUIPageState();
 }
-
 
 class _CommonUIPageState extends State<CommonUIPage> {
   int _selectedIndex = 0;
@@ -84,44 +85,45 @@ class _CommonUIPageState extends State<CommonUIPage> {
             buttonClaimStatus: widget.buttonClaimStatus);
       case 1:
         return CoveragePage(
-          userName: widget.name,
-          userId: widget.userId,
-          phone: widget.msisdn,
-          email: widget.email,
-          message: widget.message,
-          nextPayment: widget.nextPayment,
-          paymentAmount: widget.paymentAmount,
-          paymentPeriod: widget.paymentPeriod,
-          policyNumber: widget.policyNumber,
-          sumInsured: widget.sumInsured,
-          uptoDatePaymentData: widget.uptoDatePaymentData,
-          buttonClaimStatus: widget.buttonClaimStatus,
-          promotionCode: widget.promotionCode,
-          tableData: [],
-          rowsBenefits: [],
-          rowsSumIsured: [],
-          addStampDuty: 0,
-          annualPremium: 0,
-          basicPremium: 0,
-          dailyPremium: 0,
-          monthlyPremium: 0,
-          totalPremium: 0,
-          weeklyPremium: 0
-        );
+            userName: widget.name,
+            userId: widget.userId,
+            phone: widget.msisdn,
+            email: widget.email,
+            message: widget.message,
+            nextPayment: widget.nextPayment,
+            paymentAmount: widget.paymentAmount,
+            paymentPeriod: widget.paymentPeriod,
+            policyNumber: widget.policyNumber,
+            sumInsured: widget.sumInsured,
+            uptoDatePaymentData: widget.uptoDatePaymentData,
+            buttonClaimStatus: widget.buttonClaimStatus,
+            promotionCode: widget.promotionCode,
+            tableData: [],
+            rowsBenefits: [],
+            rowsSumIsured: [],
+            addStampDuty: 0,
+            annualPremium: 0,
+            basicPremium: 0,
+            dailyPremium: 0,
+            monthlyPremium: 0,
+            totalPremium: 0,
+            weeklyPremium: 0);
       case 2:
         return ClaimHomePage(
             userName: widget.name,
             userId: widget.userId,
             phone: widget.msisdn,
             email: widget.email,
-            message: widget.message);
+            message: widget.message,
+            claimListData: widget.claimListData);
       case 3:
         return ProfileScreen(
             userName: widget.name,
             userId: widget.userId,
             phone: widget.msisdn,
             email: widget.email,
-            message: widget.message);
+            message: widget.message,
+            profilePic: widget.profilePic);
 
       default:
         HomePage(
@@ -137,9 +139,7 @@ class _CommonUIPageState extends State<CommonUIPage> {
   }
 
   void _onItemTapped(int index) async {
-
-    
-    setState(()  {
+    setState(() {
       _selectedIndex = index;
     });
     // if(_selectedIndex == 1){

@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 class InitiateClaimModal extends ChangeNotifier {
   num? userId;
 
+  num? claimId;
+
+  String? claimType;
   File? claimForm;
-  
+
   File? medicalReport;
   File? sickSheet;
   File? policeAbstruct;
@@ -24,6 +27,3 @@ class InitiateClaimModal extends ChangeNotifier {
     notifyListeners();
   }
 }
-
-
-

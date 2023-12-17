@@ -17,4 +17,5 @@ class ApiConstants {
   static String policyDetailsEndpoint = '/policyDetails';
   static String defaultPolicyPayEndpoint = '/defaultPolicyPay';
   static String claimDefaultEndpoint = '/claimDefault';
+  static String fetchProfileEndpoint = '/fetchDocument';
 }

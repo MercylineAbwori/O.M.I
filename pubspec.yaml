@@ -52,6 +52,7 @@ dependencies:
   flutter_share: ^2.0.0
   image_picker: ^1.0.5
   file_picker: ^6.1.1
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:

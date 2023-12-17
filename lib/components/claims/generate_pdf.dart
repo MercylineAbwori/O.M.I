@@ -36,18 +36,18 @@ Future<File> generatePDF(
 ) async {
   final pdf = pw.Document();
 
-  final img = await rootBundle.load('assets/images.png');
-  final imageBytes = img.buffer.asUint8List();
+  // final img = await rootBundle.load('assets/images.png');
+  // final imageBytes = img.buffer.asUint8List();
 
-  final imgtitle = await rootBundle.load('assets/title.png');
-  final imagetitleBytes = imgtitle.buffer.asUint8List();
+  // final imgtitle = await rootBundle.load('assets/title.png');
+  // final imagetitleBytes = imgtitle.buffer.asUint8List();
 
-  final imglogo = await rootBundle.load('assets/logo.png');
-  final imagelogoBytes = imglogo.buffer.asUint8List();
+  // final imglogo = await rootBundle.load('assets/logo.png');
+  // final imagelogoBytes = imglogo.buffer.asUint8List();
 
-  pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
-  pw.Image image2 = pw.Image(pw.MemoryImage(imagetitleBytes));
-  pw.Image image3 = pw.Image(pw.MemoryImage(imagelogoBytes));
+  // pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
+  // pw.Image image2 = pw.Image(pw.MemoryImage(imagetitleBytes));
+  // pw.Image image3 = pw.Image(pw.MemoryImage(imagelogoBytes));
 //Basic Details
     pdf.addPage(pw.Page(
       build: (pw.Context context) {
@@ -69,23 +69,23 @@ Future<File> generatePDF(
 
             pw.SizedBox(width: 20),
             pw.Row(children: [
-              pw.Align(
-                alignment: pw.Alignment.centerLeft,
-                child: pw.Container(
-                width: 500,
-                    height: 200,
-                    child: image2
-              )
-              ),
+              // pw.Align(
+              //   alignment: pw.Alignment.centerLeft,
+              //   child: pw.Container(
+              //   width: 500,
+              //       height: 200,
+              //       child: image2
+              // )
+              // ),
               pw.SizedBox(height: 20),
-              pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Container(
-                width: 500,
-                    height: 200,
-                    child: image3
-              )
-              )
+              // pw.Align(
+              //   alignment: pw.Alignment.centerRight,
+              //   child: pw.Container(
+              //   width: 500,
+              //       height: 200,
+              //       child: image3
+              // )
+              // )
               
             ]),
             pw.SizedBox(height: 20),
@@ -601,11 +601,11 @@ Future<File> generatePDF(
               ),
               ),
             pw.SizedBox(height: 300),
-            pw.Container(
-              width: 500,
-                  height: 200,
-                  child: image1
-            )
+            // pw.Container(
+            //   width: 500,
+            //       height: 200,
+            //       child: image1
+            // )
               
 
               

@@ -22,18 +22,18 @@ import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:path_provider/path_provider.dart';
 
-class ClaimForm extends StatefulWidget {
+class ClaimReviewForm extends StatefulWidget {
   final num userId;
 
-  const ClaimForm({
+  const ClaimReviewForm({
     Key? key,
     required this.userId,
   }) : super(key: key);
   @override
-  _ClaimFormState createState() => _ClaimFormState();
+  _ClaimReviewFormState createState() => _ClaimReviewFormState();
 }
 
-class _ClaimFormState extends State<ClaimForm>
+class _ClaimReviewFormState extends State<ClaimReviewForm>
     with SingleTickerProviderStateMixin {
   GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
 
@@ -47,8 +47,6 @@ class _ClaimFormState extends State<ClaimForm>
   FilePickerResult? resultClaimForm;
   FilePickerResult? resultMedicalReport;
 
-  // FilePickerResult? resultMedicalCertificate;
-  // FilePickerResult? resultProofOfEarning;
   FilePickerResult? resultDeathCertificate;
 
   FilePickerResult? resultPostMortem;
@@ -300,22 +298,6 @@ class _ClaimFormState extends State<ClaimForm>
       log(e.toString());
     }
   }
-
-  late final String? selectedImagesName = 'pictures of accident';
-  String? resultClaimFormName = 'claim form';
-  String? resultMedicalReportName = 'medical report';
-
-  String? resultDeathCertificateName = 'death certificate';
-
-  String? resultPostMortemName= 'post morterm';
-  String? resultProofOfFuneralExpencesName= 'funeral expenses';
-
-  String? resultSickSheetName= 'sick sheet';
-
-  String? resultPoliceAbstructName= 'police abstruct';
-
- 
-
 
   @override
   Widget build(BuildContext context) {

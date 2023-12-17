@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+import 'package:async/async.dart';
 
 //constants
 const buttonTextStyle = TextStyle(
@@ -72,12 +74,24 @@ class _UploadFilesState extends State<UploadFiles>
           Uri.parse(
               ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
 
-      // request.files.add(http.MultipartFile(documentName,
-      //     File(file!.path).readAsBytes(), File(documentName).lengthSync()));
+      // open a bytestream
+      var stream = http.ByteStream(DelegatingStream.typed(file.openRead()));
+      // get file length
+      var length = await file.length();
+
+      // multipart that takes file
+      var multipartFile = http.MultipartFile('file', stream, length,
+          filename: basename(file.path));
+
+      request.fields.addAll(
+          {"userId": json.encode(userId), "documentName": documentName});
+      // request.fields["documentName"] = documentName;
       // request.fields["userId"] = userId.toString();
-      request.files.add(http.MultipartFile.fromBytes(
-        documentName, 
-        File(file!.path).readAsBytesSync(),filename: file!.path));
+
+      
+
+      // add file to multipart
+      request.files.add(multipartFile);
 
       var response = await request.send();
       var responced = await http.Response.fromStream(response);
@@ -99,11 +113,13 @@ class _UploadFilesState extends State<UploadFiles>
       } else {
         throw Exception('Unexpected Calculator error occured!');
       }
+      log('The Request Payload : ${request.files}');
     } on PlatformException catch (e) {
       log('Unsupported operation' + e.toString());
     } catch (e) {
       log(e.toString());
     }
+
     setState(() {
       _isButtonDisabledFID = true;
     });
@@ -329,39 +345,39 @@ class _UploadFilesState extends State<UploadFiles>
                                       ),
                                       const SizedBox(height: 10),
                                       SizedBox(
-                                        height: 40.0,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: kPrimaryColor,
-                                              fixedSize: const Size(200, 40)),
-                                          onPressed: () async{
-                                            await pickerFiles(widget.userId, 'Front National ID', _imageFrontId);
+                                          height: 40.0,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                backgroundColor: kPrimaryColor,
+                                                fixedSize: const Size(200, 40)),
+                                            onPressed: () async {
+                                              // await pickerFiles(widget.userId, 'Front National ID', _imageFrontId);
+                                              await pickerFiles(
+                                                  widget.userId,
+                                                  // 'Front National ID',
+                                                  'front national id',
+                                                  _imageFrontId);
 
+                                              // final snackBar = SnackBar(
+                                              //   content: Text(messageFrontID!),
+                                              //   action: SnackBarAction(
+                                              //     label: 'Undo',
+                                              //     onPressed: () {
+                                              //       // Some code to undo the change.
+                                              //     },
+                                              //   ),
+                                              // );
 
-                                            // final snackBar = SnackBar(
-                                            //   content: Text(messageFrontID!),
-                                            //   action: SnackBarAction(
-                                            //     label: 'Undo',
-                                            //     onPressed: () {
-                                            //       // Some code to undo the change.
-                                            //     },
-                                            //   ),
-                                            // );
-
-                                            // ScaffoldMessenger.of(context)
-                                            //     .showSnackBar(snackBar);
-                                            
-                                            
-                                          },
-                                          child: const Text(
-                                            "Submit Front ID",
-                                            style: TextStyle(
-                                              fontSize: 12.0,
+                                              // ScaffoldMessenger.of(context)
+                                              //     .showSnackBar(snackBar);
+                                            },
+                                            child: const Text(
+                                              "Submit Front ID",
+                                              style: TextStyle(
+                                                fontSize: 12.0,
+                                              ),
                                             ),
-                                          ),
-                                        )
-                                        
-                                      ),
+                                          )),
                                     ],
                                   ),
                                   const SizedBox(
@@ -451,48 +467,55 @@ class _UploadFilesState extends State<UploadFiles>
                                       const SizedBox(height: 10),
                                       SizedBox(
                                         height: 40.0,
-                                        child: (messageFrontID != null)?
-                                        
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: kPrimaryColor,
-                                              fixedSize: const Size(200, 40)),
-                                          onPressed: () async{
-                                            await pickerFiles(widget.userId, 'Back National ID' , _imageBackId);
+                                        child: (messageFrontID ==
+                                                'Request processed Successfully')
+                                            ? ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        kPrimaryColor,
+                                                    fixedSize:
+                                                        const Size(200, 40)),
+                                                onPressed: () async {
+                                                  await pickerFiles(
+                                                      widget.userId,
+                                                      // 'Back National ID',
+                                                      'back national id',
+                                                      _imageBackId);
 
-                                            // final snackBar = SnackBar(
-                                            //   content: Text(messageEndID!),
-                                            //   action: SnackBarAction(
-                                            //     label: 'Undo',
-                                            //     onPressed: () {
-                                            //       // Some code to undo the change.
-                                            //     },
-                                            //   ),
-                                            // );
+                                                  // final snackBar = SnackBar(
+                                                  //   content: Text(messageEndID!),
+                                                  //   action: SnackBarAction(
+                                                  //     label: 'Undo',
+                                                  //     onPressed: () {
+                                                  //       // Some code to undo the change.
+                                                  //     },
+                                                  //   ),
+                                                  // );
 
-                                            // ScaffoldMessenger.of(context)
-                                            //     .showSnackBar(snackBar);
-                                            
-                                          },
-                                          child: const Text(
-                                            "Submit Back ID",
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                            ),
-                                          ),
-                                        ) :
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: kPrimaryColor,
-                                              fixedSize: const Size(200, 40)),
-                                          onPressed: null,
-                                          child: const Text(
-                                            "Submit Back ID",
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                            ),
-                                          ),
-                                        ),
+                                                  // ScaffoldMessenger.of(context)
+                                                  //     .showSnackBar(snackBar);
+                                                },
+                                                child: const Text(
+                                                  "Submit Back ID",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              )
+                                            : ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        kPrimaryColor,
+                                                    fixedSize:
+                                                        const Size(200, 40)),
+                                                onPressed: null,
+                                                child: const Text(
+                                                  "Submit Back ID",
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                  ),
+                                                ),
+                                              ),
                                       ),
                                     ],
                                   ),
@@ -601,47 +624,54 @@ class _UploadFilesState extends State<UploadFiles>
                                     const SizedBox(height: 10),
                                     SizedBox(
                                       height: 40.0,
-                                      child: (messageEndID != null)?
-                                       ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
-                                            fixedSize: const Size(200, 40)),
-                                        onPressed: () async{
-                                            await pickerFiles(widget.userId, 'Driving Licence' , _imageDrivingLincencs);
-                                            
-                                            // final snackBar = SnackBar(
-                                            //   content: Text(messageDrivingL!),
-                                            //   action: SnackBarAction(
-                                            //     label: 'Undo',
-                                            //     onPressed: () {
-                                            //       // Some code to undo the change.
-                                            //     },
-                                            //   ),
-                                            // );
+                                      child: (messageEndID ==
+                                              'Request processed Successfully')
+                                          ? ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      kPrimaryColor,
+                                                  fixedSize:
+                                                      const Size(200, 40)),
+                                              onPressed: () async {
+                                                await pickerFiles(
+                                                    widget.userId,
+                                                    'driving licence',
+                                                    _imageDrivingLincencs);
 
-                                            // ScaffoldMessenger.of(context)
-                                            //     .showSnackBar(snackBar);
-                                            
-                                          },
-                                        child: const Text(
-                                          "Submit Driving License",
-                                          style: TextStyle(
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ):
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
-                                            fixedSize: const Size(200, 40)),
-                                        onPressed: null,
-                                        child: const Text(
-                                          "Submit Driving License",
-                                          style: TextStyle(
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ),
+                                                // final snackBar = SnackBar(
+                                                //   content: Text(messageDrivingL!),
+                                                //   action: SnackBarAction(
+                                                //     label: 'Undo',
+                                                //     onPressed: () {
+                                                //       // Some code to undo the change.
+                                                //     },
+                                                //   ),
+                                                // );
+
+                                                // ScaffoldMessenger.of(context)
+                                                //     .showSnackBar(snackBar);
+                                              },
+                                              child: const Text(
+                                                "Submit Driving License",
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                ),
+                                              ),
+                                            )
+                                          : ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      kPrimaryColor,
+                                                  fixedSize:
+                                                      const Size(200, 40)),
+                                              onPressed: null,
+                                              child: const Text(
+                                                "Submit Driving License",
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ],
                                 ),
@@ -746,48 +776,52 @@ class _UploadFilesState extends State<UploadFiles>
                                     const SizedBox(height: 10),
                                     SizedBox(
                                       height: 40.0,
-                                      child: (messageDrivingL != null)?
-                                      
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
-                                            fixedSize: const Size(200, 40)),
-                                        onPressed: () async{
-                                            await pickerFiles(widget.userId, 'Logbook' , _imageLogbook);
-                                            
-                                            // final snackBar = SnackBar(
-                                            //   content: Text(messageLogBook!),
-                                            //   action: SnackBarAction(
-                                            //     label: 'Undo',
-                                            //     onPressed: () {
-                                            //       // Some code to undo the change.
-                                            //     },
-                                            //   ),
-                                            // );
+                                      child: (messageDrivingL ==
+                                              'Request processed Successfully')
+                                          ? ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      kPrimaryColor,
+                                                  fixedSize:
+                                                      const Size(200, 40)),
+                                              onPressed: () async {
+                                                await pickerFiles(widget.userId,
+                                                    'logbook', _imageLogbook);
 
-                                            // ScaffoldMessenger.of(context)
-                                            //     .showSnackBar(snackBar);
-                                            
-                                          },
-                                        child: const Text(
-                                          "Submit Logbook",
-                                          style: TextStyle(
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ):
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor,
-                                            fixedSize: const Size(200, 40)),
-                                        onPressed: null,
-                                        child: const Text(
-                                          "Submit Logbook",
-                                          style: TextStyle(
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ),
+                                                // final snackBar = SnackBar(
+                                                //   content: Text(messageLogBook!),
+                                                //   action: SnackBarAction(
+                                                //     label: 'Undo',
+                                                //     onPressed: () {
+                                                //       // Some code to undo the change.
+                                                //     },
+                                                //   ),
+                                                // );
+
+                                                // ScaffoldMessenger.of(context)
+                                                //     .showSnackBar(snackBar);
+                                              },
+                                              child: const Text(
+                                                "Submit Logbook",
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                ),
+                                              ),
+                                            )
+                                          : ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      kPrimaryColor,
+                                                  fixedSize:
+                                                      const Size(200, 40)),
+                                              onPressed: null,
+                                              child: const Text(
+                                                "Submit Logbook",
+                                                style: TextStyle(
+                                                  fontSize: 12.0,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ],
                                 ),

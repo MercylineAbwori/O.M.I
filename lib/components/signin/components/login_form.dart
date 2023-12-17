@@ -13,6 +13,7 @@ import 'package:one_million_app/components/sign_up/signup_screen.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/claim_list_model.dart';
 import 'package:one_million_app/core/model/default_claim.dart';
+import 'package:one_million_app/core/model/fetch_document.model.dart';
 import 'package:one_million_app/core/model/login_model.dart';
 import 'package:one_million_app/core/model/notification_model.dart';
 import 'package:one_million_app/core/model/policy_details.dart';
@@ -50,13 +51,13 @@ class _LoginPageState extends State<LoginPage> {
   late String _msisdn;
   String? _name;
 
-  // late num _userId;
-
-  num _userId = 1;
+  late num _userId;
 
   late num _otp;
 
   late List<String> message = [];
+
+  late List<dynamic> claimlistData;
 
   late String uptoDatePaymentData;
 
@@ -165,15 +166,44 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<List<ClaimListModal>?> listClaim(_userId) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.claimListEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": _userId,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        claimlistData = obj["result"]["data"];
+      });
+
+      print('Claim LIst Below: $claimlistData');
+      if (response.statusCode == 200) {
+        throw Exception('Claim LIst retrieved successfully');
+      } else {
+        throw Exception('Unexpected verify OTP error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
   Future<List<NotificationModal>?> getNotification(userId) async {
     try {
       var url =
           Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId
-        "userId": 1
-      });
+      final body = jsonEncode({"userId": userId});
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -217,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         // "userId": userId,
-        "userId": 1,
+        "userId": userId,
       });
 
       final response = await http.post(url, headers: headers, body: body);
@@ -296,7 +326,7 @@ class _LoginPageState extends State<LoginPage> {
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         // "userId": userId,
-        "userId": 1
+        "userId": userId
       });
 
       final response = await http.post(url, headers: headers, body: body);
@@ -341,14 +371,51 @@ class _LoginPageState extends State<LoginPage> {
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         // "userId": userId,
-        "userId": 1
+        "userId": userId
       });
 
       final response = await http.post(url, headers: headers, body: body);
 
       print('Claim List Responce Body: ${response.body}');
 
-      
+      if (response.statusCode == 200) {
+        throw Exception('Claim Policy List successfully');
+      } else {
+        throw Exception('Unexpected error occured!');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
+  late String proilePic;
+
+  //policy Details Modal
+  Future<List<FetchFileModal>?> getProfile(userId, documentName) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.fetchProfileEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId,
+        "userId": userId,
+        "documentName": "profile"
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      print('Profile Responce Body: ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        proilePic = obj["result"]["data"];
+      });
+
       if (response.statusCode == 200) {
         throw Exception('Claim Policy List successfully');
       } else {
@@ -404,7 +471,6 @@ class _LoginPageState extends State<LoginPage> {
                   return "Enter your phone number should not start with a 0";
                 },
               ),
-
               const SizedBox(height: defaultPadding),
               TextFormField(
                 textInputAction: TextInputAction.done,
@@ -463,6 +529,10 @@ class _LoginPageState extends State<LoginPage> {
                       _userId,
                     );
 
+                    await listClaim(
+                      _userId,
+                    );
+
                     (_statusCode == 5000)
                         // ignore: use_build_context_synchronously
                         ? Navigator.push(
@@ -470,23 +540,24 @@ class _LoginPageState extends State<LoginPage> {
                             MaterialPageRoute(
                               builder: (context) {
                                 return CommonUIPage(
-                                  userId: _userId,
-                                  name: _name!,
-                                  msisdn: _msisdn,
-                                  email: _email,
-                                  message: message,
-                                  uptoDatePaymentData: uptoDatePaymentData,
-                                  promotionCode: widget.promotionCode,
-                                  buttonClaimStatus: buttonStatus,
-                                  nextPayment: nextPayment,
-                                  paymentAmount: paymentAmount,
-                                  paymentPeriod: paymentPeriod,
-                                  policyNumber: policyNumber,
-                                  sumInsured: sumInsured,
-                                  tableData: [],
-                                  rowsBenefits: [],
-                                  rowsSumIsured: [],
-                                );
+                                    userId: _userId,
+                                    name: _name!,
+                                    msisdn: _msisdn,
+                                    email: _email,
+                                    message: message,
+                                    uptoDatePaymentData: uptoDatePaymentData,
+                                    promotionCode: widget.promotionCode,
+                                    buttonClaimStatus: buttonStatus,
+                                    nextPayment: nextPayment,
+                                    paymentAmount: paymentAmount,
+                                    paymentPeriod: paymentPeriod,
+                                    policyNumber: policyNumber,
+                                    sumInsured: sumInsured,
+                                    tableData: [],
+                                    rowsBenefits: [],
+                                    rowsSumIsured: [],
+                                    claimListData: claimlistData,
+                                    profilePic: proilePic);
                               },
                             ),
                           )
