@@ -88,8 +88,6 @@ class _UploadFilesState extends State<UploadFiles>
       // request.fields["documentName"] = documentName;
       // request.fields["userId"] = userId.toString();
 
-      
-
       // add file to multipart
       request.files.add(multipartFile);
 
@@ -100,7 +98,7 @@ class _UploadFilesState extends State<UploadFiles>
 
       print('rESPONCE bODY : $responseData');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         if (file == _imageFrontId) {
           messageFrontID = responseData["statusMessage"];
         } else if (file == _imageBackId) {

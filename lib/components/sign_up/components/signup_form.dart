@@ -107,7 +107,7 @@ class _SignUpFormState extends State<SignUpForm> {
         promotionCode = obj["result"]["data"]["promotionCode"];
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         await sendOTP(_msisdn);
       } else {
         throw Exception('Unexpected error occured!');
@@ -141,7 +141,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
       // // print('Responce Status Code : ' + response.statusCode);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         await sendOTPVerify(_userId, _otp);
       } else {
         throw Exception('Unexpected error occured!');
@@ -167,7 +167,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('OTP verified successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -441,26 +441,25 @@ class _SignUpFormState extends State<SignUpForm> {
                             vertical: defaultPadding),
                         child: TextFormField(
                           keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            controller: promotionCodeController,
-                            focusNode: promotionCodeNode,
-                            onSaved: (email) {},
-                            decoration: InputDecoration(
-                              labelText: "Your Promo Code",
-                              labelStyle: TextStyle(
-                                  color: emailNode.hasFocus
-                                      ? kPrimaryColor
-                                      : Colors.grey),
-                              prefixIcon: const Padding(
-                                padding: EdgeInsets.all(defaultPadding),
-                                child: Icon(Icons.mail, color: kPrimaryColor),
-                              ),
-                              border: myinputborder(),
-                              enabledBorder: myinputborder(),
-                              focusedBorder: myfocusborder(),
+                          textInputAction: TextInputAction.next,
+                          cursorColor: kPrimaryColor,
+                          controller: promotionCodeController,
+                          focusNode: promotionCodeNode,
+                          onSaved: (email) {},
+                          decoration: InputDecoration(
+                            labelText: "Your Promo Code",
+                            labelStyle: TextStyle(
+                                color: emailNode.hasFocus
+                                    ? kPrimaryColor
+                                    : Colors.grey),
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(Icons.mail, color: kPrimaryColor),
                             ),
-                          
+                            border: myinputborder(),
+                            enabledBorder: myinputborder(),
+                            focusedBorder: myfocusborder(),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -487,7 +486,8 @@ class _SignUpFormState extends State<SignUpForm> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) {
-                                        return LoginScreen(promotionCode: promotionCode);
+                                        return LoginScreen(
+                                            promotionCode: promotionCode);
                                       },
                                     ),
                                   )
@@ -520,7 +520,6 @@ class _SignUpFormState extends State<SignUpForm> {
                       const SizedBox(
                         height: 10,
                       ),
-                      
                       AlreadyHaveAnAccountCheck(
                         login: false,
                         press: () {
@@ -528,7 +527,9 @@ class _SignUpFormState extends State<SignUpForm> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return LoginScreen(promotionCode: promotionCode,);
+                                return LoginScreen(
+                                  promotionCode: promotionCode,
+                                );
                               },
                             ),
                           );

@@ -38,7 +38,6 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
   GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
 
   // List<File> selectedImages = [];
-  
 
   List<File> selectedfiles = [];
   final picker = ImagePicker();
@@ -182,10 +181,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
       var multipartFile = http.MultipartFile('file', stream, length,
           filename: basename(file.path));
 
-      request.fields.addAll({
-        "userId": json.encode(userId),
-        "documentName": documentName
-      });
+      request.fields.addAll(
+          {"userId": json.encode(userId), "documentName": documentName});
       // request.fields["documentName"] = documentName;
       // request.fields["userId"] = userId.toString();
 
@@ -220,7 +217,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
         claimantOccupationController.text,
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         if (file == resultMedicalReport) {
           messageResultMedicalReport = responseData["statusMessage"];
         } else if (file == resultDeathCertificate) {
@@ -285,7 +282,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
 
       print('Responce Policy Details Body: ${response.body}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Policy Details Displayed Successfully successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -1446,7 +1443,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                       await pickerFiles(
                                                           widget.userId,
                                                           'claim form',
-                                                          resultClaimForm?.files);
+                                                          resultClaimForm
+                                                              ?.files);
                                                       setState(() {
                                                         setState(() {
                                                           if (messageResultClaimForm ==
@@ -1715,7 +1713,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                         await pickerFiles(
                                                             widget.userId,
                                                             'medical report',
-                                                            resultMedicalReport?.files);
+                                                            resultMedicalReport
+                                                                ?.files);
                                                         setState(() {
                                                           setState(() {
                                                             if (messageResultMedicalReport ==
@@ -2001,7 +2000,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                           await pickerFiles(
                                                               widget.userId,
                                                               'sick sheet',
-                                                              resultSickSheet?.files);
+                                                              resultSickSheet
+                                                                  ?.files);
                                                           setState(() {
                                                             if (messageResultSickSheet ==
                                                                 'Request processed Successfully') {
@@ -2244,7 +2244,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                       await pickerFiles(
                                                           widget.userId,
                                                           'police abstruct',
-                                                          resultPoliceAbstruct?.files);
+                                                          resultPoliceAbstruct
+                                                              ?.files);
                                                       setState(() {
                                                         if (messageResultPoliceAbstruct ==
                                                             'Request processed Successfully') {
@@ -2322,8 +2323,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.all(20.0),
-                                                child: selectedImages !=
-                                                        null
+                                                child: selectedImages != null
                                                     ? Image.file(
                                                         selectedImages!,
                                                         width: 300,
@@ -2363,60 +2363,66 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                   const SizedBox(
                                                     height: 20,
                                                   ),
-
-                                                        SizedBox(
-                                            height: 40.0,
-                                            child: (messageResultPoliceAbstruct !=
-                                                        null)
-                                                    ? ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    kPrimaryColor,
-                                                                fixedSize:
-                                                                    const Size(
-                                                                        200,
-                                                                        40)),
-                                                        onPressed: () async {
-                                                          await pickerFiles(
-                                                              widget.userId,
-                                                              'pictures of accident',
-                                                              selectedImages);
-                                                          setState(() {
-                                                            if (messageResultPicturesOfAccident ==
-                                                                'Request processed Successfully') {
-                                                              _isPicturesOfAccidentUploaded =
-                                                                  'Uploaded';
-                                                            } else {
-                                                              _isPicturesOfAccidentUploaded =
-                                                                  'Not Uploaded';
-                                                            }
-                                                          });
-                                                        },
-                                                        child: const Text(
-                                                          "Submit pictures of the accident",
-                                                          style: TextStyle(
-                                                            fontSize: 12.0,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    kPrimaryColor,
-                                                                fixedSize:
-                                                                    const Size(
-                                                                        200,
-                                                                        40)),
-                                                        onPressed: null,
-                                                        child: const Text(
-                                                          "Submit pictures of the accident",
-                                                          style: TextStyle(
-                                                            fontSize: 12.0,
-                                                          ),
-                                                        ),
-                                                      ),
+                                                  SizedBox(
+                                                    height: 40.0,
+                                                    child:
+                                                        (messageResultPoliceAbstruct !=
+                                                                null)
+                                                            ? ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        kPrimaryColor,
+                                                                    fixedSize:
+                                                                        const Size(
+                                                                            200,
+                                                                            40)),
+                                                                onPressed:
+                                                                    () async {
+                                                                  await pickerFiles(
+                                                                      widget
+                                                                          .userId,
+                                                                      'pictures of accident',
+                                                                      selectedImages);
+                                                                  setState(() {
+                                                                    if (messageResultPicturesOfAccident ==
+                                                                        'Request processed Successfully') {
+                                                                      _isPicturesOfAccidentUploaded =
+                                                                          'Uploaded';
+                                                                    } else {
+                                                                      _isPicturesOfAccidentUploaded =
+                                                                          'Not Uploaded';
+                                                                    }
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  "Submit pictures of the accident",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12.0,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        kPrimaryColor,
+                                                                    fixedSize:
+                                                                        const Size(
+                                                                            200,
+                                                                            40)),
+                                                                onPressed: null,
+                                                                child:
+                                                                    const Text(
+                                                                  "Submit pictures of the accident",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12.0,
+                                                                  ),
+                                                                ),
+                                                              ),
                                                   ),
                                                 ],
                                               ),
@@ -2537,61 +2543,61 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                     //       const SizedBox(
                                     //         height: 10,
                                     //       ),
-                                          // SizedBox(
-                                          //   height: 40.0,
-                                          //   child:
-                                          //       (messageResultPoliceAbstruct !=
-                                          //               null)
-                                          //           ? ElevatedButton(
-                                          //               style: ElevatedButton
-                                          //                   .styleFrom(
-                                          //                       backgroundColor:
-                                          //                           kPrimaryColor,
-                                          //                       fixedSize:
-                                          //                           const Size(
-                                          //                               200,
-                                          //                               40)),
-                                          //               onPressed: () async {
-                                          //                 await pickerFiles(
-                                          //                     widget.userId,
-                                          //                     'Pictures of Accident',
-                                          //                     selectedImages);
-                                          //                 setState(() {
-                                          //                   if (messageResultPicturesOfAccident ==
-                                          //                       'Request processed Successfully') {
-                                          //                     _isPicturesOfAccidentUploaded =
-                                          //                         'Uploaded';
-                                          //                   } else {
-                                          //                     _isPicturesOfAccidentUploaded =
-                                          //                         'Not Uploaded';
-                                          //                   }
-                                          //                 });
-                                          //               },
-                                          //               child: const Text(
-                                          //                 "Submit pictures of the accident",
-                                          //                 style: TextStyle(
-                                          //                   fontSize: 12.0,
-                                          //                 ),
-                                          //               ),
-                                          //             )
-                                          //           : ElevatedButton(
-                                          //               style: ElevatedButton
-                                          //                   .styleFrom(
-                                          //                       backgroundColor:
-                                          //                           kPrimaryColor,
-                                          //                       fixedSize:
-                                          //                           const Size(
-                                          //                               200,
-                                          //                               40)),
-                                          //               onPressed: null,
-                                          //               child: const Text(
-                                          //                 "Submit pictures of the accident",
-                                          //                 style: TextStyle(
-                                          //                   fontSize: 12.0,
-                                          //                 ),
-                                          //               ),
-                                          //             ),
-                                          // ),
+                                    // SizedBox(
+                                    //   height: 40.0,
+                                    //   child:
+                                    //       (messageResultPoliceAbstruct !=
+                                    //               null)
+                                    //           ? ElevatedButton(
+                                    //               style: ElevatedButton
+                                    //                   .styleFrom(
+                                    //                       backgroundColor:
+                                    //                           kPrimaryColor,
+                                    //                       fixedSize:
+                                    //                           const Size(
+                                    //                               200,
+                                    //                               40)),
+                                    //               onPressed: () async {
+                                    //                 await pickerFiles(
+                                    //                     widget.userId,
+                                    //                     'Pictures of Accident',
+                                    //                     selectedImages);
+                                    //                 setState(() {
+                                    //                   if (messageResultPicturesOfAccident ==
+                                    //                       'Request processed Successfully') {
+                                    //                     _isPicturesOfAccidentUploaded =
+                                    //                         'Uploaded';
+                                    //                   } else {
+                                    //                     _isPicturesOfAccidentUploaded =
+                                    //                         'Not Uploaded';
+                                    //                   }
+                                    //                 });
+                                    //               },
+                                    //               child: const Text(
+                                    //                 "Submit pictures of the accident",
+                                    //                 style: TextStyle(
+                                    //                   fontSize: 12.0,
+                                    //                 ),
+                                    //               ),
+                                    //             )
+                                    //           : ElevatedButton(
+                                    //               style: ElevatedButton
+                                    //                   .styleFrom(
+                                    //                       backgroundColor:
+                                    //                           kPrimaryColor,
+                                    //                       fixedSize:
+                                    //                           const Size(
+                                    //                               200,
+                                    //                               40)),
+                                    //               onPressed: null,
+                                    //               child: const Text(
+                                    //                 "Submit pictures of the accident",
+                                    //                 style: TextStyle(
+                                    //                   fontSize: 12.0,
+                                    //                 ),
+                                    //               ),
+                                    //             ),
+                                    // ),
                                     //       const SizedBox(
                                     //         height: defaultPadding / 2,
                                     //       ),
@@ -2801,7 +2807,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                           await pickerFiles(
                                                               widget.userId,
                                                               'death certificate',
-                                                              resultDeathCertificate?.files);
+                                                              resultDeathCertificate
+                                                                  ?.files);
                                                           setState(() {
                                                             if (messageResultDeathCertificate ==
                                                                 'Request processed Successfully') {
@@ -3046,7 +3053,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                           await pickerFiles(
                                                               widget.userId,
                                                               'post morterm',
-                                                              resultPostMortem?.files);
+                                                              resultPostMortem
+                                                                  ?.files);
                                                           setState(() {
                                                             if (messageResultPostMortem ==
                                                                 'Request processed Successfully') {
@@ -3289,7 +3297,8 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                       await pickerFiles(
                                                           widget.userId,
                                                           'funeral expenses',
-                                                          resultProofOfFuneralExpences?.files);
+                                                          resultProofOfFuneralExpences
+                                                              ?.files);
                                                       setState(() {
                                                         if (messageResultProofOfFuneralExpences ==
                                                             'Request processed Successfully') {
@@ -3428,6 +3437,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
           Radius.circular(8),
         ));
   }
+
   Future getSelectedPicturesOfAccident(ImageSource source) async {
     try {
       final image = await ImagePicker().pickImage(source: source);
@@ -3444,6 +3454,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
       print('Failed to pick image: $e');
     }
   }
+
   Future<File> saveFilePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = basename(imagePath);

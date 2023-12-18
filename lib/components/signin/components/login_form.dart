@@ -63,6 +63,8 @@ class _LoginPageState extends State<LoginPage> {
 
   late bool buttonStatus;
 
+  late String profilePic;
+
   Future<List<UserLoginModal>?> PostLogin(
     phoneNo,
     pinontroller,
@@ -91,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
         _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         await sendOTP(_msisdn);
       } else {
         throw Exception('Unexpected Login error occured!');
@@ -126,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // // print('Responce Status Code : ' + response.statusCode);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         await sendOTPVerify(_userId, _otp);
       } else {
         throw Exception('Unexpected OTP error occured!');
@@ -152,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('OTP verified successfully');
       } else {
         throw Exception('Unexpected verify OTP error occured!');
@@ -184,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       print('Claim LIst Below: $claimlistData');
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Claim LIst retrieved successfully');
       } else {
         throw Exception('Unexpected verify OTP error occured!');
@@ -223,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         print('Notifcation success');
       } else {
         throw Exception('Unexpected Login error occured!');
@@ -260,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
         uptoDatePaymentData = obj["result"]["data"];
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('UP TO DATE Succcess');
       } else {
         throw Exception('Unexpected error occured!');
@@ -296,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Button Status: ${buttonStatus}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Promotion Code successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -349,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
       // print('Policy Number: ${policyNumber}');
       // print('Sum Insured: ${sumInsured}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Policy Details Displayed Successfully successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -378,7 +380,7 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Claim List Responce Body: ${response.body}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Claim Policy List successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -392,7 +394,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  late String proilePic;
+  
 
   //policy Details Modal
   Future<List<FetchFileModal>?> getProfile(userId, documentName) async {
@@ -413,10 +415,10 @@ class _LoginPageState extends State<LoginPage> {
       var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
-        proilePic = obj["result"]["data"];
+        profilePic = obj["result"]["data"];
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         throw Exception('Claim Policy List successfully');
       } else {
         throw Exception('Unexpected error occured!');
@@ -557,7 +559,7 @@ class _LoginPageState extends State<LoginPage> {
                                     rowsBenefits: [],
                                     rowsSumIsured: [],
                                     claimListData: claimlistData,
-                                    profilePic: proilePic);
+                                    profilePic: profilePic!);
                               },
                             ),
                           )

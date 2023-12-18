@@ -18,12 +18,8 @@ import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 
 class ApiService {
-
   late String _statusMessage;
   num? _statusCode;
-
-  
-  
 
   Future<List<coverageSelectionModal>?> postCoverageSelection(
     userId,
@@ -54,7 +50,7 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         print("Subscribed successfully");
       } else {
         throw Exception('Unexpected Login error occured!');
@@ -68,19 +64,6 @@ class ApiService {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //MPESA Payment
   Future<List<MpesaPaymentModal>?> mpesaPayment(
     userId,
@@ -91,28 +74,23 @@ class ApiService {
       var url =
           Uri.parse(ApiConstants.baseUrl + ApiConstants.mpesaPaymentEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "amount": amount,
-        "userId": userId,
-        "phoneNumber": phoneNumber
-      });
+      final body = jsonEncode(
+          {"amount": amount, "userId": userId, "phoneNumber": phoneNumber});
 
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-        });
 
-      if (response.statusCode == 200) {
-          throw Exception('Beneficiary added successfully');
-          
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
+      if (response.statusCode == 5000) {
+        throw Exception('Beneficiary added successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -137,19 +115,17 @@ class ApiService {
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-        });
 
-      if (response.statusCode == 200) {
-          throw Exception('Beneficiary added successfully');
-          
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
+      if (response.statusCode == 5000) {
+        throw Exception('Beneficiary added successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -161,34 +137,28 @@ class ApiService {
 
   //default Claim
   Future<List<UptodatePaymentStatusModal>?> defaultClaim(
-    userId,
-    promotionCode
-  ) async {
+      userId, promotionCode) async {
     try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.defaultPolicyPayEndpoint);
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.defaultPolicyPayEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": userId,
-        "promotionCode": promotionCode
-      });
+      final body =
+          jsonEncode({"userId": userId, "promotionCode": promotionCode});
 
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-        });
 
-      if (response.statusCode == 200) {
-          throw Exception('Promotion Code successfully');
-          
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
+      if (response.statusCode == 5000) {
+        throw Exception('Promotion Code successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -200,34 +170,28 @@ class ApiService {
 
   //claim default Claim
   Future<List<UptodatePaymentStatusModal>?> claimDefault(
-    userId,
-    promotionCode
-  ) async {
+      userId, promotionCode) async {
     try {
       var url =
           Uri.parse(ApiConstants.baseUrl + ApiConstants.claimDefaultEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": userId,
-        "promotionCode": promotionCode
-      });
+      final body =
+          jsonEncode({"userId": userId, "promotionCode": promotionCode});
 
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
-        
-        obj.forEach((key, value){
-          _statusCode = obj["statusCode"];
-          _statusMessage = obj["statusMessage"];
-        });
 
-      if (response.statusCode == 200) {
-          throw Exception('Promotion Code successfully');
-          
+      obj.forEach((key, value) {
+        _statusCode = obj["statusCode"];
+        _statusMessage = obj["statusMessage"];
+      });
+
+      if (response.statusCode == 5000) {
+        throw Exception('Promotion Code successfully');
       } else {
         throw Exception('Unexpected error occured!');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -236,6 +200,7 @@ class ApiService {
       log(e.toString());
     }
   }
+
   ///Share app with promocode
   Future<void> shareApp() async {
     // Set the app link and the message to be shared
@@ -247,6 +212,4 @@ class ApiService {
     await FlutterShare.share(
         title: 'Share App', text: message, linkUrl: appLink);
   }
-
-
 }
