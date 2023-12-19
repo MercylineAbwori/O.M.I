@@ -45,15 +45,27 @@ class ApiService {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCodeSubscription;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCodeSubscription = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        print("Subscribed successfully");
+
+      if (response.statusCode == 200) {
+
+        if(_statusCodeSubscription == 5000){
+
+          throw Exception('Subscribed successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeSubscription}');
+        }
+        
       } else {
-        throw Exception('Unexpected Login error occured!');
+
+        throw Exception('Unexpected Subscribed error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -81,15 +93,27 @@ class ApiService {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCodeMpesaPayment;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCodeMpesaPayment = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        throw Exception('Beneficiary added successfully');
+
+      if (response.statusCode == 200) {
+
+        if(_statusCodeMpesaPayment == 5000){
+
+          throw Exception('Beneficiary added successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeMpesaPayment}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -116,15 +140,27 @@ class ApiService {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCodeUpToDatePayment;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCodeUpToDatePayment = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        throw Exception('Beneficiary added successfully');
+
+      if (response.statusCode == 200) {
+
+        if(_statusCodeUpToDatePayment == 5000){
+
+          throw Exception('UptoDataAdded added successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeUpToDatePayment}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected UptoDataAdded error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -149,15 +185,26 @@ class ApiService {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCodeDefaultClaim;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCodeDefaultClaim = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        throw Exception('Promotion Code successfully');
+       if (response.statusCode == 200) {
+
+        if(_statusCodeDefaultClaim == 5000){
+
+          throw Exception('Default Claim IS  successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeDefaultClaim}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected Default Claim error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -182,15 +229,26 @@ class ApiService {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCodeDefaultClaim;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCodeDefaultClaim = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        throw Exception('Promotion Code successfully');
+       if (response.statusCode == 200) {
+
+        if(_statusCodeDefaultClaim == 5000){
+
+          throw Exception('Default Claim IS  successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeDefaultClaim}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected Default Claim error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");

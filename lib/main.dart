@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_million_app/color_palette.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:one_million_app/splash_screen.dart';
 void main() => runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple
+        primarySwatch: Palette.kToDark
         
       ),
       home: MyHomePage(),

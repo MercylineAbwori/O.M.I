@@ -173,6 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: CircleAvatar(
+                    backgroundColor: kPrimaryLightColor,
                     child: _imageProfile != null
                         ? Image.file(
                             _imageProfile!,
@@ -180,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: 250,
                             fit: BoxFit.cover,
                           )
-                        : (widget.profilePic == null)? 
+                        : (widget.profilePic == '')? 
                         Image.asset(
                           'assets/icons/profile_icons/profile.jpg',
                             width: 300,

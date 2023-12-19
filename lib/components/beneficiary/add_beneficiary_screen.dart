@@ -78,15 +78,26 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
 
       var obj = jsonDecode(response.body);
 
+      var _statusCode;
+
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCode = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 5000) {
-        throw Exception('Beneficiary added successfully');
+      if (response.statusCode == 200) {
+
+        if(_statusCode == 5000){
+
+          throw Exception('Beneficiary added successfully');
+
+        }else{
+          log('failed the code is ${_statusCode}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");

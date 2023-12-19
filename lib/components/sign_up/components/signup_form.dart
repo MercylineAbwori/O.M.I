@@ -100,18 +100,29 @@ class _SignUpFormState extends State<SignUpForm> {
       var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCode = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
         _userId = obj["result"]["data"]["userId"];
         _msisdn = obj["result"]["data"]["msisdn"];
         promotionCode = obj["result"]["data"]["promotionCode"];
       });
 
-      if (response.statusCode == 5000) {
-        await sendOTP(_msisdn);
+      if (response.statusCode == 200) {
+
+        if( _statusCode== 5000){
+
+          await sendOTP(_msisdn);
+
+        }else{
+          log('failed the code is ${_statusCode}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected signup error occured! Status code ${response.statusCode}');
       }
+
+
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -134,18 +145,29 @@ class _SignUpFormState extends State<SignUpForm> {
       var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCode = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
         _otp = obj["result"]["data"]["otpId"];
+        // _userId = obj["result"]["data"]["userId"];
       });
 
       // // print('Responce Status Code : ' + response.statusCode);
 
-      if (response.statusCode == 5000) {
-        await sendOTPVerify(_userId, _otp);
+      if (response.statusCode == 200) {
+
+        if(_statusCode == 5000){
+
+          await sendOTPVerify(_userId, _otp);
+
+        }else{
+          log('failed the code is ${_statusCode}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected OTP error occured! Status code ${response.statusCode}');
       }
+
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -158,7 +180,7 @@ class _SignUpFormState extends State<SignUpForm> {
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
       _userId, _otp) async {
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "userId": _userId,
@@ -167,11 +189,29 @@ class _SignUpFormState extends State<SignUpForm> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 5000) {
-        throw Exception('OTP verified successfully');
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeOTP;
+
+      obj.forEach((key, value) {
+        _statusCodeOTP = obj["result"]["code"];
+      });
+
+      if (response.statusCode == 200) {
+
+        if( _statusCodeOTP== 5000){
+
+          throw Exception('OTP verified successfully');
+
+        }else{
+          log('failed the code is ${_statusCodeOTP}');
+        }
+        
       } else {
-        throw Exception('Unexpected error occured!');
+
+        throw Exception('Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
+
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {

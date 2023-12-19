@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               //Add Beneficiary
                               Container(
-                                width: 160,
+                                width: 175,
                                 height: 100,
                                 padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
@@ -277,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                                           const Text(
                                             'Add Beneficiary',
                                             style: TextStyle(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                                 color: Colors.black),
                                             // style: GoogleFonts.bebasNeue(fontSize: 72),
                                           ),
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               //Upload Documents
                               Container(
-                                width: 160,
+                                width: 175,
                                 height: 100,
                                 padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
@@ -322,15 +322,15 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(height: 5),
                                           Image.asset(
                                             'assets/icons/home_icons/coverage.png',
-                                            width: 30,
-                                            height: 30,
+                                            width: 40,
+                                            height: 40,
                                             fit: BoxFit.cover,
                                           ),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Upload Documents',
                                             style: TextStyle(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                                 color: Colors.black),
                                             // style: GoogleFonts.bebasNeue(fontSize: 72),
                                           ),
@@ -345,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               //Share Promo Code
                               Container(
-                                width: 160,
+                                width: 175,
                                 height: 100,
                                 padding: EdgeInsets.all(10.0),
                                 child: ElevatedButton(
@@ -370,15 +370,15 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(height: 5),
                                           Image.asset(
                                             'assets/icons/home_icons/payment.png',
-                                            width: 30,
-                                            height: 30,
+                                            width: 40,
+                                            height: 40,
                                             fit: BoxFit.cover,
                                           ),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Overdue Bonus',
                                             style: TextStyle(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                                 color: Colors.black),
                                             // style: GoogleFonts.bebasNeue(fontSize: 72),
                                           ),
@@ -389,7 +389,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               //Default Claim
                               Container(
-                                width: 160,
+                                width: 175,
                                 height: 100,
                                 padding: EdgeInsets.all(10.0),
                                 child: (widget.buttonClaimStatus == false)
@@ -408,15 +408,15 @@ class _HomePageState extends State<HomePage> {
                                                 const SizedBox(height: 5),
                                                 Image.asset(
                                                   'assets/icons/home_icons/payment.png',
-                                                  width: 30,
-                                                  height: 30,
+                                                  width: 40,
+                                                  height: 40,
                                                   fit: BoxFit.cover,
                                                 ),
                                                 const SizedBox(height: 5),
                                                 const Text(
                                                   'Default Claims',
                                                   style: TextStyle(
-                                                      fontSize: 10,
+                                                      fontSize: 12,
                                                       color: Colors.black),
                                                   // style: GoogleFonts.bebasNeue(fontSize: 72),
                                                 ),
@@ -443,15 +443,15 @@ class _HomePageState extends State<HomePage> {
                                                 const SizedBox(height: 5),
                                                 Image.asset(
                                                   'assets/icons/home_icons/payment.png',
-                                                  width: 30,
-                                                  height: 30,
+                                                  width: 40,
+                                                  height: 40,
                                                   fit: BoxFit.cover,
                                                 ),
                                                 const SizedBox(height: 5),
                                                 const Text(
                                                   'Default Claims',
                                                   style: TextStyle(
-                                                      fontSize: 10,
+                                                      fontSize: 12,
                                                       color: Colors.black),
                                                   // style: GoogleFonts.bebasNeue(fontSize: 72),
                                                 ),

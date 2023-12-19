@@ -161,6 +161,8 @@ class _ClaimHomePageState extends State<ClaimHomePage>
   @override
   Widget build(BuildContext context) {
     _elements = widget.claimListData;
+
+    
     final List<dynamic> itemsTitles = _elements.map((e) {
       return e['claimType'];
     }).toList();
@@ -171,7 +173,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
       return e['updatedAt'];
     }).toList();
     final List<dynamic> itemsType = _elements.map((e) {
-      return e['claimType'];
+      return ['claimType'];
     }).toList();
 
     //Claim List Container
@@ -336,6 +338,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
+                                
                                   ListTile(
                                     leading: CircleAvatar(
                                       // child: Icon(icons[index])
@@ -343,79 +346,77 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                               'death'
                                           ? Icons.dangerous
                                           : itemsType.toList()[index] ==
-                                                  'permanentDisability'
+                                                  'permanent disability'
                                               ? Icons.wheelchair_pickup_outlined
                                               : itemsType.toList()[index] ==
-                                                      'temporaryDisability'
+                                                      'temporary disability'
                                                   ? Icons.personal_injury
                                                   : Icons
                                                       .medical_information_outlined),
                                     ),
-                                    // title: Text(itemsTitles[index]),
-                                    subtitle: Text(itemsDate[index],
+                                    title: 
+                                    
+                                    Text(itemsTitles.toList()[index]),
+                                    subtitle: Text(itemsDate.toList()[index],
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
                                         )),
-                                    trailing: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            itemsStatus.toList()[index] ==
-                                                    'pending'
-                                                ? 'Pending'
-                                                : itemsStatus.toList()[index] ==
-                                                        'in review'
-                                                    ? 'In Review'
-                                                    : itemsStatus.toList()[
-                                                                index] ==
-                                                            'completed'
-                                                        ? 'Completed'
-                                                        : 'Failed',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400,
-                                              color: itemsStatus
-                                                          .toList()[index] ==
-                                                      'failed'
-                                                  ? Colors.red
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          itemsStatus.toList()[index] ==
+                                                  'pending'
+                                              ? 'Pending'
+                                              : itemsStatus.toList()[index] ==
+                                                      'in review'
+                                                  ? 'In Review'
                                                   : itemsStatus.toList()[
                                                               index] ==
-                                                          'pending'
-                                                      ? Colors.yellow
-                                                      : itemsStatus.toList()[
-                                                                  index] ==
-                                                              'in Review'
-                                                          ? Colors.blue
-                                                          : Colors.green,
-                                            ),
+                                                          'completed'
+                                                      ? 'Completed'
+                                                      : 'Failed',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                            color: itemsStatus
+                                                        .toList()[index] ==
+                                                    'failed'
+                                                ? Colors.red
+                                                : itemsStatus.toList()[
+                                                            index] ==
+                                                        'pending'
+                                                    ? Colors.yellow
+                                                    : itemsStatus.toList()[
+                                                                index] ==
+                                                            'in Review'
+                                                        ? Colors.blue
+                                                        : Colors.green,
                                           ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          // IconButton(
-                                          //   iconSize: 30,
-                                          //   icon: const Icon(
-                                          //     Icons.arrow_forward,
-                                          //     color: kPrimaryColor,
-                                          //   ),
-                                          //   // the method which is called
-                                          //   // when button is pressed
-                                          //   onPressed: () {
-                                          //     Navigator.push(
-                                          //       context,
-                                          //       MaterialPageRoute(
-                                          //         builder: (context) {
-                                          //           return ClaimReviewForm(
-                                          //               userId: widget.userId);
-                                          //         },
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          // ),
-                                        ],
-                                      ),
+                                        ),
+                                        
+                                        // IconButton(
+                                        //   iconSize: 30,
+                                        //   icon: const Icon(
+                                        //     Icons.arrow_forward,
+                                        //     color: kPrimaryColor,
+                                        //   ),
+                                        //   // the method which is called
+                                        //   // when button is pressed
+                                        //   onPressed: () {
+                                        //     Navigator.push(
+                                        //       context,
+                                        //       MaterialPageRoute(
+                                        //         builder: (context) {
+                                        //           return ClaimReviewForm(
+                                        //               userId: widget.userId);
+                                        //         },
+                                        //       ),
+                                        //     );
+                                        //   },
+                                        // ),
+                                      ],
                                     ),
                                   ),
                                 ],

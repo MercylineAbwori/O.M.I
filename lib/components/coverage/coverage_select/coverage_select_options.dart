@@ -96,7 +96,7 @@ class _PremiumSelectState extends State<PremiumSelect> {
       var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
-        _statusCode = obj["statusCode"];
+        _statusCode = obj["result"]["code"];
         _statusMessage = obj["statusMessage"];
         addStampDuty = obj["result"]["data"]["addStampDuty"];
         annualPremium = obj["result"]["data"]["annualPremium"];
@@ -155,12 +155,21 @@ class _PremiumSelectState extends State<PremiumSelect> {
         //   }
         // }
       });
+      if (response.statusCode == 200) {
 
-      if (response.statusCode == 5000) {
-        print("generated");
+        if(_statusCode == 5000){
+
+          throw Exception('Calculator successfully');
+
+        }else{
+          log('failed the code is ${_statusCode}');
+        }
+        
       } else {
-        throw Exception('Unexpected Calculator error occured!');
+
+        throw Exception('Unexpected Calculator error occured! Status code ${response.statusCode}');
       }
+
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
