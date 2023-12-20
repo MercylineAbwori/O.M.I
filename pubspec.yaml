@@ -53,6 +53,7 @@ dependencies:
   image_picker: ^1.0.5
   file_picker: ^6.1.1
   dio: ^5.4.0
+  easy_loading_button: ^0.3.2
 
 dev_dependencies:
   flutter_test:

@@ -269,8 +269,8 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(height: 5),
                                           Image.asset(
                                             'assets/icons/home_icons/claims.png',
-                                            width: 30,
-                                            height: 30,
+                                            width: 40,
+                                            height: 40,
                                             fit: BoxFit.cover,
                                           ),
                                           const SizedBox(height: 5),
@@ -321,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           const SizedBox(height: 5),
                                           Image.asset(
-                                            'assets/icons/home_icons/coverage.png',
+                                            'assets/icons/home_icons/reporting.png',
                                             width: 40,
                                             height: 40,
                                             fit: BoxFit.cover,
@@ -407,7 +407,7 @@ class _HomePageState extends State<HomePage> {
                                               children: [
                                                 const SizedBox(height: 5),
                                                 Image.asset(
-                                                  'assets/icons/home_icons/payment.png',
+                                                  'assets/icons/home_icons/coverage.png',
                                                   width: 40,
                                                   height: 40,
                                                   fit: BoxFit.cover,

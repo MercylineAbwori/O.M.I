@@ -46,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
   late String _statusMessage;
   num? _statusCode;
 
-
   //User Details
   late String _email;
   late String _msisdn;
@@ -66,13 +65,15 @@ class _LoginPageState extends State<LoginPage> {
 
   late String profilePic;
 
-   //Policy Details
+  //Policy Details
 
   late String nextPayment;
   late num paymentAmount;
   late String paymentPeriod;
   late String policyNumber;
   late num sumInsured;
+
+  bool isLoading = false;
 
   Future<List<UserLoginModal>?> PostLogin(
     phoneNo,
@@ -102,20 +103,15 @@ class _LoginPageState extends State<LoginPage> {
         _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
       });
 
-      if (response.statusCode == 200) {
+      log('THe responce : ${response.body}');
 
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           await sendOTP(_msisdn);
           log('Login Sucesss the code is ${_statusCode}');
-
-        }else{
-          log('Log in failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected Login error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Login error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -144,21 +140,13 @@ class _LoginPageState extends State<LoginPage> {
         _otp = obj["result"]["data"]["otpId"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           await sendOTPVerify(_userId, _otp);
-
-        }else{
-          log('failed the code is otp ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected OTP error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected OTP error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -188,21 +176,16 @@ class _LoginPageState extends State<LoginPage> {
         _statusCodeOTP = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if( _statusCodeOTP== 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeOTP == 5000) {
           throw Exception('OTP verified successfully');
-
-        }else{
+        } else {
           log('failed the code is otp verify ${_statusCodeOTP}');
         }
-        
       } else {
-
-        throw Exception('Unexpected verify OTP error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -225,7 +208,6 @@ class _LoginPageState extends State<LoginPage> {
 
       var obj = jsonDecode(response.body);
 
-      
       var _statusCodeOTPVerify;
 
       obj.forEach((key, value) {
@@ -234,21 +216,16 @@ class _LoginPageState extends State<LoginPage> {
         // _claimlistData = obj["result"]["data"]["claimFormEntity"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodeOTPVerify == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeOTPVerify == 5000) {
           throw Exception('OTP verified successfully');
-
-        }else{
+        } else {
           log('failed the code is list ${_statusCodeOTPVerify}');
         }
-        
       } else {
-
-        throw Exception('Unexpected verify OTP error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
-     
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -285,21 +262,16 @@ class _LoginPageState extends State<LoginPage> {
         }
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodeGetNotification == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeGetNotification == 5000) {
           throw Exception('Notification message retrieved successfully');
-
-        }else{
+        } else {
           log('failed the code is noti ${_statusCodeGetNotification}');
         }
-        
       } else {
-
-        throw Exception('Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -334,21 +306,16 @@ class _LoginPageState extends State<LoginPage> {
         uptoDatePaymentData = obj["result"]["data"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodeUpToDatePayment == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeUpToDatePayment == 5000) {
           throw Exception('UP TO DATE successfully');
-
-        }else{
+        } else {
           log('failed the code is  up to date${_statusCodeUpToDatePayment}');
         }
-        
       } else {
-
-        throw Exception('Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -380,21 +347,16 @@ class _LoginPageState extends State<LoginPage> {
         buttonStatus = obj["result"]["data"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodeDefaultClaim == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeDefaultClaim == 5000) {
           throw Exception('Promotion Code successfully');
-
-        }else{
+        } else {
           log('failed the code is promo ${_statusCodeDefaultClaim}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Promotion Code error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Promotion Code error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -403,8 +365,6 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
     }
   }
-
- 
 
   //policy Details Modal
   Future<List<PolicyDetailsModal>?> getPolicyDetails(userId) async {
@@ -432,22 +392,16 @@ class _LoginPageState extends State<LoginPage> {
         sumInsured = obj["result"]["data"]["sumInsured"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodePolicyDetails == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodePolicyDetails == 5000) {
           throw Exception('Policy Details Displayed successfully');
-
-        }else{
+        } else {
           log('failed the code is policy details ${_statusCodePolicyDetails}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Policy Details Displayed  error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Policy Details Displayed  error occured! Status code ${response.statusCode}');
       }
-
-      
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -456,9 +410,6 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
     }
   }
-
-  
-  
 
   //policy Details Modal
   Future<List<FetchFileModal>?> getProfile(userId) async {
@@ -485,21 +436,16 @@ class _LoginPageState extends State<LoginPage> {
         profilePic = obj["result"]["data"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCodeGetProfile == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeGetProfile == 5000) {
           throw Exception('Get Profile successfully');
-
-        }else{
+        } else {
           log('failed the code is pROFILE ${_statusCodeGetProfile}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Get Profile error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Get Profile error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -604,7 +550,6 @@ class _LoginPageState extends State<LoginPage> {
                       _userId,
                     );
 
-
                     await listClaim(
                       _userId,
                     );
@@ -634,7 +579,7 @@ class _LoginPageState extends State<LoginPage> {
                                     rowsSumIsured: [],
                                     claimListData: claimlistData,
                                     profilePic: '');
-                                    // profilePic: profilePic);
+                                // profilePic: profilePic);
                               },
                             ),
                           )
@@ -643,6 +588,13 @@ class _LoginPageState extends State<LoginPage> {
                     setState(
                       () {},
                     );
+
+                    Future.delayed(const Duration(seconds: 3), (){ 
+                        setState(() { 
+                          isLoading = false; 
+                        }); 
+                      } 
+                    ); 
 
                     final snackBar = SnackBar(
                       content: Text(_statusMessage),
@@ -656,9 +608,21 @@ class _LoginPageState extends State<LoginPage> {
 
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
-                  child: Text(
-                    "Log in".toUpperCase(),
+                  child: isLoading? const Row( 
+                    mainAxisAlignment: MainAxisAlignment.center, 
+                        
+                    // ignore: prefer_const_literals_to_create_immutables 
+                    children: [ 
+                    Text('Loading...', style: TextStyle(fontSize: 20),), 
+                    SizedBox(width: 10,), 
+                      CircularProgressIndicator(color: Colors.white,), 
+                    ], 
+                  ) : 
+                  Text(
+                        "Log in".toUpperCase(),
                   ),
+                  
+                  
                 ),
               ),
               const SizedBox(height: defaultPadding),

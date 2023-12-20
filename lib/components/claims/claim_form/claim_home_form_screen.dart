@@ -227,39 +227,34 @@ class _ClaimFormState extends State<ClaimForm>
         _statusCode = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCode == 5000) {
           if (file == resultMedicalReport) {
-          messageResultMedicalReport = responseData["statusMessage"];
-        } else if (file == resultDeathCertificate) {
-          messageResultDeathCertificate = responseData["statusMessage"];
-        } else if (file == resultPostMortem) {
-          messageResultPostMortem = responseData["statusMessage"];
-        } else if (file == resultProofOfFuneralExpences) {
-          messageResultProofOfFuneralExpences = responseData["statusMessage"];
-        } else if (file == resultSickSheet) {
-          messageResultSickSheet = responseData["statusMessage"];
-        } else if (file == resultPoliceAbstruct) {
-          messageResultPoliceAbstruct = responseData["statusMessage"];
-        } else if (file == selectedImages) {
-          messageResultPicturesOfAccident = responseData["statusMessage"];
-        } else if (file == pdfFile) {
-          messageResultClaimForm = responseData["result"]["message"];
-        }
+            messageResultMedicalReport = responseData["statusMessage"];
+          } else if (file == resultDeathCertificate) {
+            messageResultDeathCertificate = responseData["statusMessage"];
+          } else if (file == resultPostMortem) {
+            messageResultPostMortem = responseData["statusMessage"];
+          } else if (file == resultProofOfFuneralExpences) {
+            messageResultProofOfFuneralExpences = responseData["statusMessage"];
+          } else if (file == resultSickSheet) {
+            messageResultSickSheet = responseData["statusMessage"];
+          } else if (file == resultPoliceAbstruct) {
+            messageResultPoliceAbstruct = responseData["statusMessage"];
+          } else if (file == selectedImages) {
+            messageResultPicturesOfAccident = responseData["statusMessage"];
+          } else if (file == pdfFile) {
+            messageResultClaimForm = responseData["result"]["message"];
+          }
 
-        claimFormId = responseData["result"]["data"]["claimId"];
-
-        }else{
+          claimFormId = responseData["result"]["data"]["claimId"];
+        } else {
           log('failed the code is ${_statusCode}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Calculator error Displayed error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Calculator error Displayed error occured! Status code ${response.statusCode}');
       }
-
     } on PlatformException catch (e) {
       log('Unsupported operation' + e.toString());
     } catch (e) {
@@ -310,21 +305,13 @@ class _ClaimFormState extends State<ClaimForm>
         _statusCode = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           throw Exception('Claim Form Displayed successfully');
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {

@@ -106,30 +106,25 @@ class _UploadFilesState extends State<UploadFiles>
         _statusCode = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCode == 5000) {
           if (file == _imageFrontId) {
-          messageFrontID = responseData["statusMessage"];
-        } else if (file == _imageBackId) {
-          messageEndID = responseData["statusMessage"];
-        } else if (file == _imageDrivingLincencs) {
-          messageDrivingL = responseData["statusMessage"];
-        } else if (file == _imageLogbook) {
-          messageLogBook = responseData["statusMessage"];
+            messageFrontID = responseData["statusMessage"];
+          } else if (file == _imageBackId) {
+            messageEndID = responseData["statusMessage"];
+          } else if (file == _imageDrivingLincencs) {
+            messageDrivingL = responseData["statusMessage"];
+          } else if (file == _imageLogbook) {
+            messageLogBook = responseData["statusMessage"];
 
-          throw Exception('posted successfully');
-
-        }else{
-          log('failed the code is ${_statusCode}');
+            throw Exception('posted successfully');
+          } else {
+            log('failed the code is ${_statusCode}');
+          }
+        } else {
+          throw Exception(
+              'Unexpected posted error occured! Status code ${response.statusCode}');
         }
-        
-      } else {
-
-        throw Exception('Unexpected posted error occured! Status code ${response.statusCode}');
-      }
-
       }
       log('The Request Payload : ${request.files}');
     } on PlatformException catch (e) {

@@ -107,22 +107,13 @@ class _SignUpFormState extends State<SignUpForm> {
         promotionCode = obj["result"]["data"]["promotionCode"];
       });
 
-      if (response.statusCode == 200) {
-
-        if( _statusCode== 5000){
-
+      if (response.statusCode == 5000) {
           await sendOTP(_msisdn);
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected signup error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected signup error occured! Status code ${response.statusCode}');
       }
-
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -153,21 +144,13 @@ class _SignUpFormState extends State<SignUpForm> {
 
       // // print('Responce Status Code : ' + response.statusCode);
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           await sendOTPVerify(_userId, _otp);
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected OTP error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected OTP error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {
@@ -197,21 +180,16 @@ class _SignUpFormState extends State<SignUpForm> {
         _statusCodeOTP = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if( _statusCodeOTP== 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeOTP == 5000) {
           throw Exception('OTP verified successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeOTP}');
         }
-        
       } else {
-
-        throw Exception('Unexpected verify OTP error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {

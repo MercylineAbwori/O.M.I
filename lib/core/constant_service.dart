@@ -52,20 +52,15 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-
-      if (response.statusCode == 200) {
-
-        if(_statusCodeSubscription == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeSubscription == 5000) {
           throw Exception('Subscribed successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeSubscription}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Subscribed error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Subscribed error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -100,20 +95,15 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-
-      if (response.statusCode == 200) {
-
-        if(_statusCodeMpesaPayment == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeMpesaPayment == 5000) {
           throw Exception('Beneficiary added successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeMpesaPayment}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -147,20 +137,15 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-
-      if (response.statusCode == 200) {
-
-        if(_statusCodeUpToDatePayment == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeUpToDatePayment == 5000) {
           throw Exception('UptoDataAdded added successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeUpToDatePayment}');
         }
-        
       } else {
-
-        throw Exception('Unexpected UptoDataAdded error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected UptoDataAdded error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -192,19 +177,15 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-       if (response.statusCode == 200) {
-
-        if(_statusCodeDefaultClaim == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeDefaultClaim == 5000) {
           throw Exception('Default Claim IS  successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeDefaultClaim}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Default Claim error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Default Claim error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -236,19 +217,15 @@ class ApiService {
         _statusMessage = obj["statusMessage"];
       });
 
-       if (response.statusCode == 200) {
-
-        if(_statusCodeDefaultClaim == 5000){
-
+      if (response.statusCode == 5000) {
+        if (_statusCodeDefaultClaim == 5000) {
           throw Exception('Default Claim IS  successfully');
-
-        }else{
+        } else {
           log('failed the code is ${_statusCodeDefaultClaim}');
         }
-        
       } else {
-
-        throw Exception('Unexpected Default Claim error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Default Claim error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");

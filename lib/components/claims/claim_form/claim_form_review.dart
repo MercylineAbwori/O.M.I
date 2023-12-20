@@ -217,7 +217,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
         claimantOccupationController.text,
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 5000) {
         if (file == resultMedicalReport) {
           messageResultMedicalReport = responseData["statusMessage"];
         } else if (file == resultDeathCertificate) {
@@ -280,7 +280,6 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
 
       final response = await http.post(url, headers: headers, body: body);
 
-
       var obj = jsonDecode(response.body);
 
       var _statusCode;
@@ -289,21 +288,13 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
         _statusCode = obj["result"]["code"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           throw Exception('Claim Form Displayed successfully');
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {

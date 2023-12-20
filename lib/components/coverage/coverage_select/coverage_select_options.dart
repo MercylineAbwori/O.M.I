@@ -155,21 +155,13 @@ class _PremiumSelectState extends State<PremiumSelect> {
         //   }
         // }
       });
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           throw Exception('Calculator successfully');
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
         
       } else {
-
-        throw Exception('Unexpected Calculator error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Calculator error occured! Status code ${response.statusCode}');
       }
-
     } catch (e) {
       print("Error: $e");
       if (e is http.ClientException) {

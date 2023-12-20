@@ -85,19 +85,12 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
         _statusMessage = obj["statusMessage"];
       });
 
-      if (response.statusCode == 200) {
-
-        if(_statusCode == 5000){
-
+      if (response.statusCode == 5000) {
           throw Exception('Beneficiary added successfully');
-
-        }else{
-          log('failed the code is ${_statusCode}');
-        }
-        
+          
       } else {
-
-        throw Exception('Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
+        throw Exception(
+            'Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
