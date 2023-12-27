@@ -119,18 +119,18 @@ class _UploadFilesState extends State<UploadFiles>
 
             throw Exception('posted successfully');
           } else {
-            log('failed the code is ${_statusCode}');
+            // log('failed the code is ${_statusCode}');
           }
         } else {
           throw Exception(
               'Unexpected posted error occured! Status code ${response.statusCode}');
         }
       }
-      log('The Request Payload : ${request.files}');
+      // log('The Request Payload : ${request.files}');
     } on PlatformException catch (e) {
-      log('Unsupported operation' + e.toString());
+      // log('Unsupported operation' + e.toString());
     } catch (e) {
-      log(e.toString());
+      // log(e.toString());
     }
 
     setState(() {
@@ -243,7 +243,7 @@ class _UploadFilesState extends State<UploadFiles>
           child: Column(
             children: <Widget>[
               Container(
-                constraints: const BoxConstraints.expand(height: 80),
+                constraints: const BoxConstraints.expand(height: 5),
                 padding: const EdgeInsets.all(10),
                 child: Container(
                   height: kToolbarHeight - 8.0,

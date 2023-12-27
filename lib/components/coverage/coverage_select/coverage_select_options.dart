@@ -16,9 +16,12 @@ class PremiumSelect extends StatefulWidget {
   final String userName;
   final String phone;
   final String email;
+  final List<String> title;
   final List<String> message;
+  final List<String> readStatus;
+  final List<num> notificationIdList;
 
-  final String uptoDatePaymentData;
+  final String uptoDatePayment;
 
   final String promotionCode;
 
@@ -29,6 +32,9 @@ class PremiumSelect extends StatefulWidget {
   final String paymentPeriod;
   final String policyNumber;
   final num sumInsured;
+
+  final String claimApplicationActive;
+ final String qualifiesForCompensation;
   const PremiumSelect(
       {Key? key,
       required this.itemSelected,
@@ -37,6 +43,9 @@ class PremiumSelect extends StatefulWidget {
       required this.phone,
       required this.email,
       required this.message,
+      required this.title,
+      required this.notificationIdList,
+      required this.readStatus,
       required this.nextPayment,
       required this.paymentAmount,
       required this.paymentPeriod,
@@ -44,7 +53,9 @@ class PremiumSelect extends StatefulWidget {
       required this.sumInsured,
       required this.buttonClaimStatus,
       required this.promotionCode,
-      required this.uptoDatePaymentData})
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment})
       : super(key: key);
 
   @override
@@ -156,8 +167,7 @@ class _PremiumSelectState extends State<PremiumSelect> {
         // }
       });
       if (response.statusCode == 5000) {
-          throw Exception('Calculator successfully');
-        
+        throw Exception('Calculator successfully');
       } else {
         throw Exception(
             'Unexpected Calculator error occured! Status code ${response.statusCode}');
@@ -167,7 +177,7 @@ class _PremiumSelectState extends State<PremiumSelect> {
       if (e is http.ClientException) {
         print("Response Body: ${e.message}");
       }
-      log(e.toString());
+      // log(e.toString());
     }
   }
 
@@ -259,13 +269,17 @@ class _PremiumSelectState extends State<PremiumSelect> {
                             userName: widget.userName,
                             phone: widget.phone,
                             email: widget.email,
+                            title: widget.title,
                             message: widget.message,
+                            readStatus: widget.readStatus,
+                            notificationIdList: widget.notificationIdList,
                             nextPayment: widget.nextPayment,
                             paymentAmount: widget.paymentAmount,
                             paymentPeriod: widget.paymentPeriod,
                             policyNumber: widget.policyNumber,
                             sumInsured: int.parse(_currentSumInsuredValue!),
-                            uptoDatePaymentData: widget.uptoDatePaymentData,
+                            claimApplicationActive: widget.claimApplicationActive,
+                            qualifiesForCompensation: widget.claimApplicationActive,
                             buttonClaimStatus: widget.buttonClaimStatus,
                             promotionCode: widget.promotionCode,
                             tableData: tabledata,
@@ -277,7 +291,8 @@ class _PremiumSelectState extends State<PremiumSelect> {
                             dailyPremium: dailyPremium,
                             monthlyPremium: monthlyPremium,
                             totalPremium: totalPremium,
-                            weeklyPremium: weeklyPremium)),
+                            weeklyPremium: weeklyPremium,
+                            uptoDatePayment: widget.paymentPeriod,)),
                   );
                 },
                 child: const Text('Submit'),

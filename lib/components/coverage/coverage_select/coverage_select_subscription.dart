@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:one_million_app/components/coverage/coverarage_make_payments.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/calculator_model.dart';
@@ -23,6 +24,7 @@ class SubscriptionSelect extends StatefulWidget {
   final num? totalPremium;
   final num? weeklyPremium;
   final num sumInsured;
+  final num paymentAmount;
   const SubscriptionSelect({Key? key, 
   required this.userId,
   required this.phone,
@@ -33,7 +35,8 @@ class SubscriptionSelect extends StatefulWidget {
   required this.monthlyPremium,
   required this.totalPremium,
   required this.weeklyPremium,
-  required this.sumInsured}) : super(key: key);
+  required this.sumInsured,
+  required this.paymentAmount}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SubscriptionSelectState();
@@ -298,7 +301,27 @@ class _SubscriptionSelectState extends State<SubscriptionSelect> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor,
                         fixedSize: const Size(100, 40)),
-                    onPressed: _showMultiPaymentSelect(context),
+                    // onPressed: _showMultiPaymentSelect(context),
+                    onPressed: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return MakePayments(    
+                              userId: widget.userId,
+                                annualPremium: widget.annualPremium,
+                                basicPremium: widget.weeklyPremium,
+                                dailyPremium: widget.dailyPremium,
+                                monthlyPremium: widget.monthlyPremium,
+                                totalPremium: widget.totalPremium,
+                                weeklyPremium: widget.totalPremium,
+                                paymentAmount : widget.paymentAmount,
+                                sumInsured: widget.sumInsured,
+                                currentSubcriptionValue: _currentSubcriptionValue!,);
+                          },
+                        ),
+                      );
+                    },
                     child: const Text('Submit'),
                   ),
                 ],

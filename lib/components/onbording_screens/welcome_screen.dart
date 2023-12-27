@@ -20,6 +20,7 @@ class WelcomeScreen extends StatelessWidget {
                 Expanded(
                   child: Onbording(),
                 ),
+                SizedBox(height: 20,),
                 
                 const Expanded(
                   child: Row(

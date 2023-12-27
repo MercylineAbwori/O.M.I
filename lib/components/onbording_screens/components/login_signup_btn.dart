@@ -15,9 +15,9 @@ class LoginAndSignupBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
-      child: Column(
-        
+      height: 100,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const SizedBox(height: 20,),
           Hero(
@@ -25,14 +25,14 @@ class LoginAndSignupBtn extends StatelessWidget {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,
-                fixedSize: const Size(200, 40)
+                fixedSize: const Size(150, 40)
               ),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return LoginScreen(promotionCode: '',);
+                      return LoginScreen();
                     },
                   ),
                 );
@@ -59,7 +59,7 @@ class LoginAndSignupBtn extends StatelessWidget {
             style: ElevatedButton.styleFrom(
                 primary: kPrimaryLightColor,
                  elevation: 0,
-                 fixedSize: const Size(200, 40)),
+                 fixedSize: const Size(150, 40)),
             child: Text(
               "Sign Up".toUpperCase(),
               style: TextStyle(color: Colors.black),

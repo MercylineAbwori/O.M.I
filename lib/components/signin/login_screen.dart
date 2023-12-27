@@ -6,16 +6,18 @@ import 'components/login_screen_top_image.dart';
 
 class LoginScreen extends StatelessWidget {
 
-  final String promotionCode;
+  // final String promotionCode;
   
-  const LoginScreen({Key? key, required this.promotionCode}) : super(key: key);
+  const LoginScreen({Key? key, 
+  // required this.promotionCode
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Background(
       child: SingleChildScrollView(
         child: Responsive(
-          mobile: MobileLoginScreen(promotionCode: promotionCode),
+          mobile: MobileLoginScreen(promotionCode: ''),
           desktop: const Row(
             children: [
               Expanded(
@@ -51,18 +53,18 @@ class MobileLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const LoginScreenTopImage(),
+        LoginScreenTopImage(),
         Row(
           children: [
-            const Spacer(),
+            Spacer(),
             Expanded(
               flex: 8,
-              child: LoginPage(promotionCode : promotionCode),
+              child: LoginPage(),
             ),
-            const Spacer(),
+            Spacer(),
           ],
         ),
       ],

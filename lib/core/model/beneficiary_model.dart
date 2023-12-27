@@ -5,14 +5,14 @@ import 'package:flutter/foundation.dart';
 class BeneficiaryModal extends ChangeNotifier {
 
   String? beneficiaryName;
-  num? memeberId;
+  String? memberId;
   String? gender;
   String? dateOfBirth;
 
   
   BeneficiaryModal({
     required this.beneficiaryName,
-    required this.memeberId,
+    required this.memberId,
     required this.gender,
     required this.dateOfBirth,
     
@@ -22,7 +22,7 @@ class BeneficiaryModal extends ChangeNotifier {
  factory BeneficiaryModal.fromJson(Map<String, dynamic> json) {
     return BeneficiaryModal(
       beneficiaryName: json['beneficiaryName'],
-      memeberId: json['memeberId'],
+      memberId: json['memberId'],
       gender: json['gender'],
       dateOfBirth: json['dateOfBirth'],
     );

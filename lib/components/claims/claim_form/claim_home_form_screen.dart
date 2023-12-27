@@ -24,10 +24,18 @@ import 'package:path_provider/path_provider.dart';
 
 class ClaimForm extends StatefulWidget {
   final num userId;
+  final String uptoDatePayment;
+  final num paymentAmount;
+  final String claimApplicationActive;
+ final String qualifiesForCompensation;
 
   const ClaimForm({
     Key? key,
     required this.userId,
+    required this.paymentAmount,
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment
   }) : super(key: key);
   @override
   _ClaimFormState createState() => _ClaimFormState();
@@ -249,16 +257,16 @@ class _ClaimFormState extends State<ClaimForm>
 
           claimFormId = responseData["result"]["data"]["claimId"];
         } else {
-          log('failed the code is ${_statusCode}');
+          // log('failed the code is ${_statusCode}');
         }
       } else {
         throw Exception(
             'Unexpected Calculator error Displayed error occured! Status code ${response.statusCode}');
       }
     } on PlatformException catch (e) {
-      log('Unsupported operation' + e.toString());
+      // log('Unsupported operation' + e.toString());
     } catch (e) {
-      log(e.toString());
+      // log(e.toString());
     }
   }
 
@@ -306,8 +314,7 @@ class _ClaimFormState extends State<ClaimForm>
       });
 
       if (response.statusCode == 5000) {
-          throw Exception('Claim Form Displayed successfully');
-        
+        throw Exception('Claim Form Displayed successfully');
       } else {
         throw Exception(
             'Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
@@ -317,7 +324,7 @@ class _ClaimFormState extends State<ClaimForm>
       if (e is http.ClientException) {
         print("Response Body: ${e.message}");
       }
-      log(e.toString());
+      // log(e.toString());
     }
   }
 
@@ -358,7 +365,9 @@ class _ClaimFormState extends State<ClaimForm>
             ),
           ),
         ),
-        body: DefaultTabController(
+        body: (widget.claimApplicationActive == "You will be eligiable to apply for claims after 60 days of registartion") ||
+        (widget.qualifiesForCompensation != "Your payment is not upto date ,you are not eligiable for claim application")?
+        DefaultTabController(
           length: 2,
           child: Column(
             children: <Widget>[
@@ -3426,7 +3435,58 @@ class _ClaimFormState extends State<ClaimForm>
               )
             ],
           ),
-        ));
+        ):
+        Container(
+          child: Column(children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 5,
+                shadowColor: Colors.black,
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.info,
+                          size: 100,
+                          color: kPrimaryColor,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          widget.claimApplicationActive,
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                          // style: GoogleFonts.bebasNeue(fontSize: 72),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          widget.qualifiesForCompensation,
+                          style: TextStyle(
+                              fontSize: 15, color: Colors.black),
+                          // style: GoogleFonts.bebasNeue(fontSize: 72),
+                        ),
+                        
+                        const SizedBox(height: 20),
+                        
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ]),
+        )
+        );
+        
+
+
+
   }
 
   // void dltImages(data) {

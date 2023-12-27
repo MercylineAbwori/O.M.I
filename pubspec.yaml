@@ -54,10 +54,23 @@ dependencies:
   file_picker: ^6.1.1
   dio: ^5.4.0
   easy_loading_button: ^0.3.2
+  quickalert: ^1.0.2
+  responsive_framework: ^1.1.1
+  input_quantity: ^2.2.0
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logos/O.M.I logo.png"
+  adaptive_icon_background: "#fffffff"
+  # adaptive_icon_foreground: "assets/logos/O.M.I logo.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -83,11 +96,50 @@ flutter:
     - assets/images/adverts/
     - assets/icons/
     - assets/logos/
+    - assets/sliders/
     - assets/logos/slide_one.png
     - assets/icons/submenu_icons/
     - assets/icons/profile_icons/
     - assets/icons/home_icons/
     - assets/xx.ttf
+
+  fonts:
+    # - family: RobotoSarif
+    #   fonts:
+    #     - asset: fonts/RobotoSarif/RobotoSarif-Regular.ttf
+    #     - asset: fonts/RobotoSarif/RobotoSarif-Italic.ttf
+    #       style: normal
+    - family: RobotoSlab
+      fonts:
+        - asset: fonts/RobotoSlab/RobotoSlab-Regular.ttf
+        - asset: fonts/RobotoSlab/RobotoSlab-Light.ttf
+        - asset: fonts/RobotoSlab/RobotoSlab-Bold.ttf
+        - asset: fonts/RobotoSlab/RobotoSlab-Thin.ttf
+          style: normal
+    - family: Kalnia
+      fonts:
+        - asset: fonts/Kalnia/Kalnia-Medium.ttf
+        - asset: fonts//Kalnia/Kalnia-Regular.ttf
+        - asset: fonts//Kalnia/Kalnia-Light.ttf
+        - asset: fonts//Kalnia/Kalnia-Bold.ttf
+        - asset: fonts//Kalnia/Kalnia-Thin.ttf
+          style: italic
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto/Roboto-Italic.ttf
+        - asset: fonts/Roboto/Roboto-Regular.ttf
+        - asset: fonts/Roboto/Roboto-Light.ttf
+        - asset: fonts/Roboto/Roboto-Bold.ttf
+        - asset: fonts/Roboto/Roboto-Thin.ttf
+          style: italic
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway/Raleway-Italic.ttf
+        - asset: fonts/Raleway/Raleway-Regular.ttf
+        - asset: fonts/Raleway/Raleway-Light.ttf
+        - asset: fonts/Raleway/Raleway-Bold.ttf
+        - asset: fonts/Raleway/Raleway-Thin.ttf
+          weight: 700
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

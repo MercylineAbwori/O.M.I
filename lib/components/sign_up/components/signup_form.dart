@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
+import 'package:one_million_app/components/oto_screens/otp_signup.dart';
 import 'package:one_million_app/components/signin/login_screen.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
@@ -38,164 +40,122 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-  GlobalKey<FormState> basicFormKey = GlobalKey<FormState>();
+  bool _isButtonDisabled = false;
+  String _buttonText = 'Sign Up';
 
-  TextEditingController nameController = TextEditingController();
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
+
+  String? dropdownValue;
+  String? FullName;
+  TextEditingController fnameController = TextEditingController();
+  TextEditingController lnameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController genderController = TextEditingController();
-  TextEditingController passwordontroller = TextEditingController();
-  TextEditingController passwordConfirmController = TextEditingController();
+  TextEditingController pinController = TextEditingController();
+  TextEditingController pinConfirmController = TextEditingController();
   TextEditingController dateOfBirthController = TextEditingController();
   TextEditingController promotionCodeController = TextEditingController();
 
+  var _country = countries.firstWhere((element) => element.code == 'KE');
+
+  String? _fnameErrorText;
+  String? _lnameErrorText;
+
+  String? _emailErrorText;
+
+  bool isEmailValid(String email) {
+    // Basic email validation using regex
+    // You can implement more complex validation if needed
+    return RegExp(r'^[\w-\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}$').hasMatch(email);
+  }
+
+  String? _dateErrorText;
+
+  String? _phoneErrorText;
+
+  String? _pinErrorText;
+
+  String? _confirmPinErrorText;
+
+  bool passwordVisiblePin = false;
+  bool passwordVisibleConfirmPin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordVisiblePin = true;
+    passwordVisibleConfirmPin = true;
+  }
+
   String initialCountry = 'KE';
 
-  FocusNode nameNode = FocusNode();
-  FocusNode emailNode = FocusNode();
-  FocusNode phoneNode = FocusNode();
-  FocusNode genderNode = FocusNode();
-  FocusNode passwordNode = FocusNode();
-  FocusNode passwordConfirmNode = FocusNode();
-  FocusNode dateOfBirthNode = FocusNode();
-  FocusNode promotionCodeNode = FocusNode();
+  
 
-  String? dropdownValue;
-
-  String? phoneNo;
-
-  late String _statusMessage;
-  num? _statusCode;
-
-  late num _userId;
-  late num _otp;
-  late String _msisdn;
-
-  late String promotionCode;
-
-  Future<List<UserRegistrationModal>?> addUsers(
-      nameController,
-      emailController,
-      phoneNo,
-      dateOfBirthController,
-      dropdownValue,
-      passwordConfirmController,
-      passwordontroller) async {
-    try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.registrationEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "msisdn": phoneNo,
-        "name": nameController,
-        "pin": passwordontroller,
-        "confirmPin": passwordConfirmController,
-        "email": emailController,
-        "gender": dropdownValue,
-        "dateOfBirth": dateOfBirthController
+  Future<void> _submitForm() async {
+    if (!_isButtonDisabled) {
+      setState(() {
+        _isButtonDisabled = true;
+        _buttonText = 'Loading...';
       });
+      // Perform the action that the button triggers here
 
-      final response = await http.post(url, headers: headers, body: body);
+      Future.delayed(const Duration(seconds: 5), () async {
+        if (formkey.currentState!.validate()) {
+          // Form is valid, proceed with your logic here
+          // For this example, we will simply print the email
 
-      var obj = jsonDecode(response.body);
+          FullName = '${fnameController.text} ${lnameController.text}';
+          print('Name: ${FullName}');
+          print('Email: ${emailController.text}');
+          print('Date: ${dateOfBirthController.text}');
+          print('Gender: ${dropdownValue}');
+          print('Phone: ${phoneController.text}');
+          print('Promo code: ${promotionCodeController.text}');
+          print('Pin: ${pinController.text}');
+          print('Confirm Pin: ${pinConfirmController.text}');
 
-      obj.forEach((key, value) {
-        _statusCode = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
-        _userId = obj["result"]["data"]["userId"];
-        _msisdn = obj["result"]["data"]["msisdn"];
-        promotionCode = obj["result"]["data"]["promotionCode"];
-      });
-
-      if (response.statusCode == 5000) {
-          await sendOTP(_msisdn);
-        
-      } else {
-        throw Exception(
-            'Unexpected signup error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      log(e.toString());
-    }
-  }
-
-  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "msisdn": _msisdn,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      obj.forEach((key, value) {
-        _statusCode = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
-        _otp = obj["result"]["data"]["otpId"];
-        // _userId = obj["result"]["data"]["userId"];
-      });
-
-      // // print('Responce Status Code : ' + response.statusCode);
-
-      if (response.statusCode == 5000) {
-          await sendOTPVerify(_userId, _otp);
-        
-      } else {
-        throw Exception(
-            'Unexpected OTP error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      log(e.toString());
-    }
-  }
-
-  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
-      _userId, _otp) async {
-    try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": _userId,
-        "otp": _otp,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      var _statusCodeOTP;
-
-      obj.forEach((key, value) {
-        _statusCodeOTP = obj["result"]["code"];
-      });
-
-      if (response.statusCode == 5000) {
-        if (_statusCodeOTP == 5000) {
-          throw Exception('OTP verified successfully');
-        } else {
-          log('failed the code is ${_statusCodeOTP}');
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return OtpSignPage(
+                name: lnameController.text,
+                email: emailController.text,
+                date: dateOfBirthController.text,
+                phoneNo: phoneController.text,
+                gender : dropdownValue!,
+                pin: pinController.text,
+                Confirm: pinConfirmController.text,
+                promotionCode: promotionCodeController.text,
+                
+              );
+              // return CommonUIPage(
+              //     userId: _userId,
+              //     name: _name!,
+              //     msisdn: _msisdn,
+              //     email: _email,
+              //     message: message,
+              //     uptoDatePaymentData: uptoDatePaymentData,
+              //     promotionCode: widget.promotionCode,
+              //     buttonClaimStatus: buttonStatus,
+              //     nextPayment: nextPayment,
+              //     paymentAmount: paymentAmount,
+              //     paymentPeriod: paymentPeriod,
+              //     policyNumber: policyNumber,
+              //     sumInsured: sumInsured,
+              //     tableData: [],
+              //     rowsBenefits: [],
+              //     rowsSumIsured: [],
+              //     claimListData: claimlistData,
+              //     profilePic: '');
+              // profilePic: profilePic);
+            },
+          ));
+          // ignore: use_build_context_synchronously
         }
-      } else {
-        throw Exception(
-            'Unexpected verify OTP error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      log(e.toString());
+        setState(() {
+          _isButtonDisabled = false;
+          _buttonText = 'Sign Up';
+        });
+      });
     }
   }
 
@@ -209,151 +169,162 @@ class _SignUpFormState extends State<SignUpForm> {
           builder: (context, modal, child) {
             return Card(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Form(
-                  key: basicFormKey,
+                  key: formkey,
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          controller: nameController,
-                          focusNode: nameNode,
-                          onSaved: (name) {},
-                          decoration: InputDecoration(
-                            labelText: "Your Name",
-                            labelStyle: TextStyle(
-                                color: nameNode.hasFocus
-                                    ? kPrimaryColor
-                                    : Colors.grey),
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.all(defaultPadding),
-                              child: Icon(Icons.person, color: kPrimaryColor),
-                            ),
-                            border: myinputborder(),
-                            enabledBorder: myinputborder(),
-                            focusedBorder: myfocusborder(),
-                          ),
-                          validator: RequiredValidator(
-                            errorText: "Required *",
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            controller: emailController,
-                            focusNode: emailNode,
-                            onSaved: (email) {},
-                            decoration: InputDecoration(
-                              labelText: "Your email",
-                              labelStyle: TextStyle(
-                                  color: emailNode.hasFocus
-                                      ? kPrimaryColor
-                                      : Colors.grey),
-                              prefixIcon: const Padding(
-                                padding: EdgeInsets.all(defaultPadding),
-                                child: Icon(Icons.mail, color: kPrimaryColor),
-                              ),
-                              border: myinputborder(),
-                              enabledBorder: myinputborder(),
-                              focusedBorder: myfocusborder(),
-                            ),
-                            validator: MultiValidator([
-                              RequiredValidator(
-                                errorText: "Required *",
-                              ),
-                              EmailValidator(
-                                errorText: "Not Valid Email",
-                              ),
-                            ])),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: IntlPhoneField(
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
-                          controller: phoneController,
-                          onSaved: (phone) {},
-                          focusNode: phoneNode,
-                          decoration: InputDecoration(
-                            labelText: 'Phone Number',
-                            labelStyle: TextStyle(
-                                color: phoneNode.hasFocus
-                                    ? kPrimaryColor
-                                    : Colors.grey),
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.all(defaultPadding),
-                              child: Icon(
-                                Icons.phone,
-                                color: kPrimaryColor,
-                              ),
-                            ),
-                            border: myinputborder(),
-                            enabledBorder: myinputborder(),
-                            focusedBorder: myfocusborder(),
-                          ),
-                          initialCountryCode: 'KE',
-                          onChanged: (phone) {
-                            phoneNo = phone.completeNumber;
-                            print(phoneController);
-                          },
-                          validator: (value) {
-                            //allow upper and lower case alphabets and space
-                            return "Enter your phone number should not start with a 0";
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: TextFormField(
-                          focusNode: dateOfBirthNode,
-                          decoration: InputDecoration(
-                            labelText: 'Date of Birth',
-                            border: myinputborder(),
-                            enabledBorder: myinputborder(),
-                            focusedBorder: myfocusborder(),
-                          ),
-                          controller: dateOfBirthController,
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime(2050));
 
-                            if (pickedDate != null) {
-                              dateOfBirthController.text =
-                                  DateFormat("yyyy-MM-dd HH:mm:ss")
-                                      .format(pickedDate);
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 15.0,
+                                    right: 15.0,
+                                    top: 15,
+                                    bottom: 0),
+                                child: TextFormField(
+                                  controller: lnameController,
+                                  decoration: InputDecoration(
+                                    border: myinputborder(),
+                                    labelText: 'Full Name',
+                                    hintText:
+                                        'Enter Full name with single space',
+                                    prefixIcon: const Padding(
+                                      padding: EdgeInsets.all(defaultPadding),
+                                      child: Icon(Icons.person,
+                                          color: kPrimaryColor),
+                                    ),
+                                    errorText: _lnameErrorText,
+                                  ),
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      setState(() {
+                                        _lnameErrorText = "* Required";
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _lnameErrorText = null;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
+                        child: TextFormField(
+                          controller: emailController,
+                          decoration: InputDecoration(
+                            border: myinputborder(),
+                            labelText: 'Email',
+                            hintText: 'Enter valid email id as abc@gmail.com',
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(Icons.mail, color: kPrimaryColor),
+                            ),
+                            errorText: _emailErrorText,
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              setState(() {
+                                _emailErrorText = "* Required";
+                              });
+                            } else if (!isEmailValid(value)) {
+                              setState(() {
+                                _emailErrorText = 'Invalid Email';
+                              });
+                            } else {
+                              setState(() {
+                                _emailErrorText = null;
+                              });
                             }
                           },
                         ),
                       ),
-                      const SizedBox(
-                        width: 20,
+                      Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15.0, right: 15.0, top: 15, bottom: 0),
+                          child: TextFormField(
+                            controller: dateOfBirthController,
+                            decoration: InputDecoration(
+                              border: myinputborder(),
+                              labelText: 'Date of Birth',
+                              hintText: 'Enter the date of birth',
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(Icons.calendar_today,
+                                    color: kPrimaryColor),
+                              ),
+                              errorText: _dateErrorText,
+                            ),
+                            readOnly: true,
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1950),
+                                  lastDate: DateTime(2050));
+
+                              if (pickedDate != null) {
+                                dateOfBirthController.text =
+                                    DateFormat("yyyy-MM-dd HH:mm:ss")
+                                        .format(pickedDate);
+                              }
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                setState(() {
+                                  _dateErrorText = "* Required";
+                                });
+                              } else {
+                                setState(() {
+                                  _dateErrorText = null;
+                                });
+                              }
+                            },
+                          )
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
                         child: DropdownButtonFormField<String>(
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              border: myinputborder(),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(
+                                  Icons.person_add,
+                                  color: kPrimaryColor,
+                                ),
+                              ),
                             ),
                             hint: const Text(
-                              'Gender',
+                              'Select Gender',
                               style: TextStyle(fontSize: 17),
                             ),
                             value: dropdownValue,
@@ -363,8 +334,8 @@ class _SignUpFormState extends State<SignUpForm> {
                               });
                             },
                             validator: (value) =>
-                                value == null ? 'field required' : null,
-                            items: <String>['female', 'male']
+                                value == null ? "* Required" : null,
+                            items: <String>['Female', 'Male']
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
@@ -378,165 +349,198 @@ class _SignUpFormState extends State<SignUpForm> {
                               );
                             }).toList()),
                       ),
-                      const SizedBox(
-                        width: 20,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
+                        child: IntlPhoneField(
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.next,
+                            cursorColor: kPrimaryColor,
+                            controller: phoneController,
+                            onSaved: (phone) {},
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              hintText: 'Enter phone number',
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(
+                                  Icons.phone,
+                                  color: kPrimaryColor,
+                                ),
+                              ),
+                              border: myinputborder(),
+                              // enabledBorder: myinputborder(),
+                              // focusedBorder: myfocusborder(),
+                            ),
+                            initialCountryCode: 'KE',
+                            validator: (value) {
+                              var _countryLImit = countries.firstWhere(
+                                  (element) =>
+                                      element.code == value!.countryISOCode);
+
+                              print(_countryLImit.maxLength);
+                              if (value!.number.isEmpty) {
+                                setState(() {
+                                  _phoneErrorText = "* Required";
+                                });
+                              } else if (value.number.length >=
+                                      _country.minLength &&
+                                  value.number.length <= _country.maxLength) {
+                                setState(() {
+                                  // Run anything here
+                                });
+                              } else {
+                                setState(() {
+                                  _phoneErrorText = null;
+                                });
+                              }
+                            },
+                            onCountryChanged: (country) => _country = country,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.deny(RegExp('^0+')),
+                            ]),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
-                        child: Column(
-                          children: [
-                            TextFormField(
-                              textInputAction: TextInputAction.done,
-                              obscureText: true,
-                              cursorColor: kPrimaryColor,
-                              controller: passwordontroller,
-                              focusNode: passwordNode,
-                              decoration: InputDecoration(
-                                labelText: "Your password",
-                                labelStyle: TextStyle(
-                                    color: passwordNode.hasFocus
-                                        ? kPrimaryColor
-                                        : Colors.grey),
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(defaultPadding),
-                                  child: Icon(Icons.lock, color: kPrimaryColor),
-                                ),
-                                border: myinputborder(),
-                                enabledBorder: myinputborder(),
-                                focusedBorder: myfocusborder(),
-                              ),
-                              validator: MinLengthValidator(
-                                6,
-                                errorText: "Min 6 characters required",
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            TextFormField(
-                              textInputAction: TextInputAction.done,
-                              obscureText: true,
-                              cursorColor: kPrimaryColor,
-                              controller: passwordConfirmController,
-                              focusNode: passwordConfirmNode,
-                              decoration: InputDecoration(
-                                labelText: "Confirm password",
-                                labelStyle: TextStyle(
-                                    color: passwordConfirmNode.hasFocus
-                                        ? kPrimaryColor
-                                        : Colors.grey),
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(defaultPadding),
-                                  child: Icon(Icons.lock, color: kPrimaryColor),
-                                ),
-                                border: myinputborder(),
-                                enabledBorder: myinputborder(),
-                                focusedBorder: myfocusborder(),
-                              ),
-                              // validator: MinLengthValidator(
-                              //   6, errorText: "Min 6 characters required",
-                              // ),
-                              // validator: (value) {
-                              //   if (passwordontroller !=
-                              //       passwordConfirmController) {
-                              //     return 'The password does not match';
-                              //   }
-                              //   MinLengthValidator(
-                              //     6,
-                              //     errorText: "Min 6 characters required",
-                              //   );
-                              // },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: defaultPadding / 2,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: defaultPadding),
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
                         child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          cursorColor: kPrimaryColor,
                           controller: promotionCodeController,
-                          focusNode: promotionCodeNode,
-                          onSaved: (email) {},
                           decoration: InputDecoration(
-                            labelText: "Your Promo Code",
-                            labelStyle: TextStyle(
-                                color: emailNode.hasFocus
-                                    ? kPrimaryColor
-                                    : Colors.grey),
+                            border: myinputborder(),
+                            labelText: 'Promocode',
+                            hintText: 'Enter valid promocode',
                             prefixIcon: const Padding(
                               padding: EdgeInsets.all(defaultPadding),
-                              child: Icon(Icons.mail, color: kPrimaryColor),
+                              child: Icon(Icons.code, color: kPrimaryColor),
                             ),
-                            border: myinputborder(),
-                            enabledBorder: myinputborder(),
-                            focusedBorder: myfocusborder(),
+                            // errorText: _promoErrorText,
                           ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: 40.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor,
-                              fixedSize: const Size(200, 40)),
-                          onPressed: () async {
-                            await addUsers(
-                                nameController.text,
-                                emailController.text,
-                                phoneNo,
-                                dateOfBirthController.text,
-                                dropdownValue,
-                                passwordConfirmController.text,
-                                passwordontroller.text);
-
-                            (_statusCode == 5000)
-                                ? Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return LoginScreen(
-                                            promotionCode: promotionCode);
-                                      },
-                                    ),
-                                  )
-                                : Navigator.pop(context);
-                            setState(
-                              () {},
-                            );
-
-                            final snackBar = SnackBar(
-                              content: Text(_statusMessage),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () {
-                                  // Some code to undo the change.
-                                },
-                              ),
-                            );
-
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
+                          validator: (value) {
+                            // if (value!.isEmpty) {
+                            //   setState(() {
+                            //     _promoErrorText = "* Required";
+                            //   });
+                            // } else {
+                            //   setState(() {
+                            //     _promoErrorText = null;
+                            //   });
+                            // }
                           },
-                          child: const Text(
-                            "Next",
-                            style: TextStyle(
-                              fontSize: 20.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          // obscureText: true,
+                          obscureText: passwordVisiblePin,
+                          controller: pinController,
+                          decoration: InputDecoration(
+                            border: myinputborder(),
+                            labelText: 'Pin',
+                            hintText: 'Enter secure pin',
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(Icons.lock, color: kPrimaryColor),
                             ),
+                            suffixIcon: IconButton(
+                              icon: Icon(passwordVisiblePin
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    passwordVisiblePin = !passwordVisiblePin;
+                                  },
+                                );
+                              },
+                            ),
+                            errorText: _pinErrorText,
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              setState(() {
+                                _pinErrorText = "* Required";
+                              });
+                            }
+                            // else if (value.length < 4) {
+                            //   _pinErrorText = "Password should be atleast 4 characters";
+                            // }
+                            else if (value.length > 4) {
+                              setState(() {
+                                _pinErrorText =
+                                    "Password should not be greater than 4 characters";
+                              });
+                            } else {
+                              setState(() {
+                                _pinErrorText = null;
+                              });
+                            }
+                          }, //Function to check validation
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15, bottom: 0),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          obscureText: passwordVisiblePin,
+                          controller: pinConfirmController,
+                          decoration: InputDecoration(
+                            border: myinputborder(),
+                            labelText: 'Confirm Pin',
+                            hintText: 'Repeat the pin to confirm',
+                            prefixIcon: const Padding(
+                              padding: EdgeInsets.all(defaultPadding),
+                              child: Icon(Icons.lock, color: kPrimaryColor),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(passwordVisibleConfirmPin
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    passwordVisibleConfirmPin =
+                                        !passwordVisibleConfirmPin;
+                                  },
+                                );
+                              },
+                            ),
+                            errorText: _confirmPinErrorText,
+                          ),
+                          validator: (value) {
+                            if (value == pinController) {
+                              setState(() {
+                                _confirmPinErrorText = "Does not match the Pin";
+                              });
+                            } else {
+                              setState(() {
+                                _confirmPinErrorText = null;
+                              });
+                            }
+                          }, //Function to check validation
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        height: 50,
+                        width: 250,
+                        child: ElevatedButton(
+                          onPressed: _isButtonDisabled ? null : _submitForm,
+                          child: Text(
+                            _buttonText,
                           ),
                         ),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 20,
                       ),
                       AlreadyHaveAnAccountCheck(
                         login: false,
@@ -545,9 +549,7 @@ class _SignUpFormState extends State<SignUpForm> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return LoginScreen(
-                                  promotionCode: promotionCode,
-                                );
+                                return const LoginScreen();
                               },
                             ),
                           );

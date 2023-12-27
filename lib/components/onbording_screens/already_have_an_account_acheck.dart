@@ -32,3 +32,96 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
     );
   }
 }
+
+class ForgotPasswordCheck extends StatelessWidget {
+  final bool login;
+  final Function? press;
+  const ForgotPasswordCheck({
+    Key? key,
+    this.login = true,
+    required this.press,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        
+        GestureDetector(
+          onTap: press as void Function()?,
+          child: const Text(
+            "Forgot Password ? ",
+            style: TextStyle(
+              color: kPrimaryColor
+            ),
+          ),
+        )
+        
+      ],
+    );
+  }
+}
+
+class ViewAll extends StatelessWidget {
+  final bool login;
+  final Function? press;
+  const ViewAll({
+    Key? key,
+    this.login = true,
+    required this.press,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        
+        GestureDetector(
+          onTap: press as void Function()?,
+          child: const Text(
+            "View All",
+            style: TextStyle(
+              color: kPrimaryColor
+            ),
+          ),
+        )
+        
+      ],
+    );
+  }
+}
+
+class ResendCode extends StatelessWidget {
+  final bool login;
+  final Function? press;
+  const ResendCode({
+    Key? key,
+    this.login = true,
+    required this.press,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        
+        GestureDetector(
+          onTap: press as void Function()?,
+          child: const Text(
+            "Resend New Code",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: kPrimaryColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        )
+        
+      ],
+    );
+  }
+}

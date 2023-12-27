@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_form_review.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
 import 'package:one_million_app/components/notification/notification.dart';
@@ -13,9 +14,16 @@ class ClaimHomePage extends StatefulWidget {
   final String userName;
   final String phone;
   final String email;
+  final List<String> title;
   final List<String> message;
+  final List<String> readStatus;
+  final List<num> notificationIdList;
 
   final List<dynamic> claimListData;
+  final String uptoDatePayment;
+  final num paymentAmount;
+  final String claimApplicationActive;
+ final String qualifiesForCompensation;
 
   const ClaimHomePage(
       {Key? key,
@@ -23,8 +31,16 @@ class ClaimHomePage extends StatefulWidget {
       required this.userName,
       required this.phone,
       required this.email,
+      required this.title,
       required this.message,
-      required this.claimListData})
+      required this.readStatus,
+      required this.notificationIdList,
+      required this.claimListData,
+      required this.paymentAmount,
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment
+      })
       : super(key: key);
   @override
   _ClaimHomePageState createState() => _ClaimHomePageState();
@@ -114,6 +130,8 @@ class _ClaimHomePageState extends State<ClaimHomePage>
 
   late final List<dynamic> _elements;
 
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
   // final List<dynamic> _elements = [
   //   {
   //     'title': 'Claim One',
@@ -153,16 +171,25 @@ class _ClaimHomePageState extends State<ClaimHomePage>
 
   late List<String> message = [];
 
+  String? claimApplicationActive;
+  num? paymentAmount;
+  String? qualifiesForCompensation;
+  String? uptoDatePayment;
+
   @override
   void initState() {
     super.initState();
+
+    claimApplicationActive = widget.claimApplicationActive;
+    paymentAmount = widget.paymentAmount; 
+    qualifiesForCompensation = widget.qualifiesForCompensation;
+    uptoDatePayment = widget.uptoDatePayment;
   }
 
   @override
   Widget build(BuildContext context) {
     _elements = widget.claimListData;
 
-    
     final List<dynamic> itemsTitles = _elements.map((e) {
       return e['claimType'];
     }).toList();
@@ -215,7 +242,11 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return NotificationPage(message: widget.message);
+                      return NotificationPage(
+                          userId: widget.userId,
+                          readStatus: widget.readStatus,
+                          title: widget.title,
+                          message: widget.message);
                     },
                   ),
                 );
@@ -239,7 +270,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                         padding:
                             EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: const Text(
-                          "Claim",
+                          "Claims",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
@@ -259,7 +290,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                       color: Color.fromARGB(255, 204, 204, 204),
                     ),
                   ),
-
+                  
                   (_elements.isEmpty)
                       ? Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -306,11 +337,15 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                             builder: (context) {
                                               return ClaimForm(
                                                 userId: widget.userId,
+                                                claimApplicationActive: widget.claimApplicationActive,
+                                                paymentAmount: widget.paymentAmount,
+                                                qualifiesForCompensation: widget.qualifiesForCompensation,
+                                                uptoDatePayment: widget.uptoDatePayment,
                                               );
                                             },
                                           ),
                                         );
-                                        // _showDialog();
+                                        // _showDia// log();
                                       },
                                       child: Text(
                                         "Create a new Claim".toUpperCase(),
@@ -338,7 +373,6 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                
                                   ListTile(
                                     leading: CircleAvatar(
                                       // child: Icon(icons[index])
@@ -351,13 +385,18 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                               : itemsType.toList()[index] ==
                                                       'temporary disability'
                                                   ? Icons.personal_injury
+                                                  :itemsType.toList()[index] ==
+                                                      'artificial appliances'
+                                                  ? Icons.emoji_flags
+                                                  :itemsType.toList()[index] ==
+                                                      'funeral expences'
+                                                  ? Icons.money_off
+                                                  
                                                   : Icons
                                                       .medical_information_outlined),
                                     ),
-                                    title: 
-                                    
-                                    Text(itemsTitles.toList()[index]),
-                                    subtitle: Text(itemsDate.toList()[index],
+                                    title: Text(itemsTitles.toList()[index]),
+                                    subtitle: Text(formatter.format(DateTime.parse(itemsDate.toList()[index])),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
@@ -384,8 +423,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                                         .toList()[index] ==
                                                     'failed'
                                                 ? Colors.red
-                                                : itemsStatus.toList()[
-                                                            index] ==
+                                                : itemsStatus.toList()[index] ==
                                                         'pending'
                                                     ? Colors.yellow
                                                     : itemsStatus.toList()[
@@ -395,7 +433,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                                         : Colors.green,
                                           ),
                                         ),
-                                        
+
                                         // IconButton(
                                         //   iconSize: 30,
                                         //   icon: const Icon(
@@ -450,6 +488,10 @@ class _ClaimHomePageState extends State<ClaimHomePage>
               builder: (context) {
                 return ClaimForm(
                   userId: widget.userId,
+                  claimApplicationActive: widget.claimApplicationActive,
+                  paymentAmount: widget.paymentAmount,
+                  qualifiesForCompensation: widget.qualifiesForCompensation,
+                  uptoDatePayment: widget.uptoDatePayment,
                 );
               },
             ),

@@ -24,7 +24,11 @@ class ProfileScreen extends StatefulWidget {
   final String userName;
   final String phone;
   final String email;
+
+  final List<String> title;
   final List<String> message;
+  final List<String> readStatus;
+  final List<num> notificationIdList;
 
   final String profilePic;
 
@@ -34,7 +38,10 @@ class ProfileScreen extends StatefulWidget {
       required this.userName,
       required this.phone,
       required this.email,
+      required this.title,
       required this.message,
+      required this.readStatus,
+      required this.notificationIdList,
       required this.profilePic})
       : super(key: key);
   @override
@@ -101,11 +108,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       print('rESPONCE bODY : $responseData');
 
-      log('The Request Payload : ${request.files}');
+      // log('The Request Payload : ${request.files}');
     } on PlatformException catch (e) {
-      log('Unsupported operation' + e.toString());
+      // log('Unsupported operation' + e.toString());
     } catch (e) {
-      log(e.toString());
+      // log(e.toString());
     }
 
     setState(() {});
@@ -150,7 +157,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return NotificationPage(message: widget.message);
+                      return NotificationPage(
+                          userId: widget.userId,
+                          readStatus: widget.readStatus,
+                          title: widget.title,
+                          message: widget.message);
                     },
                   ),
                 );
@@ -170,31 +181,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               //   backgroundImage:
               //       AssetImage('assets/icons/profile_icons/profile.jpg'),
               // ),
-              Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: CircleAvatar(
-                    backgroundColor: kPrimaryLightColor,
-                    child: _imageProfile != null
-                        ? Image.file(
-                            _imageProfile!,
+              CircleAvatar(
+                
+                backgroundColor: kPrimaryLightColor,
+                child: _imageProfile != null
+                    ? Image.file(
+                        _imageProfile!,
+                        width: 300,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      )
+                    : (widget.profilePic == '')
+                        ? Image.asset(
+                            'assets/icons/profile_icons/profile.jpg',
                             width: 300,
                             height: 250,
                             fit: BoxFit.cover,
                           )
-                        : (widget.profilePic == '')? 
-                        Image.asset(
-                          'assets/icons/profile_icons/profile.jpg',
-                            width: 300,
-                            height: 250,
-                            fit: BoxFit.cover,
-                          ):
-                          Image.network(
+                        : Image.network(
                             widget.profilePic,
                             width: 300,
                             height: 250,
                             fit: BoxFit.cover,
                           ),
-                  )),
+              ),
               InkWell(
                   onTap: () {
                     getImageProfilePicture(ImageSource.gallery);

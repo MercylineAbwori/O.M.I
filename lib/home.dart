@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
 import 'package:one_million_app/components/notification/notification.dart';
+import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/components/upload_files/upload_files.dart';
 import 'package:one_million_app/core/constant_service.dart';
@@ -19,29 +20,53 @@ class HomePage extends StatefulWidget {
   final num userId;
   final String phone;
   final String email;
+  final List<String> title;
   final List<String> message;
-  final String uptoDatePaymentData;
+  final List<String> readStatus;
+  final String uptoDatePayment;
   final String promotionCode;
   final bool buttonClaimStatus;
+  final List<num> notificationIdList;
+  final String claimApplicationActive;
+ final String qualifiesForCompensation;
 
-  const HomePage(
+ final List<dynamic> claimListData;
+ final String profilePic;
+
+ final String nextPayment;
+  final String paymentPeriod;
+  final String policyNumber;
+  final num sumInsured;
+  final num paymentAmount;
+
+  HomePage(
       {super.key,
       required this.userId,
       required this.userName,
       required this.phone,
       required this.email,
+      required this.title,
       required this.message,
-      required this.uptoDatePaymentData,
+      required this.readStatus,
+      required this.notificationIdList,
+      required this.uptoDatePayment,
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
       required this.promotionCode,
-      required this.buttonClaimStatus});
+      required this.buttonClaimStatus,
+      required this.claimListData,
+      required this.nextPayment,
+      required this.paymentAmount,
+      required this.paymentPeriod,
+      required this.policyNumber,
+      required this.profilePic,
+      required this.sumInsured});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 //policy Details Modal
-  
-
 
 class _HomePageState extends State<HomePage> {
   // padding constants
@@ -63,10 +88,30 @@ class _HomePageState extends State<HomePage> {
   final List _children = [];
 
   int count = 0;
-  
+
+  bool? checkboxValue = false;
+  bool? checkedValue = false;
+
+  // This function is triggered when a checkbox is checked or unchecked
+  Future<void> _itemChange(num notificationId) async {
+    await ApiService().sendMarkAsRead(widget.userId, notificationId);
+    setState(() {
+      
+      
+    });
+  }
+  // This function is triggered when a checkbox is checked or unchecked
+  Future<void> _itemChangeMarkAll() async {
+    await ApiService().sendMarkAsAll(widget.userId);
+    setState(() {
+      
+      
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -122,7 +167,11 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return NotificationPage(message: widget.message);
+                      return NotificationPage(
+                          userId: widget.userId,
+                          readStatus: widget.readStatus,
+                          title: widget.title,
+                          message: widget.message);
                     },
                   ),
                 );
@@ -140,9 +189,9 @@ class _HomePageState extends State<HomePage> {
 
               // welcome home
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Row(
                     children: [
                       Container(
@@ -164,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 15),
                       Center(
                         child: Container(
                           child: Column(
@@ -173,14 +222,16 @@ class _HomePageState extends State<HomePage> {
                               Card(
                                   elevation: 5,
                                   shadowColor: Colors.black,
-                                  color: (widget.uptoDatePaymentData ==
+                                  color: (widget.uptoDatePayment ==
                                           'payment up to date')
                                       ? Colors.green
                                       : Colors.red,
                                   child: Padding(
                                     padding: const EdgeInsets.all(10.0),
-                                    child: Center(
-                                      child: Text(widget.uptoDatePaymentData),
+                                    child: Expanded(
+                                      child: Center(
+                                        child: Text(widget.uptoDatePayment),
+                                      ),
                                     ),
                                   ))
                             ],
@@ -208,12 +259,12 @@ class _HomePageState extends State<HomePage> {
 
               //Home title
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: const Text(
-                  "Home",
+                  "Quick Actions",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 24,
+                    fontSize: 17,
                     color: Colors.black,
                   ),
                 ),
@@ -249,7 +300,31 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return BeneficiaryScreen();
+                                          return BeneficiaryScreen(
+                                            userId : widget.userId,
+                                            name: widget.userName,
+                                            msisdn: widget.phone,
+                                            email: widget.email,
+                                            readStatus: widget.readStatus,
+                                            title: widget.title,
+                                            message: widget.message,
+                                            notificationIdList: widget.notificationIdList,
+                                            uptoDatePayment: widget.uptoDatePayment,
+                                            qualifiesForCompensation: widget.qualifiesForCompensation,
+                                            claimApplicationActive: widget.claimApplicationActive,
+                                            promotionCode: widget.promotionCode,
+                                            buttonClaimStatus: widget.buttonClaimStatus,
+                                            tableData: [],
+                                            rowsBenefits: [],
+                                            rowsSumIsured: [],
+                                            claimListData: widget.claimListData,
+                                            profilePic: widget.profilePic,
+                                            nextPayment: widget.nextPayment,
+                                            paymentAmount: widget.paymentAmount,
+                                            paymentPeriod: widget.paymentPeriod,
+                                            policyNumber: widget.policyNumber,
+                                            sumInsured: widget.sumInsured,
+                                          );
                                         },
                                       ),
                                     );
@@ -267,12 +342,15 @@ class _HomePageState extends State<HomePage> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           const SizedBox(height: 5),
-                                          Image.asset(
-                                            'assets/icons/home_icons/claims.png',
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          // Image.asset(
+                                          //   'assets/icons/home_icons/claims.png',
+                                          //   width: 40,
+                                          //   height: 40,
+                                          //   fit: BoxFit.cover,
+                                          // ),
+                                          Icon(Icons.people, 
+                                          color: kPrimaryColor,
+                                          size: 40,),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Add Beneficiary',
@@ -301,8 +379,7 @@ class _HomePageState extends State<HomePage> {
                                       MaterialPageRoute(
                                         builder: (context) {
                                           return UploadFiles(
-                                            userId: widget.userId
-                                          );
+                                              userId: widget.userId);
                                         },
                                       ),
                                     );
@@ -320,12 +397,15 @@ class _HomePageState extends State<HomePage> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           const SizedBox(height: 5),
-                                          Image.asset(
-                                            'assets/icons/home_icons/reporting.png',
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          // Image.asset(
+                                          //   'assets/icons/home_icons/reporting.png',
+                                          //   width: 40,
+                                          //   height: 40,
+                                          //   fit: BoxFit.cover,
+                                          // ),
+                                          Icon(Icons.file_download, 
+                                          color: kPrimaryColor,
+                                          size: 40,),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Upload Documents',
@@ -368,12 +448,15 @@ class _HomePageState extends State<HomePage> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           const SizedBox(height: 5),
-                                          Image.asset(
-                                            'assets/icons/home_icons/payment.png',
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          // Image.asset(
+                                          //   'assets/icons/home_icons/payment.png',
+                                          //   width: 40,
+                                          //   height: 40,
+                                          //   fit: BoxFit.cover,
+                                          // ),
+                                          Icon(Icons.share_sharp, 
+                                          color: kPrimaryColor,
+                                          size: 40,),
                                           const SizedBox(height: 5),
                                           const Text(
                                             'Overdue Bonus',
@@ -406,12 +489,15 @@ class _HomePageState extends State<HomePage> {
                                                   CrossAxisAlignment.center,
                                               children: [
                                                 const SizedBox(height: 5),
-                                                Image.asset(
-                                                  'assets/icons/home_icons/coverage.png',
-                                                  width: 40,
-                                                  height: 40,
-                                                  fit: BoxFit.cover,
-                                                ),
+                                                // Image.asset(
+                                                //   'assets/icons/home_icons/coverage.png',
+                                                //   width: 40,
+                                                //   height: 40,
+                                                //   fit: BoxFit.cover,
+                                                // ),
+                                                Icon(Icons.folder, 
+                                                color: kPrimaryColor,
+                                                  size: 40,),
                                                 const SizedBox(height: 5),
                                                 const Text(
                                                   'Default Claims',
@@ -472,14 +558,36 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 10),
 
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: const Text(
-                  "Recent Activities",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black,
-                  ),
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Recent Activities",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                        color: Colors.black,
+                      ),
+                    ),
+                    ViewAll(
+                      press: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return NotificationPage(
+                                userId: widget.userId,
+                                readStatus: widget.readStatus,
+                                title: widget.title,
+                                message: widget.message,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
 
@@ -528,31 +636,52 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               )
                             : Container(
-                                child: ListView.separated(
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.all(8),
-                                  itemCount: 5,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return Card(
-                                      color: Colors.white,
-                                      borderOnForeground: true,
-                                      elevation: 6,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          ListTile(
-                                            leading:
-                                                const Icon(Icons.notifications),
-                                            title: Text(widget.message[index]),
-                                            // title: Text('Notification'),
+                                child: Column(
+                                  children: [
+                                    CheckboxListTile(
+                                      title: Text("Mark All"), //    <-- label
+                                      value: (widget.readStatus.contains('Unread'))
+                                                    ? checkedValue = false
+                                                    : checkedValue = true,
+                                      onChanged: (newValue) => _itemChangeMarkAll(),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      padding: const EdgeInsets.all(8),
+                                      itemCount: 5,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Card(
+                                          color: Colors.white,
+                                          borderOnForeground: true,
+                                          elevation: 6,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              CheckboxListTile(
+                                                value: (widget.readStatus[index] ==
+                                                        'Read')
+                                                    ? checkboxValue = true
+                                                    : checkboxValue = false,
+                                                onChanged: (isChecked) =>
+                                                  _itemChange(widget.notificationIdList[index]),
+                                                
+                                                secondary:
+                                                    const Icon(Icons.notifications),
+                                                title: Text(widget.title[index]),
+                                                subtitle:
+                                                    Text(widget.message[index]),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int index) =>
-                                          const Divider(),
+                                        );
+                                      },
+                                      separatorBuilder:
+                                          (BuildContext context, int index) =>
+                                              const Divider(),
+                                    ),
+                                  ],
                                 ),
                               ),
                       ],

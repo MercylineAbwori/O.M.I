@@ -59,9 +59,9 @@ class _OnbordingState extends State<Onbording> {
                             height: 250,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         Container(
-                          height: 80,
+                          height: 120,
                           child: Text(
                             contents[0].title,
                             textAlign: TextAlign.center,
@@ -73,7 +73,7 @@ class _OnbordingState extends State<Onbording> {
                         ),
                         SizedBox(height: 10),
                         Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: 200,
                           child: Text(
                             contents[0].discription,
                             textAlign: TextAlign.justify,
@@ -108,7 +108,7 @@ class _OnbordingState extends State<Onbording> {
                         ),
                         SizedBox(height: 10),
                         Container(
-                          height: 50,
+                          height: 30,
                           child: Text(
                             contents[1].title,
                             textAlign: TextAlign.center,
@@ -132,7 +132,7 @@ class _OnbordingState extends State<Onbording> {
                                 ),
                               ),
                               Container(
-                                  height: 250,
+                                  height: 300,
                                   child: ListView.builder(
                                       itemCount: contents[1].accorditionList.length,
                                       itemBuilder: (BuildContext context, int index) {
@@ -210,7 +210,7 @@ class _OnbordingState extends State<Onbording> {
                         ),
                         SizedBox(height: 10),
                         Container(
-                          height: 50,
+                          height: 30,
                           child: Text(
                             contents[2].title,
                             textAlign: TextAlign.center,
@@ -352,7 +352,7 @@ class _OnbordingState extends State<Onbording> {
                         ),
                         const SizedBox(height: 10),
                         Container(
-                          height: 50,
+                          height: 30,
                           child: Text(
                             contents[3].title,
                             textAlign: TextAlign.center,
@@ -439,7 +439,7 @@ class _OnbordingState extends State<Onbording> {
                         Container(
                           height: MediaQuery.of(context).size.height,
                           child: ListView.builder(
-                              itemCount: contents[4].accorditionList.length,
+                              itemCount: contents[3].accorditionList.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return ListTile(
                                   title: Text(
@@ -485,7 +485,7 @@ class _OnbordingState extends State<Onbording> {
                         ),
                         const SizedBox(height: 10),
                         Container(
-                          height: 50,
+                          height: 30,
                           child: Text(
                             contents[5].title,
                             textAlign: TextAlign.center,

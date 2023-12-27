@@ -53,7 +53,7 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger() + 3
+        versionCode flutterVersionCode.toInteger() + 5
         versionName flutterVersionName
     }
 

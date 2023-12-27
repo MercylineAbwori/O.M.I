@@ -13,16 +13,13 @@ class SignUpScreenTopImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          "Sign Up".toUpperCase(),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        
         const SizedBox(height: defaultPadding),
         Row(
           children: [
             const Spacer(),
             Expanded(
-              flex: 8,
+              flex: 6,
               child: SvgPicture.asset("assets/icons/signup.svg"),
             ),
             const Spacer(),

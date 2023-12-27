@@ -20,8 +20,8 @@ class UnbordingContent {
 List<UnbordingContent> contents = [
   UnbordingContent(
       title:
-          'Welcome to Madison Personal Accident Insurance with Terrorism & Political Risks Cover!',
-      image: 'assets/logos/slide_one.png',
+          'Welcome to One Million Insurance with Terrorism & Political Risks Cover!',
+      image: 'assets/sliders/slide_one.png',
       discription:
           "Our Personal Accident Insurance with Terrorism & Political Risks Cover extension is designed to protect against the unexpected, while also offering coverage against Terrorism and Political Risk",
       accorditionList: [],
@@ -47,7 +47,7 @@ List<UnbordingContent> contents = [
   ),
   UnbordingContent(
       title: 'Benefits',
-      image: 'assets/logos/slide_four.png',
+      image: 'assets/sliders/slide_four.png',
       discription: '',
       accorditionList: [],
       accorditionTitle: [
@@ -64,19 +64,14 @@ List<UnbordingContent> contents = [
   ),
   UnbordingContent(
       title: 'Key Features',
-      image: 'assets/logos/slide_two.png',
+      image: 'assets/sliders/slide_two.png',
       discription: '',
       accorditionList: [
-        '1. Comprehensive Accident Coverage: Our policy compensates for bodily injuries resulting from accidents, offering protection for physical impairment, disablement, or death within twelve (12) months from the accident date.',
-        '2. Accidental Death Benefit: Choose coverage between Kes. 100,000 to Kes. 10,000,000, providing a lump sum payment to designated beneficiaries in the event of the insured’s accidental death.',
-        '3. Permanent Total Disablement Benefit: If an accident causes permanent total disablement, we offer a lump sum payment to help adjust to life changes and cover ongoing expenses.',
-        '4. Permanent Partial Disablement Benefit: In the case of permanent partial disablement, receive a partial payment based on the severity of the disablement.',
-        '5. Temporary Total Disablement Benefit: Receive compensation for temporary total disablement, supporting you during the recovery period and loss of income.',
-        '6. Medical Expenses Reimbursement: Covering necessary medical treatment and hospitalization expenses incurred due to accidents, easing the financial burden.'
-        '7. Hospital Cash Benefit: Receive daily cash benefits during hospitalization due to an accident, covering additional expenses.'
-        '8. Last Expense Benefit: Assist your family with funeral and last expense costs in the event of accidental death.'
-        '9. Coverage for Self and Family Members: Extend coverage to your spouse and children, ensuring their well-being during challenging times.'
-        '10. Terrorism & Political Risks Extension: Additional protection against injuries or death resulting from acts of Terrorism, riot, strike, civil commotion, and malicious acts during the policy period.'
+        '1. Accidental Death Benefit: Choose coverage between Kes. 250,000 to Kes. 1,000,000, providing a lump sum payment to designated beneficiaries in the event of the insured’s accidental death.',
+        '2. Permanent Total Disablement Benefit: If an accident causes permanent total disablement, we offer a lump sum payment to help adjust to life changes and cover ongoing expenses.',
+        '3. Permanent Partial Disablement Benefit: In the case of permanent partial disablement, receive a partial payment based on the severity of the disablement.',
+        '4. Temporary Total Disablement Benefit: Receive compensation for temporary total disablement, supporting you during the recovery period and loss of income.',
+        '5. Medical Expenses Reimbursement: Covering necessary medical treatment and hospitalization expenses incurred due to accidents, easing the financial burden.',
       ],
       accorditionTitle: [],
       
@@ -84,7 +79,7 @@ List<UnbordingContent> contents = [
   ),
   UnbordingContent(
       title: 'Policy Exclutions',
-      image: 'assets/logos/slide_five.png',
+      image: 'assets/sliders/slide_five.png',
       discription: '',
       accorditionList: [
         '1. War, civil war, mutiny, riot, strike, civil commotion, rebellion, revolution, insurrection, military or usurped power.',
@@ -103,7 +98,7 @@ List<UnbordingContent> contents = [
   ),
   UnbordingContent(
       title: 'Frequently asked questions',
-      image: 'assets/logos/slide_three.png',
+      image: 'assets/sliders/slide_three.png',
       discription: '',
       accorditionList: [],
       accorditionTitle: [
@@ -115,7 +110,7 @@ List<UnbordingContent> contents = [
         '6. Are premium affordable for individual coverage?',
         '7. How do I apply for One Million Family Personal Accident Insurance?'],
       accorditionDescrition: [
-        'Our Accidental Death Benefit offers a lump sum payment between Kes. 100,000 to Kes. 10,000,000 to designated beneficiaries in case of accidental death.',
+        'Our Accidental Death Benefit offers a lump sum payment between Kes. 250,000 to Kes. 1,000,000 to designated beneficiaries in case of accidental death.',
         'Our policy covers permanent and temporary disabilities, including permanent total disablement, permanent partial disablement, and temporary total disablement caused by accidents. ',
         'We cover necessary medical treatment and hospitalization expenses resulting from accidents, alleviating financial burdens.',
         'Yes, you can extend coverage to your spouse and children, offering protection for your entire family.',

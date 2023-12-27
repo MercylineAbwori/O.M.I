@@ -241,9 +241,9 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
         throw Exception('Unexpected Calculator error occured!');
       }
     } on PlatformException catch (e) {
-      log('Unsupported operation' + e.toString());
+      // log('Unsupported operation' + e.toString());
     } catch (e) {
-      log(e.toString());
+      // log(e.toString());
     }
   }
 
@@ -289,8 +289,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
       });
 
       if (response.statusCode == 5000) {
-          throw Exception('Claim Form Displayed successfully');
-        
+        throw Exception('Claim Form Displayed successfully');
       } else {
         throw Exception(
             'Unexpected Claim Form Displayed error occured! Status code ${response.statusCode}');
@@ -300,7 +299,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
       if (e is http.ClientException) {
         print("Response Body: ${e.message}");
       }
-      log(e.toString());
+      // log(e.toString());
     }
   }
 

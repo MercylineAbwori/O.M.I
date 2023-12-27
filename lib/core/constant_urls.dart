@@ -9,7 +9,11 @@ class ApiConstants {
   static String claimEndpoint = '/initiateClaim';
   static String claimListEndpoint = '/listClaim';
   static String notificationEndpoint = '/notification';
+
+
   static String beneficiaryEndpoint = '/beneficiary';
+static String beneficiaryLimitEndpoint = '/increaseBeneficiaryLimit';
+
   static String uploadDocumentEndpoint = '/uploadDocument';
   static String mpesaPaymentEndpoint = '/lipa-na-mpesa';
   static String uptoDatePaymentEndpoint = '/upto-date-payment';
@@ -18,4 +22,9 @@ class ApiConstants {
   static String defaultPolicyPayEndpoint = '/defaultPolicyPay';
   static String claimDefaultEndpoint = '/claimDefault';
   static String fetchProfileEndpoint = '/fetchDocument';
+
+  static String resetPasswordEndpoint = '/resetPin';
+
+  static String markAllEndpoint = '/markAllAsRead';
+  static String markAsReadEndpoint = '/markAsRead';
 }
