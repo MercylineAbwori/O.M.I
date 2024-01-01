@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MpesaPaymentModal extends ChangeNotifier {
 
-  num? amount;
+  String? amount;
   String? userId;
   String? phoneNumber;
 

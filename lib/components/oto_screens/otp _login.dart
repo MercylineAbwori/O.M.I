@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:one_million_app/common_ui.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/core/constant_service.dart';
@@ -60,21 +61,9 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
   late List<dynamic> claimlistData = [];
 
-  late String uptoDatePayment;
-  late String claimApplicationActive;
-  late num paymentAmount;
-  late String qualifiesForCompensation;
-
   late bool buttonStatus;
 
   late String profilePic;
-
-  //Policy Details
-
-  late String nextPayment = '';
-  late String paymentPeriod;
-  late String policyNumber;
-  late num sumInsured;
 
   //OTP
   TextEditingController valueOneController = TextEditingController();
@@ -86,9 +75,53 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
   TextEditingController otpController = TextEditingController();
 
-  
-
   String? _otpErrorText;
+
+  late String _statusMessageother = '';
+  num? _statusCodeother;
+  late String otp;
+
+//OTP
+  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "msisdn": _msisdn,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      log('Another banger: ${response.body}');
+
+      obj.forEach((key, value) {
+        _statusCodeother = obj["result"]["code"];
+        _statusMessageother = obj["result"]["message"];
+        otp = obj["result"]["data"]["otp"];
+      });
+
+      if (_statusCodeother == 5000) {
+        // log("Body : ${obj}");
+        // log("OTP: ${_otp}");
+        // await sendOTPVerify(_userId, _otp);
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+      } else {
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+        throw Exception(
+            'Unexpected OTP error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
 
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
       _userId, _otp) async {
@@ -111,32 +144,52 @@ class _OtpLoginState extends State<OtpLoginPage> {
         _statusMessage = obj["result"]["message"];
       });
 
-      final snackBar = SnackBar(
-        content: Text(_statusMessage),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
+      // final snackBar = SnackBar(
+      //   content: Text(_statusMessage),
+      //   action: SnackBarAction(
+      //     label: 'Undo',
+      //     onPressed: () {
+      //       // Some code to undo the change.
+      //     },
+      //   ),
+      // );
 
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
 
       if (_statusCodeOTP == 5000) {
         throw Exception('OTP verified successfully');
       } else {
-        final snackBar = SnackBar(
-          content: Text('Ann Error has occured, please check your OTP number'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
+        // final snackBar = SnackBar(
+        //   content: Text('Ann Error has occured, please check your OTP number'),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: 'Error has occured, please check your OTP number',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         throw Exception(
             'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
@@ -203,7 +256,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       obj.forEach((key, value) {
         _statusCodeGetNotification = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
+        _statusMessage = obj["result"]["message"];
 
         var objs = obj["result"]["data"];
 
@@ -230,42 +283,43 @@ class _OtpLoginState extends State<OtpLoginPage> {
     }
   }
 
-  //Up to date payment status Payment
-  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
-    userId,
-  ) async {
+  num? count;
+  Future<List<NotificationModal>?> getNotificationCount(userId) async {
     try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationCountEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId,
-        "userId": userId,
-      });
+      final body = jsonEncode({"userId": userId});
 
       final response = await http.post(url, headers: headers, body: body);
 
+      // print('Responce Status Code : ${response.statusCode}');
+      log('Responce Count Body  : ${response.body}');
+
       var obj = jsonDecode(response.body);
 
-      var _statusCodeUpToDatePayment;
+      var _statusCodeGetNotification;
 
       obj.forEach((key, value) {
-        _statusCodeUpToDatePayment = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
+        _statusCodeGetNotification = obj["result"]["code"];
+        _statusMessage = obj["result"]["message"];
+        count = obj["result"]["data"];
 
-        // var uptodatedPaymentData = obj["result"];
-        // // log('Up to date data : $uptodatedPaymentData');
-        uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
-        claimApplicationActive = obj["result"]["data"]["claimApplicationActive"];
-        paymentAmount = obj["result"]["data"]["paymentAmount"];
-        qualifiesForCompensation = obj["result"]["data"]["qualifiesForCompensation"];
+        var objs = obj["result"]["data"];
+
+        for (var item in objs) {
+          message.add(item["message"]);
+          title.add(item["type"]);
+          readStatus.add(item["readStatus"]);
+          notificationIdList.add(item["id"]);
+        }
       });
 
-      if (_statusCodeUpToDatePayment == 5000) {
-        throw Exception('UP TO DATE successfully');
+      if (_statusCodeGetNotification == 5000) {
+        throw Exception('Notification message retrieved successfully');
       } else {
         throw Exception(
-            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
+            'Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -314,6 +368,15 @@ class _OtpLoginState extends State<OtpLoginPage> {
     }
   }
 
+  //Policy Details
+  late String nextPayment = '';
+  late String paymentPeriod;
+  late String policyNumber;
+  late num paymentAmount;
+  late num sumInsured;
+
+  late num statusCodePolicyDetails;
+
   //policy Details Modal
   Future<List<PolicyDetailsModal>?> getPolicyDetails(userId) async {
     try {
@@ -329,10 +392,8 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       var obj = jsonDecode(response.body);
 
-      var _statusCodePolicyDetails;
-
       obj.forEach((key, value) {
-        _statusCodePolicyDetails = obj["result"]["code"];
+        statusCodePolicyDetails = obj["result"]["code"];
 
         paymentAmount = obj["result"]["data"]["paymentAmount"];
         paymentPeriod = obj["result"]["data"]["paymentPeriod"];
@@ -340,7 +401,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
         sumInsured = obj["result"]["data"]["sumInsured"];
       });
 
-      if (_statusCodePolicyDetails == 5000) {
+      if (statusCodePolicyDetails == 5000) {
         throw Exception('Policy Details Displayed successfully');
       } else {
         throw Exception(
@@ -411,8 +472,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
         // Form is valid, proceed with your logic here
         // For this example, we will simply print the email
 
-        
-
         // print(int.parse(widget.otp[0]));
         // print(int.parse(widget.otp[1]));
         // print(int.parse(widget.otp[2]));
@@ -448,9 +507,10 @@ class _OtpLoginState extends State<OtpLoginPage> {
             widget.userId,
           );
 
-          await uptodatePayment(
+          await getNotificationCount(
             widget.userId,
           );
+
           await defaultClaim(widget.userId, widget.promotionCode);
 
           await getPolicyDetails(
@@ -476,9 +536,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
                   title: title,
                   message: message,
                   notificationIdList: notificationIdList,
-                  uptoDatePayment: uptoDatePayment,
-                  qualifiesForCompensation: qualifiesForCompensation,
-                  claimApplicationActive: claimApplicationActive,
                   promotionCode: widget.promotionCode,
                   buttonClaimStatus: buttonStatus,
                   nextPayment: nextPayment,
@@ -486,6 +543,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
                   paymentPeriod: paymentPeriod,
                   policyNumber: policyNumber,
                   sumInsured: sumInsured,
+                  count: count!,
                   tableData: [],
                   rowsBenefits: [],
                   rowsSumIsured: [],
@@ -502,17 +560,28 @@ class _OtpLoginState extends State<OtpLoginPage> {
           });
         });
 
-        final snackBar = SnackBar(
-          content: Text(_statusMessage),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         // }
         setState(() {
           _isButtonDisabled = false;
@@ -522,18 +591,10 @@ class _OtpLoginState extends State<OtpLoginPage> {
     }
   }
 
-  @override 
-  void initState() { 
-    super.initState(); 
-
-    valueOneController.text = widget.otp[0];
-        valueTwoController.text = widget.otp[1];
-        valueThreeController.text = widget.otp[2];
-        valueFourController.text = widget.otp[3];
-        valueFiveController.text = widget.otp[4];
-        valueSixController.text = widget.otp[5];
-    
-  } 
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -689,9 +750,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
               ),
               ResendCode(
                 press: () async {
-                  // await sendOTP(){
-                  //   widget.phoneNo;
-                  // };
+                  await sendOTP(widget.phoneNo);
                 },
               ),
             ],
@@ -929,8 +988,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
       ),
     );
   }
-
- 
 
   OutlineInputBorder myinputborder() {
     //return type is OutlineInputBorder

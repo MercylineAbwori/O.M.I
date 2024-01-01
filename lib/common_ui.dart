@@ -23,12 +23,6 @@ class CommonUIPage extends StatefulWidget {
   final List<String> readStatus;
   final List<num> notificationIdList;
 
-  final String uptoDatePayment;
- final String claimApplicationActive;
- final String qualifiesForCompensation;
-  final num paymentAmount;
-  
-
   final String promotionCode;
 
   final bool buttonClaimStatus;
@@ -38,6 +32,7 @@ class CommonUIPage extends StatefulWidget {
   final String nextPayment;
   final String paymentPeriod;
   final String policyNumber;
+  late num paymentAmount;
   final num sumInsured;
 
   final List<dynamic> tableData;
@@ -49,6 +44,8 @@ class CommonUIPage extends StatefulWidget {
 
   final String profilePic;
 
+  final num count;
+
   CommonUIPage(
       {Key? key,
       required this.userId,
@@ -59,9 +56,6 @@ class CommonUIPage extends StatefulWidget {
       required this.message,
       required this.notificationIdList,
       required this.readStatus,
-      required this.uptoDatePayment,
-      required this.claimApplicationActive,
-      required this.qualifiesForCompensation,
       required this.promotionCode,
       required this.buttonClaimStatus,
       required this.nextPayment,
@@ -73,7 +67,8 @@ class CommonUIPage extends StatefulWidget {
       required this.rowsBenefits,
       required this.rowsSumIsured,
       required this.claimListData,
-      required this.profilePic})
+      required this.profilePic,
+      required this.count})
       : super(key: key);
   @override
   _CommonUIPageState createState() => _CommonUIPageState();
@@ -86,71 +81,71 @@ class _CommonUIPageState extends State<CommonUIPage> {
     switch (pos) {
       case 0:
         return HomePage(
-            userName: widget.name,
-            userId: widget.userId,
-            phone: widget.msisdn,
-            email: widget.email,
-            title: widget.title,
-            message: widget.message,
-            notificationIdList : widget.notificationIdList,
-            readStatus: widget.readStatus,
-            uptoDatePayment: widget.uptoDatePayment,
-            claimApplicationActive: widget.claimApplicationActive,
-            qualifiesForCompensation: widget.qualifiesForCompensation,
-            promotionCode: widget.promotionCode,
-            buttonClaimStatus: widget.buttonClaimStatus,
-            claimListData: widget.claimListData,
-            profilePic: widget.profilePic,
-            nextPayment: widget.nextPayment,
-            paymentAmount: widget.paymentAmount,
-            paymentPeriod: widget.paymentPeriod,
-            policyNumber: widget.policyNumber,
-            sumInsured: widget.sumInsured,);
+          userName: widget.name,
+          userId: widget.userId,
+          phone: widget.msisdn,
+          email: widget.email,
+          title: widget.title,
+          message: widget.message,
+          notificationIdList: widget.notificationIdList,
+          readStatus: widget.readStatus,
+          promotionCode: widget.promotionCode,
+          buttonClaimStatus: widget.buttonClaimStatus,
+          claimListData: widget.claimListData,
+          profilePic: widget.profilePic,
+          nextPayment: widget.nextPayment,
+          paymentAmount: widget.paymentAmount,
+          paymentPeriod: widget.paymentPeriod,
+          policyNumber: widget.policyNumber,
+          sumInsured: widget.sumInsured,
+          count : widget.count,
+        );
       case 1:
         return CoveragePage(
-            userName: widget.name,
-            userId: widget.userId,
-            phone: widget.msisdn,
-            email: widget.email,
-            title: widget.title,
-            message: widget.message,
-            readStatus: widget.readStatus,
-            notificationIdList : widget.notificationIdList,
-            nextPayment: widget.nextPayment,
-            paymentAmount: widget.paymentAmount,
-            paymentPeriod: widget.paymentPeriod,
-            policyNumber: widget.policyNumber,
-            sumInsured: widget.sumInsured,
-            claimApplicationActive: widget.claimApplicationActive,
-            qualifiesForCompensation: widget.qualifiesForCompensation,
-            uptoDatePayment: widget.uptoDatePayment,
-            buttonClaimStatus: widget.buttonClaimStatus,
-            promotionCode: widget.promotionCode,
-            tableData: [],
-            rowsBenefits: [],
-            rowsSumIsured: [],
-            addStampDuty: 0,
-            annualPremium: 0,
-            basicPremium: 0,
-            dailyPremium: 0,
-            monthlyPremium: 0,
-            totalPremium: 0,
-            weeklyPremium: 0);
+          userName: widget.name,
+          userId: widget.userId,
+          phone: widget.msisdn,
+          email: widget.email,
+          title: widget.title,
+          message: widget.message,
+          readStatus: widget.readStatus,
+          notificationIdList: widget.notificationIdList,
+          tableData: [],
+          count : widget.count,
+          // nextPayment: widget.nextPayment,
+          // paymentAmount: widget.paymentAmount,
+          // paymentPeriod: widget.paymentPeriod,
+          // policyNumber: widget.policyNumber,
+          // sumInsured: widget.sumInsured,
+          // claimApplicationActive: widget.claimApplicationActive,
+          // qualifiesForCompensation: widget.qualifiesForCompensation,
+          // uptoDatePayment: widget.uptoDatePayment,
+          // buttonClaimStatus: widget.buttonClaimStatus,
+          // promotionCode: widget.promotionCode,
+          
+          // rowsBenefits: [],
+          // rowsSumIsured: [],
+          // addStampDuty: 0,
+          // annualPremium: 0,
+          // basicPremium: 0,
+          // dailyPremium: 0,
+          // monthlyPremium: 0,
+          // totalPremium: 0,
+          // weeklyPremium: 0
+        );
       case 2:
         return ClaimHomePage(
-            userName: widget.name,
-            userId: widget.userId,
-            phone: widget.msisdn,
-            email: widget.email,
-            title: widget.title,
-            message: widget.message,
-            uptoDatePayment: widget.uptoDatePayment,
-            paymentAmount: widget.paymentAmount,
-            claimApplicationActive: widget.claimApplicationActive,
-            qualifiesForCompensation: widget.qualifiesForCompensation,
-            notificationIdList : widget.notificationIdList,
-            readStatus: widget.readStatus,
-            claimListData: widget.claimListData);
+          userName: widget.name,
+          userId: widget.userId,
+          phone: widget.msisdn,
+          email: widget.email,
+          claimListData: widget.claimListData,
+          title: widget.title,
+          message: widget.message,
+          readStatus: widget.readStatus,
+          notificationIdList: widget.notificationIdList,
+          count : widget.count,
+        );
       case 3:
         return ProfileScreen(
             userName: widget.name,
@@ -159,32 +154,32 @@ class _CommonUIPageState extends State<CommonUIPage> {
             email: widget.email,
             title: widget.title,
             message: widget.message,
-            notificationIdList : widget.notificationIdList,
+            notificationIdList: widget.notificationIdList,
             readStatus: widget.readStatus,
-            profilePic: widget.profilePic);
+            profilePic: widget.profilePic,
+            count : widget.count,);
 
       default:
         HomePage(
-            userName: widget.name,
-            userId: widget.userId,
-            phone: widget.msisdn,
-            email: widget.email,
-            title: widget.title,
-            message: widget.message,
-            notificationIdList: widget.notificationIdList,
-            readStatus: widget.readStatus,
-            claimApplicationActive: widget.claimApplicationActive,
-            qualifiesForCompensation: widget.qualifiesForCompensation,
-            uptoDatePayment: widget.uptoDatePayment,
-            promotionCode: widget.promotionCode,
-            buttonClaimStatus: widget.buttonClaimStatus,
-            claimListData: widget.claimListData,
-            profilePic: widget.profilePic,
-            nextPayment: widget.nextPayment,
-            paymentAmount: widget.paymentAmount,
-            paymentPeriod: widget.paymentPeriod,
-            policyNumber: widget.policyNumber,
-            sumInsured: widget.sumInsured,);
+          userName: widget.name,
+          userId: widget.userId,
+          phone: widget.msisdn,
+          email: widget.email,
+          title: widget.title,
+          message: widget.message,
+          notificationIdList: widget.notificationIdList,
+          readStatus: widget.readStatus,
+          promotionCode: widget.promotionCode,
+          buttonClaimStatus: widget.buttonClaimStatus,
+          claimListData: widget.claimListData,
+          profilePic: widget.profilePic,
+          nextPayment: widget.nextPayment,
+          paymentAmount: widget.paymentAmount,
+          paymentPeriod: widget.paymentPeriod,
+          policyNumber: widget.policyNumber,
+          sumInsured: widget.sumInsured,
+          count : widget.count,
+        );
     }
   }
 

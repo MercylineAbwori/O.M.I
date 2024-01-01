@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:one_million_app/components/forgot_password.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
@@ -65,32 +66,52 @@ class _OtpState extends State<OtpPage> {
         _statusMessageResult = obj["result"]["message"];
       });
 
-      final snackBar = SnackBar(
-        content: Text(_statusMessageResult),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
+      // final snackBar = SnackBar(
+      //   content: Text(_statusMessageResult),
+      //   action: SnackBarAction(
+      //     label: 'Undo',
+      //     onPressed: () {
+      //       // Some code to undo the change.
+      //     },
+      //   ),
+      // );
 
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+       // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessageResult,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
 
       if (_statusCodeOTP == 5000) {
         throw Exception('OTP verified successfully');
       } else {
-        final snackBar = SnackBar(
-          content: Text('Ann Error has occured, please check your OTP number'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
+        // final snackBar = SnackBar(
+        //   content: Text('Ann Error has occured, please check your OTP number'),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: 'Error has occured, please check your OTP number',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         throw Exception(
             'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
@@ -159,12 +180,6 @@ class _OtpState extends State<OtpPage> {
   void initState() {
     super.initState();
 
-    valueOneController.text = widget.otp[0];
-    valueTwoController.text = widget.otp[1];
-    valueThreeController.text = widget.otp[2];
-    valueFourController.text = widget.otp[3];
-    valueFiveController.text = widget.otp[4];
-    valueSixController.text = widget.otp[5];
   }
 
   @override

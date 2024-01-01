@@ -14,12 +14,16 @@ class NotificationPage extends StatefulWidget {
   final List<String> title;
   final List<String> message;
   final List<String> readStatus;
+  final List<num> notificationListId;
+  final num count;
   const NotificationPage(
       {super.key,
       required this.userId,
       required this.title,
       required this.message,
-      required this.readStatus});
+      required this.readStatus,
+      required this.notificationListId,
+      required this.count});
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -39,17 +43,68 @@ class _NotificationPageState extends State<NotificationPage> {
   bool checkboxValue = true;
   bool checkedValue = false;
 
-  // This function is triggered when a checkbox is checked or unchecked
-  Future<void> _itemChange(num notificationId) async {
-    await ApiService().sendMarkAsRead(widget.userId, notificationId);
-    setState(() {});
-  }
+  // // This function is triggered when a checkbox is checked or unchecked
+  // Future<void> _itemChange(num notificationId) async {
+  //   await ApiService().sendMarkAsRead(widget.userId, notificationId);
+  //   setState(() {});
+  // }
 
   // This function is triggered when a checkbox is checked or unchecked
   Future<void> _itemChangeMarkAll() async {
     await ApiService().sendMarkAsAll(widget.userId);
     setState(() {});
   }
+
+  late List<String> message = [];
+  late List<String> title = [];
+  late List<String> readStatus = [];
+  late List<num> notificationIdList = [];
+
+  Future<List<NotificationModal>?> getNotification(userId) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({"userId": userId});
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      // print('Responce Status Code : ${response.statusCode}');
+      // // log('Responce Body  : ${response.body}');
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeGetNotification;
+
+      obj.forEach((key, value) {
+        _statusCodeGetNotification = obj["result"]["code"];
+
+        var objs = obj["result"]["data"];
+
+        for (var item in objs) {
+          message.add(item["message"]);
+          title.add(item["type"]);
+          readStatus.add(item["readStatus"]);
+          notificationIdList.add(item["id"]);
+        }
+      });
+
+      if (_statusCodeGetNotification == 5000) {
+        throw Exception('Notification message retrieved successfully');
+      } else {
+        throw Exception(
+            'Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
+  bool isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -162,13 +217,18 @@ class _NotificationPageState extends State<NotificationPage> {
                                   child: Column(
                                     children: [
                                       CheckboxListTile(
-                                        title: Text("Mark All"), //    <-- label
+                                        title: Text(
+                                            "Mark All As Read"), //    <-- label
                                         value: (widget.readStatus
                                                 .contains('Unread'))
-                                            ? checkedValue = false
-                                            : checkedValue = true,
-                                        onChanged: (newValue) =>
-                                            _itemChangeMarkAll(),
+                                            ? isChecked = false
+                                            : isChecked = true,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            isChecked = newValue!;
+                                          });
+                                          _itemChangeMarkAll();
+                                        },
                                       ),
                                       SizedBox(
                                         height: 10,
@@ -180,40 +240,47 @@ class _NotificationPageState extends State<NotificationPage> {
                                         itemBuilder:
                                             (BuildContext context, int index) {
                                           return Card(
-                                            color: Colors.white,
-                                            borderOnForeground: true,
-                                            elevation: 6,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                CheckboxListTile(
-                                                  value: (widget.readStatus[
+                                              color: Colors.white,
+                                              borderOnForeground: true,
+                                              elevation: 6,
+                                              child: ListTile(
+                                                leading:
+                                                    Icon(Icons.notifications),
+                                                title: Text(
+                                                  widget.title[index],
+                                                  style: (widget.readStatus[
                                                               index] ==
-                                                          'Read')
-                                                      ? checkboxValue = true
-                                                      : checkboxValue = false,
-                                                  onChanged: (isChecked) {
-                                                    // if (widget.readStatus[index] ==
-                                                    //     'Read') {
-                                                    //   // log('initial should be read');
-                                                    //   checkboxValue = true;
-                                                    //   checkboxValue = isChecked!;
-                                                    // } else {
-                                                    //   // log('initial should be unread');
-                                                    //   checkboxValue = false;
-                                                    //   checkboxValue = isChecked!;
-                                                    // }
-                                                  },
-                                                  secondary: const Icon(
-                                                      Icons.notifications),
-                                                  title:
-                                                      Text(widget.title[index]),
-                                                  subtitle: Text(
-                                                      widget.message[index]),
-                                                )
-                                              ],
-                                            ),
-                                          );
+                                                          'Unread')
+                                                      ? TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        )
+                                                      : TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                        ),
+                                                ),
+                                                subtitle: Text(
+                                                  widget.message[index],
+                                                  style: (widget.readStatus[
+                                                              index] ==
+                                                          'Unread')
+                                                      ? TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        )
+                                                      : TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                        ),
+                                                ),
+                                                onTap: () async {
+                                                  await ApiService().sendMarkAsRead(
+                                                      widget.userId,
+                                                      widget.notificationListId[
+                                                          index]);
+                                                },
+                                              ));
                                         },
                                         separatorBuilder:
                                             (BuildContext context, int index) =>

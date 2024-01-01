@@ -57,6 +57,11 @@ dependencies:
   quickalert: ^1.0.2
   responsive_framework: ^1.1.1
   input_quantity: ^2.2.0
+  flutter_easyloading: ^3.0.5
+  in_app_purchases_paywall_ui: ^1.0.1
+  google_fonts: ^6.1.0
+  badges: ^3.1.2
+  fluttertoast: ^8.2.4
   
 
 dev_dependencies:

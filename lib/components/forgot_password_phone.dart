@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/oto_screens/otp.dart';
@@ -115,17 +116,27 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
           });
         });
 
-        final snackBar = SnackBar(
-          content: Text(_statusMessage),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         // }
         setState(() {
           _isButtonDisabled = false;

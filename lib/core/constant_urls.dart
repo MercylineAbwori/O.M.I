@@ -9,6 +9,9 @@ class ApiConstants {
   static String claimEndpoint = '/initiateClaim';
   static String claimListEndpoint = '/listClaim';
   static String notificationEndpoint = '/notification';
+  static String notificationCountEndpoint = '/totalUnread';
+  static String notificationMarkAllEndpoint = '/markAllAsRead';
+  static String notificationMarkAsReadEndpoint = '/markAsRead';
 
 
   static String beneficiaryEndpoint = '/beneficiary';
@@ -17,7 +20,8 @@ static String beneficiaryLimitEndpoint = '/increaseBeneficiaryLimit';
   static String uploadDocumentEndpoint = '/uploadDocument';
   static String mpesaPaymentEndpoint = '/lipa-na-mpesa';
   static String uptoDatePaymentEndpoint = '/upto-date-payment';
-  static String promotionCodeEndpoint = '/promotionCode';
+
+
   static String policyDetailsEndpoint = '/policyDetails';
   static String defaultPolicyPayEndpoint = '/defaultPolicyPay';
   static String claimDefaultEndpoint = '/claimDefault';
@@ -25,6 +29,14 @@ static String beneficiaryLimitEndpoint = '/increaseBeneficiaryLimit';
 
   static String resetPasswordEndpoint = '/resetPin';
 
-  static String markAllEndpoint = '/markAllAsRead';
-  static String markAsReadEndpoint = '/markAsRead';
+  static String generatePromoEndpoint = '/promotionCode';
+
+  
+
+}
+
+
+class ApiConstantsPromoCode {
+  static String baseUrl = 'http://localhost:8080/insurance/salesTeam';
+  static String promocodeEndpoint = '/salesTeam';
 }

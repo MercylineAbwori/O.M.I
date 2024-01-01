@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
+import 'package:one_million_app/shared/constants.dart';
 
 class MyHomePage extends StatefulWidget { 
   @override 
@@ -35,7 +36,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 200, width: 200),
                   const SizedBox(height: 15),
                   const Text(
-                    "One Million Insurance",
+                    "O.M.I",
+                    style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const Text(
+                    "Insurance"
+                    ,
                     style: TextStyle(
                         fontSize: 30,
                         color: Colors.black,
@@ -48,6 +57,37 @@ class _MyHomePageState extends State<MyHomePage> {
                         fontSize: 15,
                         color: Colors.black),
                     // style: GoogleFonts.bebasNeue(fontSize: 72),
+                  ),
+
+                  const SizedBox(height: 30),
+                  
+                  Column(
+                    children: [
+                      Center(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: const Text(
+                            '© 2024 One Million Technologies.', 
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: kPrimaryColor),
+                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'All rights reserved.', 
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: kPrimaryColor),
+                            // style: GoogleFonts.bebasNeue(fontSize: 72),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
               ],
               

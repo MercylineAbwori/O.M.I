@@ -10,10 +10,6 @@ class UserRegistrationModal extends ChangeNotifier {
   String? email;
   String? gender;
   String? dateOfBirth;
-  File? frontID;
-  File? endId;
-  List<File>? drivinglicence;
-  List<File>? logbook;
 
   int activeIndex = 0;
   int totalIndex = 4;

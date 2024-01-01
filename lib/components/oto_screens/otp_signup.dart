@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/components/signin/login_screen.dart';
 import 'package:one_million_app/core/constant_service.dart';
@@ -12,6 +13,7 @@ import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
 
 class OtpSignPage extends StatefulWidget {
+  final num userId;
   final String name;
   final String email;
   final String date;
@@ -20,9 +22,11 @@ class OtpSignPage extends StatefulWidget {
   final String pin;
   final String Confirm;
   final String promotionCode;
+  final String otp;
 
   const OtpSignPage(
       {super.key,
+      required this.userId,
       required this.name,
       required this.email,
       required this.date,
@@ -30,33 +34,28 @@ class OtpSignPage extends StatefulWidget {
       required this.gender,
       required this.pin,
       required this.Confirm,
-      required this.promotionCode,});
+      required this.promotionCode,
+      required this.otp});
 
   @override
   State<OtpSignPage> createState() => _OtpSignState();
 }
 
-
 class _OtpSignState extends State<OtpSignPage> {
-
   bool _isButtonDisabled = false;
   String _buttonText = 'Verify';
   bool isLoading = false;
 
   String? phoneNo;
 
-late String _statusMessage = '';
-num? _statusCode;
+  num? _statusCode;
 
-late String _statusMessageResult = '';
+  late String _statusMessageResult = '';
 
-late num userId;
-late String otp;
-late String _msisdn;
 
-late String promotionCode = '';
+  late String promotionCode = '';
 
-TextEditingController otpController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
 //OTP
   TextEditingController valueOneController = TextEditingController();
   TextEditingController valueTwoController = TextEditingController();
@@ -65,56 +64,11 @@ TextEditingController otpController = TextEditingController();
   TextEditingController valueFiveController = TextEditingController();
   TextEditingController valueSixController = TextEditingController();
 
-String? _otpErrorText;
+  String? _otpErrorText;
 
-Future<List<UserRegistrationModal>?> addUsers(
-    nameController,
-    emailController,
-    phoneNo,
-    dateOfBirthController,
-    dropdownValue,
-    passwordConfirmController,
-    passwordontroller) async {
-  try {
-    var url =
-        Uri.parse(ApiConstants.baseUrl + ApiConstants.registrationEndpoint);
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      "msisdn": phoneNo,
-      "name": nameController,
-      "pin": passwordontroller,
-      "confirmPin": passwordConfirmController,
-      "email": emailController,
-      "gender": dropdownValue,
-      "dateOfBirth": dateOfBirthController
-    });
-
-    final response = await http.post(url, headers: headers, body: body);
-
-    var obj = jsonDecode(response.body);
-
-    obj.forEach((key, value) {
-      _statusCode = obj["result"]["code"];
-      _statusMessage = obj["statusMessage"];
-      userId = obj["result"]["data"]["userId"];
-      _msisdn = obj["result"]["data"]["msisdn"];
-      promotionCode = obj["result"]["data"]["promotionCode"];
-    });
-
-    if (response.statusCode == 5000) {
-      await sendOTP(_msisdn);
-    } else {
-      throw Exception(
-          'Unexpected signup error occured! Status code ${response.statusCode}');
-    }
-  } catch (e) {
-    print("Error: $e");
-    if (e is http.ClientException) {
-      print("Response Body: ${e.message}");
-    }
-    // log(e.toString());
-  }
-}
+  late String _statusMessageother = '';
+  num? _statusCodeother;
+  late String otp;
 
 //OTP
   Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
@@ -129,19 +83,101 @@ Future<List<UserRegistrationModal>?> addUsers(
 
       var obj = jsonDecode(response.body);
 
+      log('Another banger: ${response.body}');
+
       obj.forEach((key, value) {
-        _statusCode = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
+        _statusCodeother = obj["result"]["code"];
+        _statusMessageother = obj["result"]["message"];
         otp = obj["result"]["data"]["otp"];
       });
 
-      if (_statusCode == 5000) {
+      if (_statusCodeother == 5000) {
         // log("Body : ${obj}");
         // log("OTP: ${_otp}");
         // await sendOTPVerify(_userId, _otp);
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
       } else {
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
         throw Exception(
             'Unexpected OTP error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
+  Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
+      _userId, _otp) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "userId": _userId,
+        "otp": _otp,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      obj.forEach((key, value) {
+        _statusCode = obj["result"]["code"];
+        _statusMessageResult = obj["result"]["message"];
+      });
+
+      if (_statusCode == 5000) {
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessageResult),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessageResult,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        throw Exception('OTP verified successfully');
+      } else {
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessageResult),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessageResult,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        throw Exception(
+            'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -151,67 +187,6 @@ Future<List<UserRegistrationModal>?> addUsers(
       // log(e.toString());
     }
   }
-
-
-Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
-    _userId, _otp) async {
-  try {
-    var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPVerify);
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      "userId": _userId,
-      "otp": _otp,
-    });
-
-    final response = await http.post(url, headers: headers, body: body);
-
-    var obj = jsonDecode(response.body);
-
-    var _statusCodeOTP;
-
-    obj.forEach((key, value) {
-      _statusCodeOTP = obj["result"]["code"];
-      _statusMessageResult = obj["result"]["message"];
-    });
-
-    final snackBar = SnackBar(
-      content: Text(_statusMessageResult),
-      action: SnackBarAction(
-        label: 'Undo',
-        onPressed: () {
-          // Some code to undo the change.
-        },
-      ),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-    if (_statusCodeOTP == 5000) {
-      throw Exception('OTP verified successfully');
-    } else {
-      final snackBar = SnackBar(
-        content: Text('Ann Error has occured, please check your OTP number'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      throw Exception(
-          'Unexpected verify OTP error occured! Status code ${response.statusCode}');
-    }
-  } catch (e) {
-    print("Error: $e");
-    if (e is http.ClientException) {
-      print("Response Body: ${e.message}");
-    }
-    // log(e.toString());
-  }
-}
-
 
   Future<void> _submitForm() async {
     if (!_isButtonDisabled) {
@@ -239,13 +214,13 @@ Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
 
         log('oTP: ${otp}');
 
-        await sendOTPVerify(userId, otp);
-        await addUsers(widget.name, widget.email, widget.phoneNo, widget.date,
-            widget.gender, widget.pin, widget.Confirm);
+        await sendOTPVerify(widget.userId, otp);
+        // await addUsers(widget.name, widget.email, widget.phoneNo, widget.date,
+        //     widget.gender, widget.pin, widget.Confirm);
         // await sendOTPVerify(
         //     widget.userId, otpController.text);
 
-        if (_statusMessage == "Request processed Successfully") {
+        if (_statusMessageResult == "Request processed Successfully") {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -262,18 +237,28 @@ Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
           });
         });
 
-        final snackBar = SnackBar(
-          content: Text(_statusMessage),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessageResult),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        // }
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessageResult,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        // 23
         setState(() {
           _isButtonDisabled = false;
           _buttonText = 'Verify';
@@ -282,18 +267,10 @@ Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
     }
   }
 
-  @override 
-  void initState() { 
-    super.initState(); 
-
-    valueOneController.text = otp[0];
-        valueTwoController.text = otp[1];
-        valueThreeController.text = otp[2];
-        valueFourController.text = otp[3];
-        valueFiveController.text = otp[4];
-        valueSixController.text = otp[5];
-    
-  } 
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -420,9 +397,7 @@ Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
               ),
               ResendCode(
                 press: () async {
-                  // await sendOTP(){
-                  //   widget.phoneNo;
-                  // };
+                  await sendOTP(widget.phoneNo);
                 },
               ),
             ],

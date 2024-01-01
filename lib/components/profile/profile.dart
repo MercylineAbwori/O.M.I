@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
@@ -18,19 +19,21 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
+import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ProfileScreen extends StatefulWidget {
   final num userId;
   final String userName;
   final String phone;
   final String email;
-
   final List<String> title;
   final List<String> message;
   final List<String> readStatus;
   final List<num> notificationIdList;
-
   final String profilePic;
+
+  final num count;
 
   const ProfileScreen(
       {Key? key,
@@ -38,11 +41,12 @@ class ProfileScreen extends StatefulWidget {
       required this.userName,
       required this.phone,
       required this.email,
-      required this.title,
       required this.message,
-      required this.readStatus,
       required this.notificationIdList,
-      required this.profilePic})
+      required this.profilePic,
+      required this.readStatus,
+      required this.title,
+      required this.count})
       : super(key: key);
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -119,71 +123,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
+          backgroundColor: Colors.white,
+          leading: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: IconButton(
+                iconSize: 30,
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                ),
+                // the method which is called
+                // when button is pressed
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.pop(context);
-              },
             ),
           ),
-        ),
-        actions: <Widget>[
-          // notification icon
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.notifications,
-                color: kPrimaryColor,
-              ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationPage(
-                          userId: widget.userId,
-                          readStatus: widget.readStatus,
-                          title: widget.title,
-                          message: widget.message);
+          actions: <Widget>[
+            Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            
+            child: (widget.count != 0)
+                ? badges.Badge(
+                    position: BadgePosition.topEnd(top: 0, end: 3),
+                    badgeContent: Text(
+                      (widget.count).toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.message,
+                        color: kPrimaryColor,
+                        size: 30,
+                      ),
+                      // the method which is called
+                      // when button is pressed
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return NotificationPage(
+                                userId: widget.userId,
+                                readStatus: widget.readStatus,
+                                title: widget.title,
+                                message: widget.message,
+                                notificationListId: widget.notificationIdList,
+                                count: widget.count,
+
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : IconButton(
+                    icon: const Icon(
+                      Icons.message,
+                      color: kPrimaryColor,
+                      size: 30,
+                    ),
+                    // the method which is called
+                    // when button is pressed
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return NotificationPage(
+                              userId: widget.userId,
+                              readStatus: widget.readStatus,
+                              title: widget.title,
+                              message: widget.message,
+                              notificationListId: widget.notificationIdList,
+                              count: widget.count,
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
           ),
-        ],
-      ),
+        )
+          ]),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               const SizedBox(height: 40),
-              // const CircleAvatar(
-              //   radius: 70,
-              //   backgroundImage:
-              //       AssetImage('assets/icons/profile_icons/profile.jpg'),
-              // ),
+              
               CircleAvatar(
+                radius: 70,
                 
-                backgroundColor: kPrimaryLightColor,
                 child: _imageProfile != null
                     ? Image.file(
                         _imageProfile!,

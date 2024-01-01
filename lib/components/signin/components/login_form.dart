@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -49,17 +50,17 @@ class _LoginPageState extends State<LoginPage> {
 
   String? phoneNo;
 
-  late String _statusMessage;
+  String? _statusMessage;
   num? _statusCode;
 
   //User Details
-  late String _email;
-  late String _msisdn;
-  late String _name;
+  String? _email;
+  String? _msisdn;
+  String? _name;
 
-  late num _userId = 0;
+  num? _userId ;
 
-  late String? _otp;
+  String? _otp;
 
   late List<String> message = [];
 
@@ -98,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "msisdn": phoneNo,
-        "pin": pin,
+        "pin": int.parse(pin),
       });
 
       final response = await http.post(url, headers: headers, body: body);
@@ -110,19 +111,66 @@ class _LoginPageState extends State<LoginPage> {
 
       obj.forEach((key, value) {
         _statusCode = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
+        _statusMessage = obj["result"]["message"];
         _userId = obj["result"]["data"]["UserDetails"]["userId"];
         _name = obj["result"]["data"]["UserDetails"]["name"];
         _email = obj["result"]["data"]["UserDetails"]["email"];
         _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
       });
 
-      // log('THe responce : ${response.body}');
+      
 
       if (_statusCode == 5000) {
+        _isButtonDisabled = false;
+          _buttonText = 'Login';
         await sendOTP(_msisdn);
-        // log('Login Sucesss the code is ${_statusCode}');
+        log('Login Sucesss the code is ${_statusCode}');
+
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage!),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
       } else {
+        _isButtonDisabled = false;
+          _buttonText = 'Login';
+        //   final snackBar = SnackBar(
+        //   content: Text("Wrong phone number or pin"),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: 'Wrong phone number or pin',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         throw Exception(
             'Unexpected Login error occured! Status code ${response.statusCode}');
       }
@@ -131,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
       if (e is http.ClientException) {
         print("Response Body: ${e.message}");
       }
-      // log(e.toString());
+      log(e.toString());
     }
   }
 
@@ -146,6 +194,8 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
+      log('THe responce : ${response.body}');
+
       var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
@@ -158,7 +208,12 @@ class _LoginPageState extends State<LoginPage> {
         // log("Body : ${obj}");
         // log("OTP: ${_otp}");
         // await sendOTPVerify(_userId, _otp);
+        _isButtonDisabled = false;
+          _buttonText = 'Login';
+        
       } else {
+        _isButtonDisabled = false;
+          _buttonText = 'Login';
         throw Exception(
             'Unexpected OTP error occured! Status code ${response.statusCode}');
       }
@@ -188,14 +243,18 @@ class _LoginPageState extends State<LoginPage> {
         print('Phone: ${phoneNo}');
         print('Pin: ${pinController.text}');
 
+        if(_statusMessage == "Request processed Successfully"){
+
+        
+
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
               return OtpLoginPage(
-                userId: _userId,
-                name: _name,
-                email: _email,
+                userId: _userId!,
+                name: _name!,
+                email: _email!,
                 message: message,
                 phoneNo: phoneController.text,
                 pin: pinController.text,
@@ -206,23 +265,15 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
+        }
+
         Future.delayed(const Duration(seconds: 3), () {
           setState(() {
             isLoading = false;
           });
         });
 
-        final snackBar = SnackBar(
-          content: Text(_statusMessage),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        
         // }
         setState(() {
           _isButtonDisabled = false;
@@ -386,7 +437,7 @@ class _LoginPageState extends State<LoginPage> {
                             MaterialPageRoute(
                               builder: (context) {
                                 return ForgotPasswordPhone(
-                                  userId: _userId,
+                                  userId: _userId!,
                                   otp: _otp!,
 
                                 );

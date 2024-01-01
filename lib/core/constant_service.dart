@@ -15,6 +15,7 @@ import 'package:one_million_app/core/model/mpesa_model.dart';
 import 'package:one_million_app/core/model/notification_markall_model.dart';
 import 'package:one_million_app/core/model/notification_markasread_model.dart';
 import 'package:one_million_app/core/model/notification_model.dart';
+import 'package:one_million_app/core/model/promocode_pass_model.dart';
 import 'package:one_million_app/core/model/regisration_otp_model.dart';
 import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
@@ -174,99 +175,99 @@ class ApiService {
     }
   }
 
-//POST SELECTION
-  Future<List<coverageSelectionModal>?> postCoverageSelection(
-    userId,
-    sumInsured,
-    paymentPeriod,
-    paymentAmount,
-  ) async {
-    try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.coverageSelectionEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "userId": userId,
-        "sumInsured": sumInsured,
-        "paymentPeriod": paymentPeriod,
-        "paymentAmount": paymentAmount,
-      });
+// //POST SELECTION
+//   Future<List<coverageSelectionModal>?> postCoverageSelection(
+//     userId,
+//     sumInsured,
+//     paymentPeriod,
+//     paymentAmount,
+//   ) async {
+//     try {
+//       var url = Uri.parse(
+//           ApiConstants.baseUrl + ApiConstants.coverageSelectionEndpoint);
+//       final headers = {'Content-Type': 'application/json'};
+//       final body = jsonEncode({
+//         "userId": userId,
+//         "sumInsured": sumInsured,
+//         "paymentPeriod": paymentPeriod,
+//         "paymentAmount": paymentAmount,
+//       });
 
-      final response = await http.post(url, headers: headers, body: body);
+//       final response = await http.post(url, headers: headers, body: body);
 
-      // print('Responce Status Code : ${response.statusCode}');
-      // print('Responce Body : ${response.body}');
+//       // print('Responce Status Code : ${response.statusCode}');
+//       // print('Responce Body : ${response.body}');
 
-      var obj = jsonDecode(response.body);
+//       var obj = jsonDecode(response.body);
 
-      var _statusCodeSubscription;
+//       var _statusCodeSubscription;
 
-      obj.forEach((key, value) {
-        _statusCodeSubscription = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
-      });
+//       obj.forEach((key, value) {
+//         _statusCodeSubscription = obj["result"]["code"];
+//         _statusMessage = obj["statusMessage"];
+//       });
 
-      if (response.statusCode == 5000) {
-        if (_statusCodeSubscription == 5000) {
-          throw Exception('Subscribed successfully');
-        } else {
-          // log('failed the code is ${_statusCodeSubscription}');
-        }
-      } else {
-        throw Exception(
-            'Unexpected Subscribed error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
+//       if (response.statusCode == 5000) {
+//         if (_statusCodeSubscription == 5000) {
+//           throw Exception('Subscribed successfully');
+//         } else {
+//           // log('failed the code is ${_statusCodeSubscription}');
+//         }
+//       } else {
+//         throw Exception(
+//             'Unexpected Subscribed error occured! Status code ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print("Error: $e");
+//       if (e is http.ClientException) {
+//         print("Response Body: ${e.message}");
+//       }
+//       // log(e.toString());
+//     }
+//   }
 
-//MPESA Payment
-  Future<List<MpesaPaymentModal>?> mpesaPayment(
-    userId,
-    amount,
-    phoneNumber,
-  ) async {
-    try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.mpesaPaymentEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(
-          {"amount": amount, "userId": userId, "phoneNumber": phoneNumber});
+// //MPESA Payment
+//   Future<List<MpesaPaymentModal>?> mpesaPayment(
+//     userId,
+//     amount,
+//     phoneNumber,
+//   ) async {
+//     try {
+//       var url =
+//           Uri.parse(ApiConstants.baseUrl + ApiConstants.mpesaPaymentEndpoint);
+//       final headers = {'Content-Type': 'application/json'};
+//       final body = jsonEncode(
+//           {"amount": amount, "userId": userId, "phoneNumber": phoneNumber});
 
-      final response = await http.post(url, headers: headers, body: body);
+//       final response = await http.post(url, headers: headers, body: body);
 
-      var obj = jsonDecode(response.body);
+//       var obj = jsonDecode(response.body);
 
-      var _statusCodeMpesaPayment;
+//       var _statusCodeMpesaPayment;
 
-      obj.forEach((key, value) {
-        _statusCodeMpesaPayment = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
-      });
+//       obj.forEach((key, value) {
+//         _statusCodeMpesaPayment = obj["result"]["code"];
+//         _statusMessage = obj["statusMessage"];
+//       });
 
-      if (response.statusCode == 5000) {
-        if (_statusCodeMpesaPayment == 5000) {
-          throw Exception('Beneficiary added successfully');
-        } else {
-          // log('failed the code is ${_statusCodeMpesaPayment}');
-        }
-      } else {
-        throw Exception(
-            'Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
+//       if (response.statusCode == 5000) {
+//         if (_statusCodeMpesaPayment == 5000) {
+//           throw Exception('Beneficiary added successfully');
+//         } else {
+//           // log('failed the code is ${_statusCodeMpesaPayment}');
+//         }
+//       } else {
+//         throw Exception(
+//             'Unexpected Beneficiary added error occured! Status code ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print("Error: $e");
+//       if (e is http.ClientException) {
+//         print("Response Body: ${e.message}");
+//       }
+//       // log(e.toString());
+//     }
+//   }
 
   //Up to date payment status Payment
   Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
@@ -390,11 +391,11 @@ class ApiService {
     }
   }
 
-  //claim default Claim
+  //mark as read
   Future<List<markAsReadModal>?> sendMarkAsRead(userId, notificationId) async {
     try {
       var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.markAsReadEndpoint);
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationMarkAsReadEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body =
           jsonEncode({"userId": userId, "notificationId": notificationId});
@@ -425,10 +426,10 @@ class ApiService {
     }
   }
 
-  //claim default Claim
+  //markAll
   Future<List<markAllModal>?> sendMarkAsAll(userId) async {
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.markAllEndpoint);
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationMarkAllEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({"userId": userId});
 
@@ -458,6 +459,74 @@ class ApiService {
     }
   }
 
+  //notification total
+  Future<List<markAllModal>?> notificationTotal(userId) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationCountEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({"userId": userId});
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeDefaultClaim;
+
+      obj.forEach((key, value) {
+        _statusCodeDefaultClaim = obj["result"]["code"];
+        _statusMessage = obj["result"]["message"];
+      });
+
+      if (_statusCodeDefaultClaim == 5000) {
+        throw Exception('notification count  successfully');
+      } else {
+        throw Exception(
+            'Unexpected notification count error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
+  //generate promocode
+  Future<List<markAllModal>?> generatePromo(userId) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.generatePromoEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({"userId": userId});
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeDefaultClaim;
+
+      obj.forEach((key, value) {
+        _statusCodeDefaultClaim = obj["result"]["code"];
+        _statusMessage = obj["result"]["message"];
+      });
+
+      if (_statusCodeDefaultClaim == 5000) {
+        throw Exception('notification count  successfully');
+      } else {
+        throw Exception(
+            'Unexpected notification count error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
+
+ 
   ///Share app with promocode
   Future<void> shareApp() async {
     // Set the app link and the message to be shared

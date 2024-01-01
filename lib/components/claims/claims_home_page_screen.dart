@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,7 +9,13 @@ import 'package:one_million_app/components/claims/claim_form/claim_form_review.d
 import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/profile/profile.dart';
+import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/claim_list_model.dart';
+import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 import 'package:one_million_app/shared/constants.dart';
+import 'package:http/http.dart' as http;
+import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ClaimHomePage extends StatefulWidget {
   final num userId;
@@ -20,10 +28,11 @@ class ClaimHomePage extends StatefulWidget {
   final List<num> notificationIdList;
 
   final List<dynamic> claimListData;
-  final String uptoDatePayment;
-  final num paymentAmount;
-  final String claimApplicationActive;
- final String qualifiesForCompensation;
+  final num count;
+//   final String uptoDatePayment;
+//   final num paymentAmount;
+//   final String claimApplicationActive;
+//  final String qualifiesForCompensation;
 
   const ClaimHomePage(
       {Key? key,
@@ -36,10 +45,11 @@ class ClaimHomePage extends StatefulWidget {
       required this.readStatus,
       required this.notificationIdList,
       required this.claimListData,
-      required this.paymentAmount,
-      required this.claimApplicationActive,
-      required this.qualifiesForCompensation,
-      required this.uptoDatePayment
+      required this.count
+      // required this.paymentAmount,
+      // required this.claimApplicationActive,
+      // required this.qualifiesForCompensation,
+      // required this.uptoDatePayment
       })
       : super(key: key);
   @override
@@ -128,36 +138,9 @@ class _ClaimHomePageState extends State<ClaimHomePage>
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
 
-  late final List<dynamic> _elements;
+  late List<dynamic> _elements;
 
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
-
-  // final List<dynamic> _elements = [
-  //   {
-  //     'title': 'Claim One',
-  //     'status': 'Pending',
-  //     'date': 'Set 10th 2023',
-  //     'type': 'death'
-  //   },
-  //   {
-  //     'title': 'Claim Two',
-  //     'status': 'In Review',
-  //     'date': 'Set 10th 2023',
-  //     'type': 'medical expences'
-  //   },
-  //   {
-  //     'title': 'Claim Three',
-  //     'status': 'Completed',
-  //     'date': 'Set 10th 2023',
-  //     'type': 'temporary disability'
-  //   },
-  //   {
-  //     'title': 'Claim Four',
-  //     'status': 'Failed',
-  //     'date': 'Set 10th 2023',
-  //     'type': 'permanent disability'
-  //   }
-  // ];
 
   //Claim LISTS
 
@@ -171,19 +154,80 @@ class _ClaimHomePageState extends State<ClaimHomePage>
 
   late List<String> message = [];
 
-  String? claimApplicationActive;
-  num? paymentAmount;
-  String? qualifiesForCompensation;
-  String? uptoDatePayment;
+  late String claimApplicationActive = '';
+  late num paymentAmount = 0;
+  late String qualifiesForCompensation = '';
+  late String uptoDatePayment = '';
 
+  //Up to date payment status Payment
+  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
+    userId,
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId,
+        "userId": userId,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeUpToDatePayment;
+      var _uptoDatePayment;
+      var _claimApplicationActive;
+      var _paymentAmount;
+      var _qualifiesForCompensation;
+
+      obj.forEach((key, value) {
+        _statusCodeUpToDatePayment = obj["result"]["code"];
+
+        // var uptodatedPaymentData = obj["result"];
+        // // log('Up to date data : $uptodatedPaymentData');
+        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
+        _claimApplicationActive =
+            obj["result"]["data"]["claimApplicationActive"];
+        _paymentAmount = obj["result"]["data"]["paymentAmount"];
+        _qualifiesForCompensation =
+            obj["result"]["data"]["qualifiesForCompensation"];
+      });
+
+      setState(() {
+        uptoDatePayment = _uptoDatePayment;
+        claimApplicationActive = _claimApplicationActive;
+        paymentAmount = _paymentAmount;
+        qualifiesForCompensation = _qualifiesForCompensation;
+      });
+
+      log('Upt to date Payment: ${uptoDatePayment}');
+      log('Claim Application Active: ${claimApplicationActive}');
+      log('Payment Amount: ${paymentAmount}');
+      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
+
+      if (_statusCodeUpToDatePayment == 5000) {
+        throw Exception('UP TO DATE successfully');
+      } else {
+        throw Exception(
+            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
   @override
   void initState() {
     super.initState();
 
-    claimApplicationActive = widget.claimApplicationActive;
-    paymentAmount = widget.paymentAmount; 
-    qualifiesForCompensation = widget.qualifiesForCompensation;
-    uptoDatePayment = widget.uptoDatePayment;
+    setState(() {
+      uptodatePayment(widget.userId);
+    });
   }
 
   @override
@@ -206,55 +250,92 @@ class _ClaimHomePageState extends State<ClaimHomePage>
     //Claim List Container
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: IconButton(
-              iconSize: 100,
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-                size: 20,
+          backgroundColor: Colors.white,
+          leading: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                // the method which is called
+                // when button is pressed
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.pop(context);
-              },
             ),
           ),
-        ),
-        actions: <Widget>[
-          // notification icon
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.notifications,
-                color: kPrimaryColor,
+          actions: <Widget>[
+            Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            
+            child: (widget.count != 0)
+                    ? badges.Badge(
+                        position: BadgePosition.topEnd(top: 0, end: 3),
+                        badgeContent: Text(
+                          (widget.count).toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.message,
+                            color: kPrimaryColor,
+                            size: 30,
+                          ),
+                          // the method which is called
+                          // when button is pressed
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return NotificationPage(
+                                    userId: widget.userId,
+                                    readStatus: widget.readStatus,
+                                    title: widget.title,
+                                    message: widget.message,
+                                    notificationListId: widget.notificationIdList,
+                                    count: widget.count,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(
+                          Icons.message,
+                          color: kPrimaryColor,
+                          size: 30,
+                        ),
+                        // the method which is called
+                        // when button is pressed
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NotificationPage(
+                                  userId: widget.userId,
+                                  readStatus: widget.readStatus,
+                                  title: widget.title,
+                                  message: widget.message,
+                                  notificationListId: widget.notificationIdList,
+                                  count: widget.count,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
               ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationPage(
-                          userId: widget.userId,
-                          readStatus: widget.readStatus,
-                          title: widget.title,
-                          message: widget.message);
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+            )
+          ]),
       body: Container(
         child: Center(
           child: Column(
@@ -290,7 +371,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                       color: Color.fromARGB(255, 204, 204, 204),
                     ),
                   ),
-                  
+
                   (_elements.isEmpty)
                       ? Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -337,10 +418,13 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                             builder: (context) {
                                               return ClaimForm(
                                                 userId: widget.userId,
-                                                claimApplicationActive: widget.claimApplicationActive,
-                                                paymentAmount: widget.paymentAmount,
-                                                qualifiesForCompensation: widget.qualifiesForCompensation,
-                                                uptoDatePayment: widget.uptoDatePayment,
+                                                claimApplicationActive:
+                                                    claimApplicationActive,
+                                                paymentAmount: paymentAmount,
+                                                qualifiesForCompensation:
+                                                    qualifiesForCompensation,
+                                                uptoDatePayment:
+                                                    uptoDatePayment,
                                               );
                                             },
                                           ),
@@ -385,18 +469,20 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                               : itemsType.toList()[index] ==
                                                       'temporary disability'
                                                   ? Icons.personal_injury
-                                                  :itemsType.toList()[index] ==
-                                                      'artificial appliances'
-                                                  ? Icons.emoji_flags
-                                                  :itemsType.toList()[index] ==
-                                                      'funeral expences'
-                                                  ? Icons.money_off
-                                                  
-                                                  : Icons
-                                                      .medical_information_outlined),
+                                                  : itemsType.toList()[index] ==
+                                                          'artificial appliances'
+                                                      ? Icons.emoji_flags
+                                                      : itemsType.toList()[
+                                                                  index] ==
+                                                              'funeral expences'
+                                                          ? Icons.money_off
+                                                          : Icons
+                                                              .medical_information_outlined),
                                     ),
                                     title: Text(itemsTitles.toList()[index]),
-                                    subtitle: Text(formatter.format(DateTime.parse(itemsDate.toList()[index])),
+                                    subtitle: Text(
+                                        formatter.format(DateTime.parse(
+                                            itemsDate.toList()[index])),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
@@ -425,7 +511,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                                 ? Colors.red
                                                 : itemsStatus.toList()[index] ==
                                                         'pending'
-                                                    ? Colors.yellow
+                                                    ? Colors.yellowAccent
                                                     : itemsStatus.toList()[
                                                                 index] ==
                                                             'in Review'
@@ -480,7 +566,14 @@ class _ClaimHomePageState extends State<ClaimHomePage>
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: (claimApplicationActive !=
+                    "You will be eligiable to apply for claims after 60 days of registartion") ||
+                (qualifiesForCompensation ==
+                    "Your payment is not upto date ,you are not eligiable for claim application")
+      ? 
+      
+      FloatingActionButton(
+        
         onPressed: () {
           Navigator.push(
             context,
@@ -488,17 +581,22 @@ class _ClaimHomePageState extends State<ClaimHomePage>
               builder: (context) {
                 return ClaimForm(
                   userId: widget.userId,
-                  claimApplicationActive: widget.claimApplicationActive,
-                  paymentAmount: widget.paymentAmount,
-                  qualifiesForCompensation: widget.qualifiesForCompensation,
-                  uptoDatePayment: widget.uptoDatePayment,
+                  claimApplicationActive: claimApplicationActive,
+                  paymentAmount: paymentAmount,
+                  qualifiesForCompensation: qualifiesForCompensation,
+                  uptoDatePayment: uptoDatePayment,
                 );
               },
             ),
           );
         },
         child: const Icon(Icons.add),
-      ),
+      ):
+      FloatingActionButton(
+        
+        onPressed: null,
+        child: const Icon(Icons.add),
+      )
     );
   }
 }

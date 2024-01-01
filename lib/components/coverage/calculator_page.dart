@@ -6,54 +6,31 @@ import 'package:input_quantity/input_quantity.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:one_million_app/components/coverage/coverage_screen.dart';
+import 'package:one_million_app/components/coverage/coverage_table_and_subscription.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/calculator_model.dart';
 
 class CalculatorPage extends StatefulWidget {
-
   final num userId;
-
-  final String uptoDatePayment;
-
-  final String promotionCode;
-
-  final bool buttonClaimStatus;
-
-  final String nextPayment;
-  final num paymentAmount;
-  final String paymentPeriod;
-  final String policyNumber;
-  final num sumInsured;
-
-  final String claimApplicationActive;
- final String qualifiesForCompensation;
- final String userName;
+  final String userName;
   final String phone;
   final String email;
   final List<String> title;
   final List<String> message;
   final List<String> readStatus;
   final List<num> notificationIdList;
-  const CalculatorPage({super.key,
-  required this.userId,
+  final num count;
+  const CalculatorPage(
+      {super.key,
+      required this.userId,
       required this.userName,
       required this.phone,
       required this.email,
       required this.message,
+      required this.readStatus,
       required this.title,
       required this.notificationIdList,
-      required this.readStatus,
-      required this.nextPayment,
-      required this.paymentAmount,
-      required this.paymentPeriod,
-      required this.policyNumber,
-      required this.sumInsured,
-      required this.buttonClaimStatus,
-      required this.promotionCode,
-      required this.claimApplicationActive,
-      required this.qualifiesForCompensation,
-      required this.uptoDatePayment
-  });
+      required this.count});
 
   @override
   State<CalculatorPage> createState() => _CalculatorPageState();
@@ -84,6 +61,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
     "Death"
   ];
 
+  List<dynamic> selectedPackages = [];
+
   String? _sumInsuredErrorText;
 
   String? _currentSumInsuredValue = "";
@@ -91,8 +70,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
   NumberFormat Format = NumberFormat.decimalPattern('en_us');
 
   void validateSumInsured(String value) {
-    _currentSumInsuredValue = otherSumInsured.text;
-
     if (value.isEmpty) {
       _sumInsuredErrorText = "* Required";
     } else if (int.parse(value) < 250000) {
@@ -115,8 +92,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
       } else {
         _selectedItems.remove(itemValue);
       }
-
-      // _submitForm(_currentSumInsuredValue!, dependants!, _selectedItems);
     });
   }
 
@@ -133,16 +108,39 @@ class _CalculatorPageState extends State<CalculatorPage> {
     // }
     if (Packages != []) {
       await calculatePremium(SumInsured, dependants, Packages);
+
+      if (_statusCode == 5000) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CoverageTablePage(
+                    userId: widget.userId,
+                    userName: widget.userName,
+                    phone: widget.phone,
+                    email: widget.email,
+                    tableData: tableData,
+                    annualPremium: annualPremium,
+                    basicPremium: annualPremium,
+                    dailyPremium: dailyPremium,
+                    monthlyPremium: monthlyPremium,
+                    totalPremium: totalPremium,
+                    weeklyPremium: weeklyPremium,
+                    title: widget.message,
+                    message: widget.message,
+                    readStatus: widget.message,
+                    sumInsured: sumInsured,
+                    notificationListId: widget.notificationIdList,
+                    count: widget.count,
+                  )),
+        );
+      }
     }
   }
 
   num? _premiumSelected;
 
   //data rom back end
-  List<dynamic> tabledata = [];
-
-  List<dynamic> rowsBenefits = [];
-  List<dynamic> rowsSumIsured = [];
+  // List<dynamic> tabledata = [];
 
   //Other Data
   num? addStampDuty;
@@ -152,9 +150,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
   num? monthlyPremium;
   num? totalPremium;
   num? weeklyPremium;
+  num? sumInsured;
 
   late String _statusMessage;
   num? _statusCode;
+
+  List<Map<String, dynamic>> tableData = [];
 
   Future<List<CalculatorModal>?> calculatePremium(
       suminsured, dependants, packages) async {
@@ -163,8 +164,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
           Uri.parse(ApiConstants.baseUrl + ApiConstants.calculatorEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
-        "sumInsured": suminsured,
-        "dependants": dependants,
+        "sumInsured": int.parse(suminsured),
+        "dependants": dependants.toInt(),
         "packages": packages,
       });
 
@@ -177,7 +178,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
       obj.forEach((key, value) {
         _statusCode = obj["result"]["code"];
-        _statusMessage = obj["statusMessage"];
+        _statusMessage = obj["result"]["message"];
         addStampDuty = obj["result"]["data"]["addStampDuty"];
         annualPremium = obj["result"]["data"]["annualPremium"];
         basicPremium = obj["result"]["data"]["basicPremium"];
@@ -185,31 +186,82 @@ class _CalculatorPageState extends State<CalculatorPage> {
         monthlyPremium = obj["result"]["data"]["monthlyPremium"];
         totalPremium = obj["result"]["data"]["totalPremium"];
         weeklyPremium = obj["result"]["data"]["weeklyPremium"];
-        tabledata = obj["result"]["data"]["benefits"];
+        var tableBenefits = obj["result"]["data"]['benefits'];
+        sumInsured = obj["result"]["data"]['sumInsured'];
+        // Extracting "packages" array from the JSON response
+        var pgs = obj['result']['data']['packages'];
 
-        var benefits = tabledata.map((e) => e['name']).toList();
-        var sumInsured = tabledata.map((e) => e['sumInsured']).toList();
+        // log('Packages: ${pgs}');
+        // log('Table Benefits: ${tableBenefits}');
+
+        tableData.clear();
+        for (String package in packages) {
+          // Find the corresponding benefit for the package
+          var packageBenefit = tableBenefits.firstWhere(
+            (benefit) => benefit['name'] == package,
+            orElse: () => null,
+          );
+
+          if (packageBenefit != null) {
+            tableData.add({
+              'packageName': package,
+              'sumInsured': packageBenefit['sumInsured']?.toInt() ?? 0,
+            });
+          }
+        }
+
+        for (Map<String, dynamic> row in tableData) {
+          print(
+              'packageName: ${row['packageName']}, sumInsured: ${row['sumInsured']}');
+        }
+
+        // log('Table ${tableData}');
+
+        // // Iterate through packages
+        // for (String package in packages) {
+        //   // Find the corresponding benefit for the package
+        //   var packageBenefit = tableBenefits.firstWhere(
+        //     (benefit) => benefit['name'] == package,
+        //     orElse: () => null,
+        //   );
+
+        //   log('Package Benefits : ${packageBenefit}');
+
+        //   // If the benefit is found, add a row to the table
+        //   if (packageBenefit != null) {
+        //     tabledata.add({
+        //       'packageName': package,
+        //       'sumInsured': packageBenefit["sumInsured"],
+        //     });
+        //   }
+        // }
+
+        // for (Map<String, dynamic> row in tabledata) {
+        //   print(
+        //       'packageName: ${row['packageName']}, sumInsured: ${row['sumInsured']}');
+        // }
+
+        // for (var packageName in packages) {
+        //   var benefits = obj['result']['data']['benefits'];
+        //   tabledata = obj(benefits, packageName);
+
+        //   print('Package: $packageName, Sum Insured: $sumInsured');
+
+        //   log('${tabledata}');
+        // }
+
+        // var getData = tabledata.map((e) => e['name']).toList();
 
         // rowsBenefits.add(benefits);
         // rowsSumIsured.add(sumInsured);
-
-        for (var item in benefits) {
-          rowsBenefits.add(item);
-        }
-
-        for (var items in sumInsured) {
-          rowsSumIsured.add(items);
-        }
 
         // print('Table Row Benefits Data: ${rowsBenefits}');
 
         // print('Table Row SumInsured Data: ${rowsBenefits}');
 
         // print('Table Data: ${tabledata}');
-
-        print('Table Data: ${tabledata}');
       });
-      if (response.statusCode == 5000) {
+      if (_statusCode == 5000) {
         throw Exception('Calculator successfully');
       } else {
         throw Exception(
@@ -228,7 +280,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
   void initState() {
     super.initState();
 
-    _submitForm(_currentSumInsuredValue!, dependants, _selectedItems);
+    otherSumInsured.text = _currentSumInsuredValue!;
   }
 
   @override
@@ -276,12 +328,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                 setState(() {
                                   // debugPrint('VAL = $isvalue');
                                   _currentSumInsuredValue = isvalue;
-
-                                  _submitForm(
-                                    _currentSumInsuredValue!,
-                                    dependants!,
-                                    _selectedItems,
-                                  );
+                                  otherSumInsured.text = isvalue!;
                                 });
                               },
                             ))
@@ -303,7 +350,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         border: myinputborder(),
                         labelText: 'Other Sum Insured',
                         hintText: 'Sum Insured',
-                        errorText: otherSumInsured.text,
+                        errorText: _sumInsuredErrorText,
                       ),
                       onTap: () {},
                       validator: (value) => _sumInsuredErrorText,
@@ -359,11 +406,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     onQtyChanged: (val) {
                       dependants = val;
                       print(val);
-                      _submitForm(
-                        _currentSumInsuredValue!,
-                        dependants!,
-                        _selectedItems,
-                      );
                     },
                   ),
                 ),
@@ -422,50 +464,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   height: 20,
                 ),
                 Container(
-                height: 50,
-                width: 250,
-                child: ElevatedButton(
-                  
-                  onPressed: (){
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CoveragePage(
-                            userId: widget.userId,
-                            userName: widget.userName,
-                            phone: widget.phone,
-                            email: widget.email,
-                            title: widget.title,
-                            message: widget.message,
-                            readStatus: widget.readStatus,
-                            notificationIdList: widget.notificationIdList,
-                            nextPayment: widget.nextPayment,
-                            paymentAmount: widget.paymentAmount,
-                            paymentPeriod: widget.paymentPeriod,
-                            policyNumber: widget.policyNumber,
-                            sumInsured: int.parse(_currentSumInsuredValue!),
-                            claimApplicationActive: widget.claimApplicationActive,
-                            qualifiesForCompensation: widget.claimApplicationActive,
-                            buttonClaimStatus: widget.buttonClaimStatus,
-                            promotionCode: widget.promotionCode,
-                            tableData: tabledata,
-                            rowsBenefits: rowsBenefits,
-                            rowsSumIsured: rowsSumIsured,
-                            addStampDuty: addStampDuty,
-                            annualPremium: annualPremium,
-                            basicPremium: basicPremium,
-                            dailyPremium: dailyPremium,
-                            monthlyPremium: monthlyPremium,
-                            totalPremium: totalPremium,
-                            weeklyPremium: weeklyPremium,
-                            uptoDatePayment: widget.paymentPeriod,)),
-                  );
-                  },
-                  child: Text(
-                    'Done'
+                  height: 50,
+                  width: 250,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _submitForm(
+                        otherSumInsured.text,
+                        dependants!,
+                        _selectedItems,
+                      );
+                    },
+                    child: Text('Done'),
                   ),
                 ),
-              ),
                 const SizedBox(
                   height: 20,
                 ),

@@ -5,7 +5,7 @@ class CalculatorModal extends ChangeNotifier {
 
   num? sumInsured;
   num? dependants;
-  num? packages;
+  List<String> packages;
 
 
   CalculatorModal({

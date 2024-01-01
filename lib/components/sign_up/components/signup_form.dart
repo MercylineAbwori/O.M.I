@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/countries.dart';
@@ -14,6 +15,7 @@ import 'package:one_million_app/components/oto_screens/otp_signup.dart';
 import 'package:one_million_app/components/signin/login_screen.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/promocode_pass_model.dart';
 import 'package:one_million_app/core/model/regisration_otp_model.dart';
 import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
@@ -47,8 +49,8 @@ class _SignUpFormState extends State<SignUpForm> {
 
   String? dropdownValue;
   String? FullName;
-  TextEditingController fnameController = TextEditingController();
-  TextEditingController lnameController = TextEditingController();
+
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController pinController = TextEditingController();
@@ -77,6 +79,10 @@ class _SignUpFormState extends State<SignUpForm> {
 
   String? _confirmPinErrorText;
 
+  String? phoneNo;
+
+  String formattedPhoneNumber = '';
+
   bool passwordVisiblePin = false;
   bool passwordVisibleConfirmPin = false;
 
@@ -89,7 +95,195 @@ class _SignUpFormState extends State<SignUpForm> {
 
   String initialCountry = 'KE';
 
-  
+  late String _statusMessageother = '';
+  num? _statusCodeother;
+
+  late String _statusMessage = '';
+  num? _statusCode;
+
+  late String _statusMessagePromoCode = '';
+  num? _statusCodePromoCode;
+
+  late String _statusMessageResult = '';
+
+  late num userId;
+  late String otp;
+  late String _msisdn;
+
+  late String promotionCode = '';
+
+  Future<List<UserRegistrationModal>?> addUsers(
+      name, email, phoneNo, dateOfBirth, dropdownValue, pinConfirm, pin) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.registrationEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "msisdn": phoneNo,
+        "name": name,
+        "pin": pin,
+        "confirmPin": pinConfirm,
+        "email": email,
+        "gender": dropdownValue,
+        "dateOfBirth": dateOfBirth
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      log('Sign Up banger: ${response.body}');
+      var obj = jsonDecode(response.body);
+
+      var mswes;
+
+      obj.forEach((key, value) {
+        _statusCode = obj["result"]["code"];
+        _statusMessage = obj["result"]["message"];
+        userId = obj["result"]["data"]["userId"];
+        _msisdn = obj["result"]["data"]["msisdn"];
+      });
+
+      log('msfyeuef : $_msisdn');
+
+      if (_statusCode == 5000) {
+        await sendOTP((_msisdn).toString());
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+      } else {
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+
+        throw Exception(
+            'Unexpected signup error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
+//OTP
+  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
+    try {
+      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        "msisdn": _msisdn,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      log('Another banger: ${response.body}');
+
+      obj.forEach((key, value) {
+        _statusCodeother = obj["result"]["code"];
+        _statusMessageother = obj["result"]["message"];
+        otp = obj["result"]["data"]["otp"];
+      });
+
+      if (_statusCodeother == 5000) {
+        // log("Body : ${obj}");
+        // log("OTP: ${_otp}");
+        // await sendOTPVerify(_userId, _otp);
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+      } else {
+        _isButtonDisabled = false;
+        _buttonText = 'Sign Up';
+        throw Exception(
+            'Unexpected OTP error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      log(e.toString());
+    }
+  }
+
+
+   //promoCode to pass
+  Future<List<promoCodePassModal>?> sendPromoCode(userId, promoCodeCode) async {
+    try {
+      var url = Uri.parse(ApiConstantsPromoCode.baseUrl + ApiConstantsPromoCode.promocodeEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({"userId": userId, "promotionCode": promoCodeCode});
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeDefaultClaim;
+
+      obj.forEach((key, value) {
+        _statusCodePromoCode = obj["result"]["code"];
+        _statusMessagePromoCode = obj["result"]["message"];
+      });
+
+      if (_statusCodePromoCode == 5000) {
+        throw Exception('Promocode passed successfully');
+      } else {
+        throw Exception(
+            'Unexpected Promocode passed error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
 
   Future<void> _submitForm() async {
     if (!_isButtonDisabled) {
@@ -100,61 +294,68 @@ class _SignUpFormState extends State<SignUpForm> {
       // Perform the action that the button triggers here
 
       Future.delayed(const Duration(seconds: 5), () async {
-        if (formkey.currentState!.validate()) {
-          // Form is valid, proceed with your logic here
-          // For this example, we will simply print the email
+        // if (formkey.currentState!.validate()) {
+        // Form is valid, proceed with your logic here
+        // For this example, we will simply print the email
 
-          FullName = '${fnameController.text} ${lnameController.text}';
-          print('Name: ${FullName}');
-          print('Email: ${emailController.text}');
-          print('Date: ${dateOfBirthController.text}');
-          print('Gender: ${dropdownValue}');
-          print('Phone: ${phoneController.text}');
-          print('Promo code: ${promotionCodeController.text}');
-          print('Pin: ${pinController.text}');
-          print('Confirm Pin: ${pinConfirmController.text}');
+        await addUsers(
+            nameController.text,
+            emailController.text,
+            phoneNo,
+            dateOfBirthController.text,
+            dropdownValue,
+            pinConfirmController.text,
+            pinController.text);
 
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+
+        // // print('Status Message: ${_statusMessage}');
+
+        if (_statusCodeother == 5000) {
+          if(promotionCodeController.text.isEmpty){
+            await sendPromoCode(userId, promotionCodeController.text);
+          }
           Navigator.push(context, MaterialPageRoute(
             builder: (context) {
               return OtpSignPage(
-                name: lnameController.text,
+                userId: userId,
+                name: nameController.text,
                 email: emailController.text,
                 date: dateOfBirthController.text,
                 phoneNo: phoneController.text,
-                gender : dropdownValue!,
+                gender: dropdownValue!,
                 pin: pinController.text,
                 Confirm: pinConfirmController.text,
                 promotionCode: promotionCodeController.text,
-                
+                otp: (otp).toString(),
               );
-              // return CommonUIPage(
-              //     userId: _userId,
-              //     name: _name!,
-              //     msisdn: _msisdn,
-              //     email: _email,
-              //     message: message,
-              //     uptoDatePaymentData: uptoDatePaymentData,
-              //     promotionCode: widget.promotionCode,
-              //     buttonClaimStatus: buttonStatus,
-              //     nextPayment: nextPayment,
-              //     paymentAmount: paymentAmount,
-              //     paymentPeriod: paymentPeriod,
-              //     policyNumber: policyNumber,
-              //     sumInsured: sumInsured,
-              //     tableData: [],
-              //     rowsBenefits: [],
-              //     rowsSumIsured: [],
-              //     claimListData: claimlistData,
-              //     profilePic: '');
-              // profilePic: profilePic);
             },
           ));
-          // ignore: use_build_context_synchronously
+          setState(() {
+            _isButtonDisabled = false;
+            _buttonText = 'Sign Up';
+          });
         }
-        setState(() {
-          _isButtonDisabled = false;
-          _buttonText = 'Sign Up';
-        });
       });
     }
   }
@@ -174,7 +375,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   key: formkey,
                   child: Column(
                     children: [
-
                       const SizedBox(
                         height: 24,
                       ),
@@ -204,7 +404,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                     top: 15,
                                     bottom: 0),
                                 child: TextFormField(
-                                  controller: lnameController,
+                                  controller: nameController,
                                   decoration: InputDecoration(
                                     border: myinputborder(),
                                     labelText: 'Full Name',
@@ -307,8 +507,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                 });
                               }
                             },
-                          )
-                      ),
+                          )),
                       Padding(
                         padding: const EdgeInsets.only(
                             left: 15.0, right: 15.0, top: 15, bottom: 0),
@@ -373,6 +572,21 @@ class _SignUpFormState extends State<SignUpForm> {
                               // focusedBorder: myfocusborder(),
                             ),
                             initialCountryCode: 'KE',
+                            onChanged: (phone) {
+                              phoneNo = phone.completeNumber;
+                              // Remove leading '0' and enforce a length of 9
+                              String sanitizedNumber =
+                                  phone.completeNumber.startsWith('0')
+                                      ? phone.completeNumber.substring(1)
+                                      : phone.completeNumber;
+
+                              if (sanitizedNumber.length == 9) {
+                                setState(() {
+                                  formattedPhoneNumber = sanitizedNumber;
+                                });
+                              }
+                              print(phoneController);
+                            },
                             validator: (value) {
                               var _countryLImit = countries.firstWhere(
                                   (element) =>

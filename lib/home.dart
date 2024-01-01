@@ -1,19 +1,23 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
+import 'package:one_million_app/components/coverage/coverarage_make_payments.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
 import 'package:one_million_app/components/profile/profile.dart';
 import 'package:one_million_app/components/upload_files/upload_files.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/default_claim.dart';
 import 'package:one_million_app/core/model/initiate_claim.dart';
 import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:badges/badges.dart' as badges;
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -23,21 +27,24 @@ class HomePage extends StatefulWidget {
   final List<String> title;
   final List<String> message;
   final List<String> readStatus;
-  final String uptoDatePayment;
+  final List<num> notificationIdList;
+
   final String promotionCode;
   final bool buttonClaimStatus;
-  final List<num> notificationIdList;
-  final String claimApplicationActive;
- final String qualifiesForCompensation;
 
- final List<dynamic> claimListData;
- final String profilePic;
+//   final String uptoDatePayment;
+//   final String claimApplicationActive;
+//  final String qualifiesForCompensation;
 
- final String nextPayment;
+  final List<dynamic> claimListData;
+  final String profilePic;
+
+  final String nextPayment;
   final String paymentPeriod;
   final String policyNumber;
   final num sumInsured;
   final num paymentAmount;
+  final num count;
 
   HomePage(
       {super.key,
@@ -49,9 +56,9 @@ class HomePage extends StatefulWidget {
       required this.message,
       required this.readStatus,
       required this.notificationIdList,
-      required this.uptoDatePayment,
-      required this.claimApplicationActive,
-      required this.qualifiesForCompensation,
+      // required this.uptoDatePayment,
+      // required this.claimApplicationActive,
+      // required this.qualifiesForCompensation,
       required this.promotionCode,
       required this.buttonClaimStatus,
       required this.claimListData,
@@ -60,7 +67,8 @@ class HomePage extends StatefulWidget {
       required this.paymentPeriod,
       required this.policyNumber,
       required this.profilePic,
-      required this.sumInsured});
+      required this.sumInsured,
+      required this.count});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -72,15 +80,6 @@ class _HomePageState extends State<HomePage> {
   // padding constants
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
-
-  final titles = ["List 1", "List 2", "List 3", "List 4", "List 5"];
-  final subtitles = [
-    "Here is list 1 subtitle",
-    "Here is list 2 subtitle",
-    "Here is list 3 subtitle",
-    "Here is list 4 subtitle",
-    "Here is list 5 subtitle",
-  ];
 
   int selectedPageIndex = 0;
 
@@ -95,91 +94,200 @@ class _HomePageState extends State<HomePage> {
   // This function is triggered when a checkbox is checked or unchecked
   Future<void> _itemChange(num notificationId) async {
     await ApiService().sendMarkAsRead(widget.userId, notificationId);
-    setState(() {
-      
-      
-    });
+    setState(() {});
   }
+
   // This function is triggered when a checkbox is checked or unchecked
   Future<void> _itemChangeMarkAll() async {
     await ApiService().sendMarkAsAll(widget.userId);
-    setState(() {
-      
-      
-    });
+    setState(() {});
+  }
+
+  late String uptoDatePayment = '';
+  late String claimApplicationActive;
+  late num paymentAmount;
+  late String qualifiesForCompensation;
+
+  //Up to date payment status Payment
+  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
+    userId,
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId,
+        "userId": userId,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeUpToDatePayment;
+      var _uptoDatePayment;
+      var _claimApplicationActive;
+      var _paymentAmount;
+      var _qualifiesForCompensation;
+
+      obj.forEach((key, value) {
+        _statusCodeUpToDatePayment = obj["result"]["code"];
+
+        // var uptodatedPaymentData = obj["result"];
+        // // log('Up to date data : $uptodatedPaymentData');
+        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
+        _claimApplicationActive =
+            obj["result"]["data"]["claimApplicationActive"];
+        _paymentAmount = obj["result"]["data"]["paymentAmount"];
+        _qualifiesForCompensation =
+            obj["result"]["data"]["qualifiesForCompensation"];
+      });
+
+      setState(() {
+        uptoDatePayment = _uptoDatePayment;
+        claimApplicationActive = _claimApplicationActive;
+        paymentAmount = _paymentAmount;
+        qualifiesForCompensation = _qualifiesForCompensation;
+      });
+
+      log('Upt to date Payment: ${uptoDatePayment}');
+      log('Claim Application Active: ${claimApplicationActive}');
+      log('Payment Amount: ${paymentAmount}');
+      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
+
+      if (_statusCodeUpToDatePayment == 5000) {
+        throw Exception('UP TO DATE successfully');
+      } else {
+        throw Exception(
+            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      uptodatePayment(widget.userId);
+
+      print('Uptodate : ${uptoDatePayment}');
+    });
+  }
+
+  late bool _showCartBadge;
+  Color color = Colors.red;
+  @override
   Widget build(BuildContext context) {
-    
+    // print('Uptodate : ${uptoDatePayment}');
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        // leading: Container(
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(4.0),
-        //     child: IconButton(
-        //       iconSize: 100,
-        //       icon: Ink.image(
-        //         image:
-        //             const AssetImage('assets/icons/profile_icons/profile.jpg'),
-        //       ),
-        //       // the method which is called
-        //       // when button is pressed
-        //       onPressed: () {
-        //         Navigator.push(
-        //           context,
-        //           MaterialPageRoute(
-        //             builder: (context) {
-        //               return ProfileScreen(
-        //                 userName: widget.userName,
-        //                 userId: widget.userId,
-        //                 phone: widget.phone,
-        //                 email: widget.email,
-        //                 message: widget.message,
-        //               );
-        //             },
-        //           ),
-        //         );
-        //         setState(
-        //           () {
-        //             count++;
-        //           },
-        //         );
-        //       },
-        //     ),
-        //   ),
-        // ),
-        actions: <Widget>[
-          // notification icon
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              iconSize: 30,
-              icon: const Icon(
-                Icons.notifications,
-                color: kPrimaryColor,
-              ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return NotificationPage(
-                          userId: widget.userId,
-                          readStatus: widget.readStatus,
-                          title: widget.title,
-                          message: widget.message);
+      appBar: AppBar(backgroundColor: Colors.white, actions: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            child: (widget.count != 0)
+                ? badges.Badge(
+                    position: BadgePosition.topEnd(top: 0, end: 3),
+                    badgeContent: Text(
+                      (widget.count).toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.message,
+                        color: kPrimaryColor,
+                        size: 30,
+                      ),
+                      // the method which is called
+                      // when button is pressed
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return NotificationPage(
+                                userId: widget.userId,
+                                readStatus: widget.readStatus,
+                                title: widget.title,
+                                message: widget.message,
+                                notificationListId: widget.notificationIdList,
+                                count: widget.count,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : IconButton(
+                    icon: const Icon(
+                      Icons.message,
+                      color: kPrimaryColor,
+                      size: 30,
+                    ),
+                    // the method which is called
+                    // when button is pressed
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return NotificationPage(
+                              userId: widget.userId,
+                              readStatus: widget.readStatus,
+                              title: widget.title,
+                              message: widget.message,
+                              notificationListId: widget.notificationIdList,
+                              count: widget.count,
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
           ),
-        ],
-      ),
+        )
+      ]
+
+          // actions: <Widget>[
+          //   // notification icon
+          //   Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: IconButton(
+          //       iconSize: 30,
+          //       icon: const Icon(
+          //         Icons.notifications,
+          //         color: kPrimaryColor,
+          //       ),
+          //       // the method which is called
+          //       // when button is pressed
+          //       onPressed: () {
+          //         Navigator.push(
+          //           context,
+          //           MaterialPageRoute(
+          //             builder: (context) {
+          //               return NotificationPage(
+          //                 userId: widget.userId,
+          //                 readStatus: widget.readStatus,
+          //                 title: widget.title,
+          //                 message: widget.message,
+          //                 notificationListId: widget.notificationIdList,
+          //               );
+          //             },
+          //           ),
+          //         );
+          //       },
+          //     ),
+          //   ),
+          // ],
+          ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -219,21 +327,65 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Card(
-                                  elevation: 5,
-                                  shadowColor: Colors.black,
-                                  color: (widget.uptoDatePayment ==
-                                          'payment up to date')
-                                      ? Colors.green
-                                      : Colors.red,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Expanded(
-                                      child: Center(
-                                        child: Text(widget.uptoDatePayment),
+                              (uptoDatePayment != null &&
+                                      uptoDatePayment.trim() != "")
+                                  ? TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return MakePayments(
+                                                userId: widget.userId,
+                                                premiumSelected:
+                                                    widget.paymentAmount,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        elevation: 5,
+                                        shadowColor: Colors.black,
+                                        color: (uptoDatePayment ==
+                                                'payment up to date')
+                                            ? Colors.green
+                                            : Colors.red,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Center(
+                                            child: Text(uptoDatePayment),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ))
+                                    )
+                                  : TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return MakePayments(
+                                                userId: widget.userId,
+                                                premiumSelected:
+                                                    widget.paymentAmount,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        elevation: 5,
+                                        shadowColor: Colors.black,
+                                        color: Colors.red,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Center(
+                                            child: Text('Not Covered'),
+                                          ),
+                                        ),
+                                      ),
+                                    )
                             ],
                           ),
                         ),
@@ -278,280 +430,257 @@ class _HomePageState extends State<HomePage> {
                   elevation: 5,
                   shadowColor: Colors.black,
                   child: Center(
-                    child: Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
+                      child: GridView.count(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    primary: false,
+                    padding: const EdgeInsets.all(20),
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    crossAxisCount: 3,
+                    childAspectRatio: (280 / 280),
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return MakePayments(
+                                    userId: widget.userId,
+                                    premiumSelected: widget.paymentAmount,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              //Add Beneficiary
-                              Container(
-                                width: 175,
-                                height: 100,
-                                padding: EdgeInsets.all(10.0),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryLightColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return BeneficiaryScreen(
-                                            userId : widget.userId,
-                                            name: widget.userName,
-                                            msisdn: widget.phone,
-                                            email: widget.email,
-                                            readStatus: widget.readStatus,
-                                            title: widget.title,
-                                            message: widget.message,
-                                            notificationIdList: widget.notificationIdList,
-                                            uptoDatePayment: widget.uptoDatePayment,
-                                            qualifiesForCompensation: widget.qualifiesForCompensation,
-                                            claimApplicationActive: widget.claimApplicationActive,
-                                            promotionCode: widget.promotionCode,
-                                            buttonClaimStatus: widget.buttonClaimStatus,
-                                            tableData: [],
-                                            rowsBenefits: [],
-                                            rowsSumIsured: [],
-                                            claimListData: widget.claimListData,
-                                            profilePic: widget.profilePic,
-                                            nextPayment: widget.nextPayment,
-                                            paymentAmount: widget.paymentAmount,
-                                            paymentPeriod: widget.paymentPeriod,
-                                            policyNumber: widget.policyNumber,
-                                            sumInsured: widget.sumInsured,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                    setState(
-                                      () {
-                                        count++;
-                                      },
-                                    );
-                                  },
-                                  child: Center(
-                                    child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(height: 5),
-                                          // Image.asset(
-                                          //   'assets/icons/home_icons/claims.png',
-                                          //   width: 40,
-                                          //   height: 40,
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          Icon(Icons.people, 
-                                          color: kPrimaryColor,
-                                          size: 40,),
-                                          const SizedBox(height: 5),
-                                          const Text(
-                                            'Add Beneficiary',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black),
-                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                          ),
-                                          const SizedBox(height: 5),
-                                        ]),
-                                  ),
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: kPrimaryColor,
+                                child: Icon(
+                                  Icons.payment,
+                                  color: Colors.white,
+                                  size: 30,
                                 ),
                               ),
-                              //Upload Documents
-                              Container(
-                                width: 175,
-                                height: 100,
-                                padding: EdgeInsets.all(10.0),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryLightColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return UploadFiles(
-                                              userId: widget.userId);
-                                        },
-                                      ),
-                                    );
-                                    setState(
-                                      () {
-                                        count++;
-                                      },
-                                    );
-                                  },
-                                  child: Center(
-                                    child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(height: 5),
-                                          // Image.asset(
-                                          //   'assets/icons/home_icons/reporting.png',
-                                          //   width: 40,
-                                          //   height: 40,
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          Icon(Icons.file_download, 
-                                          color: kPrimaryColor,
-                                          size: 40,),
-                                          const SizedBox(height: 5),
-                                          const Text(
-                                            'Upload Documents',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black),
-                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                          ),
-                                          const SizedBox(height: 5),
-                                        ]),
-                                  ),
+                              SizedBox(height: 3,),
+                              
+                              Center(
+                                child: Text(
+                                  'Pay',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.black),
                                 ),
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              //Share Promo Code
-                              Container(
-                                width: 175,
-                                height: 100,
-                                padding: EdgeInsets.all(10.0),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryLightColor,
-                                  ),
-                                  onPressed: () async {
-                                    await ApiService().shareApp();
-                                    setState(
-                                      () {
-                                        count++;
-                                      },
-                                    );
-                                  },
-                                  child: Center(
-                                    child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(height: 5),
-                                          // Image.asset(
-                                          //   'assets/icons/home_icons/payment.png',
-                                          //   width: 40,
-                                          //   height: 40,
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                          Icon(Icons.share_sharp, 
-                                          color: kPrimaryColor,
-                                          size: 40,),
-                                          const SizedBox(height: 5),
-                                          const Text(
-                                            'Overdue Bonus',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black),
-                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                          ),
-                                          const SizedBox(height: 5),
-                                        ]),
-                                  ),
-                                ),
-                              ),
-                              //Default Claim
-                              Container(
-                                width: 175,
-                                height: 100,
-                                padding: EdgeInsets.all(10.0),
-                                child: (widget.buttonClaimStatus == false)
-                                    ? ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: kPrimaryLightColor,
-                                        ),
-                                        onPressed: null,
-                                        child: Center(
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(height: 5),
-                                                // Image.asset(
-                                                //   'assets/icons/home_icons/coverage.png',
-                                                //   width: 40,
-                                                //   height: 40,
-                                                //   fit: BoxFit.cover,
-                                                // ),
-                                                Icon(Icons.folder, 
-                                                color: kPrimaryColor,
-                                                  size: 40,),
-                                                const SizedBox(height: 5),
-                                                const Text(
-                                                  'Default Claims',
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.black),
-                                                  // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                                ),
-                                                const SizedBox(height: 5),
-                                              ]),
-                                        ),
-                                      )
-                                    : ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: kPrimaryLightColor,
-                                        ),
-                                        onPressed: () async {
-                                          await ApiService().claimDefault(
-                                              widget.userId,
-                                              widget.promotionCode);
-                                        },
-                                        child: Center(
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                const SizedBox(height: 5),
-                                                Image.asset(
-                                                  'assets/icons/home_icons/payment.png',
-                                                  width: 40,
-                                                  height: 40,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                                const SizedBox(height: 5),
-                                                const Text(
-                                                  'Default Claims',
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.black),
-                                                  // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                                ),
-                                                const SizedBox(height: 5),
-                                              ]),
-                                        ),
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return BeneficiaryScreen(
+                                      userId: widget.userId,
+                                      name: widget.userName,
+                                      msisdn: widget.phone,
+                                      email: widget.email,
+                                      promotionCode: widget.promotionCode,
+                                      notificationIdList:
+                                          widget.notificationIdList,
+                                      buttonClaimStatus:
+                                          widget.buttonClaimStatus,
+                                      nextPayment: widget.nextPayment,
+                                      paymentAmount: widget.paymentAmount,
+                                      paymentPeriod: widget.paymentPeriod,
+                                      policyNumber: widget.policyNumber,
+                                      sumInsured: widget.sumInsured,
+                                      tableData: [],
+                                      rowsBenefits: [],
+                                      rowsSumIsured: [],
+                                      claimListData: widget.claimListData,
+                                      profilePic: widget.profilePic,
+                                      readStatus: widget.readStatus,
+                                      message: widget.message,
+                                      title: widget.title,
+                                      count: widget.count);
+                                },
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: kPrimaryColor,
+                                child: Icon(
+                                  Icons.people,
+                                  color: Colors.white,
+                                  size: 35,
+                                ),
+                              ),
+                              SizedBox(height: 3,),
+                              
+                              Center(
+                                child: Text(
+                                  
+                                  'Dependants',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return UploadFiles(userId: widget.userId);
+                                },
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: kPrimaryColor,
+                              
+                                child: Icon(
+                                  Icons.file_download,
+                                  color: Colors.white,
+                                  size: 35,
+                                ),
+                              ),
+
+                              SizedBox(height: 3,),
+                              
+                              Center(
+                                child: Text(
+                                  'Documents',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: TextButton(
+                          onPressed: () async {
+                            await ApiService().generatePromo(widget.userId);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: kPrimaryColor,
+                                child: Icon(
+                                  Icons.share,
+                                  color: Colors.white,
+                                  size: 35,
+                                ),
+                              ),
+                              SizedBox(height: 3,),
+                              
+                              Center(
+                                child: Text(
+                                  'Share',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: (widget.buttonClaimStatus == false)
+                            ? TextButton(
+                                onPressed: null,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: kPrimaryColor,
+                                      child: Icon(
+                                        Icons.folder,
+                                        color: Colors.white,
+                                        size: 35,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        'Default Claims',
+                                        style: TextStyle(
+                                            fontSize: 10, color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : TextButton(
+                                onPressed: () async {
+                                  await ApiService().claimDefault(
+                                      widget.userId, widget.promotionCode);
+                                },
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: kPrimaryColor,
+                                      child: Icon(
+                                        Icons.folder,
+                                        color: kPrimaryColor,
+                                        size: 35,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        'Default Claims',
+                                        style: TextStyle(
+                                            fontSize: 10, color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                      
+                    ],
+                  )),
                 ),
               ),
 
@@ -581,6 +710,8 @@ class _HomePageState extends State<HomePage> {
                                 readStatus: widget.readStatus,
                                 title: widget.title,
                                 message: widget.message,
+                                notificationListId: widget.notificationIdList,
+                                count: widget.count,
                               );
                             },
                           ),
@@ -638,14 +769,9 @@ class _HomePageState extends State<HomePage> {
                             : Container(
                                 child: Column(
                                   children: [
-                                    CheckboxListTile(
-                                      title: Text("Mark All"), //    <-- label
-                                      value: (widget.readStatus.contains('Unread'))
-                                                    ? checkedValue = false
-                                                    : checkedValue = true,
-                                      onChanged: (newValue) => _itemChangeMarkAll(),
+                                    SizedBox(
+                                      height: 10,
                                     ),
-                                    SizedBox(height: 10,),
                                     ListView.separated(
                                       shrinkWrap: true,
                                       padding: const EdgeInsets.all(8),
@@ -653,29 +779,49 @@ class _HomePageState extends State<HomePage> {
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Card(
-                                          color: Colors.white,
-                                          borderOnForeground: true,
-                                          elevation: 6,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              CheckboxListTile(
-                                                value: (widget.readStatus[index] ==
-                                                        'Read')
-                                                    ? checkboxValue = true
-                                                    : checkboxValue = false,
-                                                onChanged: (isChecked) =>
-                                                  _itemChange(widget.notificationIdList[index]),
-                                                
-                                                secondary:
-                                                    const Icon(Icons.notifications),
-                                                title: Text(widget.title[index]),
-                                                subtitle:
-                                                    Text(widget.message[index]),
+                                            color: Colors.white,
+                                            borderOnForeground: true,
+                                            elevation: 6,
+                                            child: ListTile(
+                                              leading:
+                                                  Icon(Icons.notifications),
+                                              title: Text(
+                                                widget.title[index],
+                                                style:
+                                                    (widget.readStatus[index] ==
+                                                            'Unread')
+                                                        ? TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )
+                                                        : TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                          ),
                                               ),
-                                            ],
-                                          ),
-                                        );
+                                              subtitle: Text(
+                                                widget.message[index],
+                                                style:
+                                                    (widget.readStatus[index] ==
+                                                            'Unread')
+                                                        ? TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )
+                                                        : TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                          ),
+                                              ),
+                                              onTap: () async {
+                                                await ApiService().sendMarkAsRead(
+                                                    widget.userId,
+                                                    widget.notificationIdList[
+                                                        index]);
+                                              },
+                                            ));
                                       },
                                       separatorBuilder:
                                           (BuildContext context, int index) =>

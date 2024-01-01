@@ -312,7 +312,6 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
             child: Padding(
               padding: const EdgeInsets.all(4.0),
               child: IconButton(
-                iconSize: 100,
                 icon: const Icon(
                   Icons.arrow_back,
                   color: Colors.black,
@@ -332,7 +331,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
           child: Column(
             children: <Widget>[
               Container(
-                constraints: BoxConstraints.expand(height: 80),
+                constraints: BoxConstraints.expand(height: 70),
                 padding: EdgeInsets.all(10),
                 child: Container(
                   height: kToolbarHeight - 8.0,

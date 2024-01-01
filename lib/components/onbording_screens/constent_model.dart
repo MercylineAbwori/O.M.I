@@ -20,7 +20,7 @@ class UnbordingContent {
 List<UnbordingContent> contents = [
   UnbordingContent(
       title:
-          'Welcome to One Million Insurance with Terrorism & Political Risks Cover!',
+          'Welcome to One Million Insurance',
       image: 'assets/sliders/slide_one.png',
       discription:
           "Our Personal Accident Insurance with Terrorism & Political Risks Cover extension is designed to protect against the unexpected, while also offering coverage against Terrorism and Political Risk",
@@ -37,9 +37,8 @@ List<UnbordingContent> contents = [
       accorditionList: [
         '1. Temporary total disability',
         '2. Permanent total disability',
-        '3. Permanent total disability',
-        '4. Medical expenses resulting from and accident',
-        '5. Death'
+        '3. Medical expenses resulting from and accident',
+        '4. Death'
       ],
       accorditionTitle: [],
       

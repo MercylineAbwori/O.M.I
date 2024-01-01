@@ -3,40 +3,48 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/coverage/coverage_screen.dart';
 import 'package:one_million_app/components/oto_screens/otp.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/coverage_model.dart';
+import 'package:one_million_app/core/model/mpesa_model.dart';
 import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class MakePayments extends StatefulWidget {
   final num userId;
+  final num premiumSelected;
   //Other Data
-  final num? annualPremium;
-  final num? basicPremium;
-  final num? dailyPremium;
-  final num? monthlyPremium;
-  final num? totalPremium;
-  final num? weeklyPremium;
-  final num sumInsured;
-  final num paymentAmount;
-  final String currentSubcriptionValue;
-  const MakePayments(
-      {super.key,
-      required this.userId,
-      required this.annualPremium,
-      required this.basicPremium,
-      required this.dailyPremium,
-      required this.monthlyPremium,
-      required this.totalPremium,
-      required this.weeklyPremium,
-      required this.sumInsured,
-      required this.paymentAmount,
-      required this.currentSubcriptionValue});
+  // final num? annualPremium;
+  // final num? basicPremium;
+  // final num? dailyPremium;
+  // final num? monthlyPremium;
+  // final num? totalPremium;
+  // final num? weeklyPremium;
+  // final num sumInsured;
+  // final num paymentAmount;
+  // final String currentSubcriptionValue;
+  const MakePayments({
+    super.key,
+    required this.userId,
+    required this.premiumSelected,
+    // required this.annualPremium,
+    // required this.basicPremium,
+    // required this.dailyPremium,
+    // required this.monthlyPremium,
+    // required this.totalPremium,
+    // required this.weeklyPremium,
+    // required this.sumInsured,
+    // required this.paymentAmount,
+    // required this.currentSubcriptionValue
+  });
 
   @override
   _MakePaymentsState createState() => _MakePaymentsState();
@@ -69,6 +77,48 @@ class _MakePaymentsState extends State<MakePayments> {
 
   late String phoneNo;
 
+  //MPESA Payment
+  Future<List<MpesaPaymentModal>?> mpesaPayment(
+    amount,
+    userId,
+    phoneNo,
+  ) async {
+    try {
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.mpesaPaymentEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode(
+        
+          {"amount": (amount).toString(), "userId": userId, "phoneNumber": phoneNo});
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      log('Make Payment Data: ${response.body}');
+
+      var _statusCodeMpesaPayment;
+
+      obj.forEach((key, value) {
+        _statusCodeMpesaPayment = obj["result"]["code"];
+        _statusMessage = obj["result"]["message"];
+      });
+
+      if (_statusCodeMpesaPayment == 5000) {
+        throw Exception('Coverage Payment successful');
+      } else {
+        throw Exception(
+            'Unexpected Coverage Payment error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!_isButtonDisabled) {
       setState(() {
@@ -81,70 +131,69 @@ class _MakePaymentsState extends State<MakePayments> {
         // Form is valid, proceed with your logic here
         // For this example, we will simply print the email
 
-        await ApiService().postCoverageSelection(
-            widget.userId,
-            widget.sumInsured,
-            widget.currentSubcriptionValue,
-            widget.paymentAmount);
+        log('AMount : ${widget.premiumSelected.toInt()}');
+        log('UserId : ${widget.userId}');
+        log('Phone Number : ${phoneNo}');
 
-        await ApiService().mpesaPayment(
-            widget.paymentAmount, widget.userId, phoneNo.toString());
+        await mpesaPayment(
+            widget.premiumSelected.toInt(), widget.userId, phoneNo);
 
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) {
-        //       return CoveragePage(
-        //           userId: widget.userId,
-        //           userName: widget.userName,
-        //           phone: widget.phone,
-        //           email: widget.email,
-        //           title: widget.title,
-        //           message: widget.message,
-        //           readStatus: widget.readStatus,
-        //           notificationIdList: widget.notificationIdList,
-        //           nextPayment: widget.nextPayment,
-        //           paymentAmount: widget.paymentAmount,
-        //           paymentPeriod: widget.paymentPeriod,
-        //           policyNumber: widget.policyNumber,
-        //           sumInsured: widget.sumInsured,
-        //           tableData: widget.tableData,
-        //           rowsBenefits: widget.rowsBenefits,
-        //           rowsSumIsured: widget.rowsSumIsured,
-        //           buttonClaimStatus: widget.buttonClaimStatus,
-        //           promotionCode: widget.promotionCode,
-        //           uptoDatePayment: widget.uptoDatePayment,
-        //           claimApplicationActive: widget.claimApplicationActive,
-        //           qualifiesForCompensation: widget.qualifiesForCompensation,
-        //           addStampDuty: widget.addStampDuty,
-        //           annualPremium: widget.annualPremium,
-        //           basicPremium: widget.basicPremium,
-        //           dailyPremium: widget.dailyPremium,
-        //           monthlyPremium: widget.monthlyPremium,
-        //           totalPremium: widget.totalPremium,
-        //           weeklyPremium: widget.weeklyPremium);
-        //     },
-        //   ),
-        // );
-        Navigator.pop(context);
+        if (_statusMessage == "Request processed Successfully") {
+          QuickAlert.show(
+              context: context,
+              type: QuickAlertType.success,
+              text: _statusMessage,
+              confirmBtnText: 'Done',
+              cancelBtnText: 'Cancel',
+              onConfirmBtnTap: () async {
+                Navigator.pop(context);
+              },
+              onCancelBtnTap: () async {
+                Navigator.pop(context);
+              });
+        } else {
+          QuickAlert.show(
+              context: context,
+              type: QuickAlertType.success,
+              text: _statusMessage,
+              confirmBtnText: 'Done',
+              cancelBtnText: 'Cancel',
+              onConfirmBtnTap: () async {
+                Navigator.pop(context);
+              },
+              onCancelBtnTap: () async {
+                Navigator.pop(context);
+              });
+          Navigator.pop(context);
+        }
 
         Future.delayed(const Duration(seconds: 3), () {
           setState(() {
             isLoading = false;
           });
         });
+        
 
-        final snackBar = SnackBar(
-          content: Text(_statusMessage),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Some code to undo the change.
-            },
-          ),
+        // final snackBar = SnackBar(
+        //   content: Text(_statusMessage),
+        //   action: SnackBarAction(
+        //     label: 'Undo',
+        //     onPressed: () {
+        //       // Some code to undo the change.
+        //     },
+        //   ),
+        // );
+
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         // }
         setState(() {
           _isButtonDisabled = false;
