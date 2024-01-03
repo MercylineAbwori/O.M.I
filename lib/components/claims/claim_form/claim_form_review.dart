@@ -724,6 +724,7 @@ class _ClaimReviewFormState extends State<ClaimReviewForm>
                                                         const EdgeInsets.all(
                                                             10.0),
                                                     child: IntlPhoneField(
+                                                      disableLengthCheck: true,
                                                       keyboardType:
                                                           TextInputType.phone,
                                                       textInputAction:

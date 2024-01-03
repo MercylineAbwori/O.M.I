@@ -275,6 +275,7 @@ class _MakePaymentsState extends State<MakePayments> {
                       padding: const EdgeInsets.only(
                           left: 15.0, right: 15.0, top: 15, bottom: 0),
                       child: IntlPhoneField(
+                          disableLengthCheck: true,
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.next,
                           cursorColor: kPrimaryColor,

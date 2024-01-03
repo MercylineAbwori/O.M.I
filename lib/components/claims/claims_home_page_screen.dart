@@ -29,10 +29,10 @@ class ClaimHomePage extends StatefulWidget {
 
   final List<dynamic> claimListData;
   final num count;
-//   final String uptoDatePayment;
-//   final num paymentAmount;
-//   final String claimApplicationActive;
-//  final String qualifiesForCompensation;
+  final String claimApplicationActive;
+  final num paymentAmountUptoDate;
+  final String qualifiesForCompensation;
+  final String uptoDatePayment;
 
   const ClaimHomePage(
       {Key? key,
@@ -45,11 +45,11 @@ class ClaimHomePage extends StatefulWidget {
       required this.readStatus,
       required this.notificationIdList,
       required this.claimListData,
-      required this.count
-      // required this.paymentAmount,
-      // required this.claimApplicationActive,
-      // required this.qualifiesForCompensation,
-      // required this.uptoDatePayment
+      required this.count,
+      required this.paymentAmountUptoDate,
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment
       })
       : super(key: key);
   @override
@@ -154,80 +154,12 @@ class _ClaimHomePageState extends State<ClaimHomePage>
 
   late List<String> message = [];
 
-  late String claimApplicationActive = '';
-  late num paymentAmount = 0;
-  late String qualifiesForCompensation = '';
-  late String uptoDatePayment = '';
-
-  //Up to date payment status Payment
-  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
-    userId,
-  ) async {
-    try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId,
-        "userId": userId,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      var _statusCodeUpToDatePayment;
-      var _uptoDatePayment;
-      var _claimApplicationActive;
-      var _paymentAmount;
-      var _qualifiesForCompensation;
-
-      obj.forEach((key, value) {
-        _statusCodeUpToDatePayment = obj["result"]["code"];
-
-        // var uptodatedPaymentData = obj["result"];
-        // // log('Up to date data : $uptodatedPaymentData');
-        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
-        _claimApplicationActive =
-            obj["result"]["data"]["claimApplicationActive"];
-        _paymentAmount = obj["result"]["data"]["paymentAmount"];
-        _qualifiesForCompensation =
-            obj["result"]["data"]["qualifiesForCompensation"];
-      });
-
-      setState(() {
-        uptoDatePayment = _uptoDatePayment;
-        claimApplicationActive = _claimApplicationActive;
-        paymentAmount = _paymentAmount;
-        qualifiesForCompensation = _qualifiesForCompensation;
-      });
-
-      log('Upt to date Payment: ${uptoDatePayment}');
-      log('Claim Application Active: ${claimApplicationActive}');
-      log('Payment Amount: ${paymentAmount}');
-      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
-
-      if (_statusCodeUpToDatePayment == 5000) {
-        throw Exception('UP TO DATE successfully');
-      } else {
-        throw Exception(
-            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
+ 
   @override
   void initState() {
     super.initState();
 
-    setState(() {
-      uptodatePayment(widget.userId);
-    });
+   
   }
 
   @override
@@ -419,12 +351,12 @@ class _ClaimHomePageState extends State<ClaimHomePage>
                                               return ClaimForm(
                                                 userId: widget.userId,
                                                 claimApplicationActive:
-                                                    claimApplicationActive,
-                                                paymentAmount: paymentAmount,
+                                                    widget.claimApplicationActive,
+                                                paymentAmount: widget.paymentAmountUptoDate,
                                                 qualifiesForCompensation:
-                                                    qualifiesForCompensation,
+                                                    widget.qualifiesForCompensation,
                                                 uptoDatePayment:
-                                                    uptoDatePayment,
+                                                    widget.uptoDatePayment,
                                               );
                                             },
                                           ),
@@ -566,9 +498,9 @@ class _ClaimHomePageState extends State<ClaimHomePage>
           ),
         ),
       ),
-      floatingActionButton: (claimApplicationActive !=
+      floatingActionButton: (widget.claimApplicationActive !=
                     "You will be eligiable to apply for claims after 60 days of registartion") ||
-                (qualifiesForCompensation ==
+                (widget.qualifiesForCompensation ==
                     "Your payment is not upto date ,you are not eligiable for claim application")
       ? 
       
@@ -581,10 +513,10 @@ class _ClaimHomePageState extends State<ClaimHomePage>
               builder: (context) {
                 return ClaimForm(
                   userId: widget.userId,
-                  claimApplicationActive: claimApplicationActive,
-                  paymentAmount: paymentAmount,
-                  qualifiesForCompensation: qualifiesForCompensation,
-                  uptoDatePayment: uptoDatePayment,
+                  claimApplicationActive: widget.claimApplicationActive,
+                  paymentAmount: widget.paymentAmountUptoDate,
+                  qualifiesForCompensation: widget.qualifiesForCompensation,
+                  uptoDatePayment: widget.uptoDatePayment,
                 );
               },
             ),

@@ -462,7 +462,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                           child: Center(
                             child: GridView.count(
                               primary: false,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(10),
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,
                               crossAxisCount: 2,
@@ -679,12 +679,18 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                     const EdgeInsets.all(12),
                                               ),
                                               Container(
+                                                // child: Text(
+                                                //   'Weekly Premium',
+                                                //   style: TextStyle(
+                                                //       fontWeight:
+                                                //           FontWeight.bold),
+                                                // ),
                                                 child: Text(
-                                                  'Weekly Premium',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
+                                                    'Weekly Premium',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
                                                 padding:
                                                     const EdgeInsets.all(12),
                                               ),
@@ -731,47 +737,52 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                         ));
                                       }
                                     },
-                                    child: Card(
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.5),
-                                                  spreadRadius: 5,
-                                                  blurRadius: 7,
-                                                  offset: Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  child: Icon(Icons.money,
-                                                      size: 24,
-                                                      color: kPrimaryColor),
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                ),
-                                                Container(
-                                                  child: Text(
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.5),
+                                                spreadRadius: 5,
+                                                blurRadius: 7,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                child: Icon(Icons.money,
+                                                    size: 24,
+                                                    color: kPrimaryColor),
+                                                padding:
+                                                    const EdgeInsets.all(12),
+                                              ),
+                                              Container(
+                                                // child: Text(
+                                                //   'Weekly Premium',
+                                                //   style: TextStyle(
+                                                //       fontWeight:
+                                                //           FontWeight.bold),
+                                                // ),
+                                                child: Text(
                                                     'Daily Premium',
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
-                                                  padding:
-                                                      const EdgeInsets.all(12),
-                                                ),
-                                                SizedBox(
-                                                  height: 12,
-                                                ),
-                                                Container(
+                                                padding:
+                                                    const EdgeInsets.all(12),
+                                              ),
+                                              SizedBox(
+                                                height: 12,
+                                              ),
+                                              Container(
                                                   child: Text(
                                                     'Ksh ${(widget.dailyPremium).toString()}',
                                                     style: TextStyle(
@@ -780,14 +791,13 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                             FontWeight.bold),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),

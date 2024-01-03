@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool _isButtonDisabled = false;
-  String _buttonText = 'Sign Up';
+  String _buttonText = 'Sign In';
 
   TextEditingController phoneController = TextEditingController();
   TextEditingController pinController = TextEditingController();
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
   String? _msisdn;
   String? _name;
 
-  num? _userId ;
+  num? _userId;
 
   String? _otp;
 
@@ -109,20 +109,24 @@ class _LoginPageState extends State<LoginPage> {
 
       var obj = jsonDecode(response.body);
 
+      var userId;
+
       obj.forEach((key, value) {
         _statusCode = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
-        _userId = obj["result"]["data"]["UserDetails"]["userId"];
+        userId = obj["result"]["data"]["UserDetails"]["userId"];
         _name = obj["result"]["data"]["UserDetails"]["name"];
         _email = obj["result"]["data"]["UserDetails"]["email"];
         _msisdn = obj["result"]["data"]["UserDetails"]["msisdn"];
       });
 
-      
+      setState(() {
+        _userId = userId;
+      });
 
       if (_statusCode == 5000) {
         _isButtonDisabled = false;
-          _buttonText = 'Login';
+        _buttonText = 'Login';
         await sendOTP(_msisdn);
         log('Login Sucesss the code is ${_statusCode}');
 
@@ -137,19 +141,19 @@ class _LoginPageState extends State<LoginPage> {
         // );
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessage!,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        // Show a simple toast message
+        Fluttertoast.showToast(
+          msg: _statusMessage!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       } else {
         _isButtonDisabled = false;
-          _buttonText = 'Login';
+        _buttonText = 'Login';
         //   final snackBar = SnackBar(
         //   content: Text("Wrong phone number or pin"),
         //   action: SnackBarAction(
@@ -161,16 +165,16 @@ class _LoginPageState extends State<LoginPage> {
         // );
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: 'Wrong phone number or pin',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        // Show a simple toast message
+        Fluttertoast.showToast(
+          msg: 'Wrong phone number or pin',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception(
             'Unexpected Login error occured! Status code ${response.statusCode}');
       }
@@ -209,11 +213,10 @@ class _LoginPageState extends State<LoginPage> {
         // log("OTP: ${_otp}");
         // await sendOTPVerify(_userId, _otp);
         _isButtonDisabled = false;
-          _buttonText = 'Login';
-        
+        _buttonText = 'Login';
       } else {
         _isButtonDisabled = false;
-          _buttonText = 'Login';
+        _buttonText = 'Login';
         throw Exception(
             'Unexpected OTP error occured! Status code ${response.statusCode}');
       }
@@ -234,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
       }); // Perform the action that the button triggers here
 
       Future.delayed(const Duration(seconds: 5), () async {
-        // if (formKey.currentState!.validate()) {
+        if (formKey.currentState!.validate()) {
         // Form is valid, proceed with your logic here
         // For this example, we will simply print the email
 
@@ -243,28 +246,23 @@ class _LoginPageState extends State<LoginPage> {
         print('Phone: ${phoneNo}');
         print('Pin: ${pinController.text}');
 
-        if(_statusMessage == "Request processed Successfully"){
-
-        
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return OtpLoginPage(
-                userId: _userId!,
-                name: _name!,
-                email: _email!,
-                message: message,
-                phoneNo: phoneController.text,
-                pin: pinController.text,
-                promotionCode: '',
-                otp: _otp!
-              );
-            },
-          ),
-        );
-
+        if (_statusMessage == "Request processed Successfully") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return OtpLoginPage(
+                    userId: _userId!,
+                    name: _name!,
+                    email: _email!,
+                    message: message,
+                    phoneNo: phoneController.text,
+                    pin: pinController.text,
+                    promotionCode: '',
+                    otp: _otp!);
+              },
+            ),
+          );
         }
 
         Future.delayed(const Duration(seconds: 3), () {
@@ -273,11 +271,10 @@ class _LoginPageState extends State<LoginPage> {
           });
         });
 
-        
-        // }
+        }
         setState(() {
           _isButtonDisabled = false;
-          _buttonText = 'Login';
+          _buttonText = 'Sign In';
         });
       });
     }
@@ -288,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Form(
           key: formKey,
           child: Column(
@@ -310,6 +307,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.only(
                     left: 15.0, right: 15.0, top: 15, bottom: 0),
                 child: IntlPhoneField(
+                    disableLengthCheck: true,
                     keyboardType: TextInputType.phone,
                     textInputAction: TextInputAction.next,
                     cursorColor: kPrimaryColor,
@@ -437,9 +435,7 @@ class _LoginPageState extends State<LoginPage> {
                             MaterialPageRoute(
                               builder: (context) {
                                 return ForgotPasswordPhone(
-                                  userId: _userId!,
-                                  otp: _otp!,
-
+                                  
                                 );
                               },
                             ),

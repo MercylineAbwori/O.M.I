@@ -42,6 +42,7 @@ class OtpSignPage extends StatefulWidget {
 }
 
 class _OtpSignState extends State<OtpSignPage> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool _isButtonDisabled = false;
   String _buttonText = 'Verify';
   bool isLoading = false;
@@ -51,7 +52,6 @@ class _OtpSignState extends State<OtpSignPage> {
   num? _statusCode;
 
   late String _statusMessageResult = '';
-
 
   late String promotionCode = '';
 
@@ -144,15 +144,15 @@ class _OtpSignState extends State<OtpSignPage> {
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessageResult,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        Fluttertoast.showToast(
+          msg: _statusMessageResult,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception('OTP verified successfully');
       } else {
         // final snackBar = SnackBar(
@@ -166,16 +166,16 @@ class _OtpSignState extends State<OtpSignPage> {
         // );
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessageResult,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        // Show a simple toast message
+        Fluttertoast.showToast(
+          msg: _statusMessageResult,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception(
             'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
@@ -197,58 +197,43 @@ class _OtpSignState extends State<OtpSignPage> {
 
       Future.delayed(const Duration(seconds: 5), () async {
         // if (formKey.currentState!.validate()) {
-        // Form is valid, proceed with your logic here
-        // For this example, we will simply print the email
+          // Form is valid, proceed with your logic here
+          // For this example, we will simply print the email
 
-        var otp = valueOneController.text +
-            '' +
-            valueTwoController.text +
-            '' +
-            valueThreeController.text +
-            '' +
-            valueFourController.text +
-            '' +
-            valueFiveController.text +
-            '' +
-            valueSixController.text;
+          var otp = valueOneController.text +
+              '' +
+              valueTwoController.text +
+              '' +
+              valueThreeController.text +
+              '' +
+              valueFourController.text +
+              '' +
+              valueFiveController.text +
+              '' +
+              valueSixController.text;
 
-        log('oTP: ${otp}');
+          log('oTP: ${otp}');
 
-        await sendOTPVerify(widget.userId, otp);
-        // await addUsers(widget.name, widget.email, widget.phoneNo, widget.date,
-        //     widget.gender, widget.pin, widget.Confirm);
-        // await sendOTPVerify(
-        //     widget.userId, otpController.text);
+          await sendOTPVerify(widget.userId, otp);
 
-        if (_statusMessageResult == "Request processed Successfully") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return LoginScreen();
-              },
-            ),
-          );
-        }
+          if (_statusMessageResult == "Request processed Successfully") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return LoginScreen();
+                },
+              ),
+            );
+          }
 
-        Future.delayed(const Duration(seconds: 3), () {
-          setState(() {
-            isLoading = false;
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
           });
-        });
-
-        // final snackBar = SnackBar(
-        //   content: Text(_statusMessageResult),
-        //   action: SnackBarAction(
-        //     label: 'Undo',
-        //     onPressed: () {
-        //       // Some code to undo the change.
-        //     },
-        //   ),
-        // );
-
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
+          
+          // Show a simple toast message
           Fluttertoast.showToast(
             msg: _statusMessageResult,
             toastLength: Toast.LENGTH_SHORT,
@@ -258,6 +243,7 @@ class _OtpSignState extends State<OtpSignPage> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
+        // }
         // 23
         setState(() {
           _isButtonDisabled = false;

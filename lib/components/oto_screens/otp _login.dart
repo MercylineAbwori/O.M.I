@@ -46,6 +46,8 @@ class OtpLoginPage extends StatefulWidget {
 }
 
 class _OtpLoginState extends State<OtpLoginPage> {
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String _statusMessage;
   num? _statusCode;
 
@@ -456,6 +458,79 @@ class _OtpLoginState extends State<OtpLoginPage> {
     }
   }
 
+
+  String? claimApplicationActive;
+  num? paymentAmountUptoDate;
+  String? qualifiesForCompensation;
+  String? uptoDatePayment;
+
+    //Up to date payment status Payment
+  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
+    userId,
+  ) async {
+    try {
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode({
+        // "userId": userId,
+        "userId": userId,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      var obj = jsonDecode(response.body);
+
+      var _statusCodeUpToDatePayment;
+      var _uptoDatePayment;
+      var _claimApplicationActive;
+      var _paymentAmount;
+      var _qualifiesForCompensation;
+
+      obj.forEach((key, value) {
+        _statusCodeUpToDatePayment = obj["result"]["code"];
+
+        // var uptodatedPaymentData = obj["result"];
+        // // log('Up to date data : $uptodatedPaymentData');
+        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
+        _claimApplicationActive =
+            obj["result"]["data"]["claimApplicationActive"];
+        _paymentAmount = obj["result"]["data"]["paymentAmount"];
+        _qualifiesForCompensation =
+            obj["result"]["data"]["qualifiesForCompensation"];
+      });
+
+      setState(() {
+        uptoDatePayment = _uptoDatePayment;
+        claimApplicationActive = _claimApplicationActive;
+        paymentAmountUptoDate = _paymentAmount;
+        qualifiesForCompensation = _qualifiesForCompensation;
+      });
+
+      log('Upt to date Payment: ${uptoDatePayment}');
+      log('Claim Application Active: ${claimApplicationActive}');
+      log('Payment Amount: ${paymentAmountUptoDate}');
+      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
+
+      if (_statusCodeUpToDatePayment == 5000) {
+        throw Exception('UP TO DATE successfully');
+      } else {
+        throw Exception(
+            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error: $e");
+      if (e is http.ClientException) {
+        print("Response Body: ${e.message}");
+      }
+      // log(e.toString());
+    }
+  }
+  
+
+
+
+
   bool _isButtonDisabled = false;
   String _buttonText = 'Verify';
   bool isLoading = false;
@@ -543,6 +618,11 @@ class _OtpLoginState extends State<OtpLoginPage> {
                   paymentPeriod: paymentPeriod,
                   policyNumber: policyNumber,
                   sumInsured: sumInsured,
+                  statusCodePolicyDetails: statusCodePolicyDetails,
+                  claimApplicationActive: claimApplicationActive!,
+                  paymentAmountUptoDate: paymentAmountUptoDate!,
+                  qualifiesForCompensation: qualifiesForCompensation!,
+                  uptoDatePayment: uptoDatePayment!,
                   count: count!,
                   tableData: [],
                   rowsBenefits: [],
@@ -559,18 +639,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
             isLoading = false;
           });
         });
-
-        // final snackBar = SnackBar(
-        //   content: Text(_statusMessage),
-        //   action: SnackBarAction(
-        //     label: 'Undo',
-        //     onPressed: () {
-        //       // Some code to undo the change.
-        //     },
-        //   ),
-        // );
-
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
         // Show a simple toast message
           Fluttertoast.showToast(
@@ -594,6 +662,10 @@ class _OtpLoginState extends State<OtpLoginPage> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      uptodatePayment(widget.userId);
+    });
   }
 
   @override
@@ -664,33 +736,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
                 ),
                 child: Column(
                   children: [
-                    // TextFormField(
-                    //   keyboardType: TextInputType.number,
-                    //   textInputAction: TextInputAction.done,
-                    //   obscureText: true,
-                    //   controller: otpController,
-                    //   decoration: InputDecoration(
-                    //     border: myinputborder(),
-                    //     labelText: 'OTP',
-                    //     hintText: 'Enter the OTP',
-                    //     prefixIcon: const Padding(
-                    //       padding: EdgeInsets.all(defaultPadding),
-                    //       child: Icon(Icons.lock, color: kPrimaryColor),
-                    //     ),
-                    //     errorText: _otpErrorText,
-                    //   ),
-                    //   validator: (value) {
-                    //     if (value!.isEmpty) {
-                    //       setState(() {
-                    //         _otpErrorText = "* Required";
-                    //       });
-                    //     } else {
-                    //       setState(() {
-                    //         _otpErrorText = null;
-                    //       });
-                    //     }
-                    //   }, //Function to check validation
-                    // ),
+                    
 
                     // TODO
                     Row(

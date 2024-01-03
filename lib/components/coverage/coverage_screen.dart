@@ -29,6 +29,18 @@ class CoveragePage extends StatefulWidget {
 
   final num count;
 
+  final String claimApplicationActive;
+  final num paymentAmountUptoDate;
+  final String qualifiesForCompensation;
+  final String uptoDatePayment;
+
+  final String nextPayment;
+  final String paymentPeriod;
+  final String policyNumber;
+  late num paymentAmount;
+  final num sumInsured;
+  final num statusCodePolicyDetails;
+
   CoveragePage(
       {Key? key,
       required this.userId,
@@ -40,7 +52,17 @@ class CoveragePage extends StatefulWidget {
       required this.title,
       required this.readStatus,
       required this.notificationIdList,
-      required this.count})
+      required this.count,
+      required this.claimApplicationActive,
+      required this.paymentAmountUptoDate,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment,
+      required this.nextPayment,
+      required this.paymentAmount,
+      required this.paymentPeriod,
+      required this.policyNumber,
+      required this.sumInsured,
+      required this.statusCodePolicyDetails,})
       : super(key: key);
 
   @override
@@ -101,170 +123,18 @@ class _CoverageState extends State<CoveragePage> {
     'Daily',
   ];
 
-  String? claimApplicationActive;
-  num? paymentAmount;
-  String? qualifiesForCompensation;
-  String? uptoDatePayment;
+  
 
-  // Future<void> _showMultiSelectSubscription(BuildContext context) async {
-  //   final List<dynamic>? results = await showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       // return MakePayments(
-  //       //   userId: widget.userId,
-  //       //     itemSelected: item,
-  //       //     annualPremium: widget.annualPremium,
-  //       //     basicPremium: widget.weeklyPremium,
-  //       //     dailyPremium: widget.dailyPremium,
-  //       //     monthlyPremium: widget.monthlyPremium,
-  //       //     totalPremium: widget.totalPremium,
-  //       //     weeklyPremium: widget.totalPremium,
-  //       //     paymentAmount : widget.paymentAmount,
-  //       //     sumInsured: widget.sumInsured);
-  //       return SubscriptionSelect(
-  //         userId: widget.userId,
-  //         // itemSelected: item
-  //         // annualPremium: widget.annualPremium,
-  //         // basicPremium: widget.weeklyPremium,
-  //         // dailyPremium: widget.dailyPremium,
-  //         // monthlyPremium: widget.monthlyPremium,
-  //         // totalPremium: widget.totalPremium,
-  //         // weeklyPremium: widget.totalPremium,
-  //         // phone: widget.phone,
-  //         // sumInsured: widget.sumInsured,
-  //         // paymentAmount: widget.paymentAmount,
-  //       );
-  //     },
-  //   );
 
-  //   // Update UI
-  //   if (results != null) {
-  //     setState(() {
-  //       _selectedItems = results;
-  //     });
-  //   }
-  // }
-
-  //Up to date payment status Payment
-  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
-    userId,
-  ) async {
-    try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId,
-        "userId": userId,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      var _statusCodeUpToDatePayment;
-      var _uptoDatePayment;
-      var _claimApplicationActive;
-      var _paymentAmount;
-      var _qualifiesForCompensation;
-
-      obj.forEach((key, value) {
-        _statusCodeUpToDatePayment = obj["result"]["code"];
-
-        // var uptodatedPaymentData = obj["result"];
-        // // log('Up to date data : $uptodatedPaymentData');
-        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
-        _claimApplicationActive =
-            obj["result"]["data"]["claimApplicationActive"];
-        _paymentAmount = obj["result"]["data"]["paymentAmount"];
-        _qualifiesForCompensation =
-            obj["result"]["data"]["qualifiesForCompensation"];
-      });
-
-      setState(() {
-        uptoDatePayment = _uptoDatePayment;
-        claimApplicationActive = _claimApplicationActive;
-        paymentAmount = _paymentAmount;
-        qualifiesForCompensation = _qualifiesForCompensation;
-      });
-
-      log('Upt to date Payment: ${uptoDatePayment}');
-      log('Claim Application Active: ${claimApplicationActive}');
-      log('Payment Amount: ${paymentAmount}');
-      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
-
-      if (_statusCodeUpToDatePayment == 5000) {
-        throw Exception('UP TO DATE successfully');
-      } else {
-        throw Exception(
-            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
+  
   // Policy Details
 
-  String? nextPayment;
-  String? paymentPeriod;
-  String? policyNumber;
-  num? sumInsured;
-
-  num statusCodePolicyDetails = 0;
-
-  //policy Details Modal
-  Future<List<PolicyDetailsModal>?> getPolicyDetails(userId) async {
-    try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.policyDetailsEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId,
-        "userId": userId
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      log('Responce: ${response.body}');
-
-      obj.forEach((key, value) {
-        statusCodePolicyDetails = obj["result"]["code"];
-
-        paymentAmount = obj["result"]["data"]["paymentAmount"];
-        paymentPeriod = obj["result"]["data"]["paymentPeriod"];
-        policyNumber = obj["result"]["data"]["policyNumber"];
-        sumInsured = obj["result"]["data"]["sumInsured"];
-      });
-
-      if (statusCodePolicyDetails == 5000) {
-        throw Exception('Policy Details Displayed successfully');
-      } else {
-        throw Exception(
-            'Unexpected Policy Details Displayed  error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
-
+  
   @override
   void initState() {
     super.initState();
 
-    setState(() {
-      uptodatePayment(widget.userId);
-      getPolicyDetails(widget.userId);
-    });
+  
   }
 
   @override
@@ -360,7 +230,7 @@ class _CoverageState extends State<CoveragePage> {
               )
             ]),
         body: SingleChildScrollView(
-            child: (statusCodePolicyDetails == 5000)
+            child: (widget.statusCodePolicyDetails == 5000)
                 ? Container(
                     /** Card Widget **/
                     child: Column(
@@ -413,7 +283,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              (paymentAmount).toString(),
+                                              (widget.paymentAmountUptoDate).toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -431,7 +301,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              paymentPeriod!,
+                                              widget.paymentPeriod,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -449,7 +319,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              policyNumber!,
+                                              widget.policyNumber!,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -467,7 +337,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              (sumInsured).toString(),
+                                              (widget.sumInsured).toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -495,13 +365,13 @@ class _CoverageState extends State<CoveragePage> {
                                                         MakePayments(
                                                           userId: widget.userId,
                                                           premiumSelected:
-                                                              paymentAmount!,
+                                                              widget.paymentAmountUptoDate,
                                                         )));
                                           },
                                           child: Card(
                                               elevation: 5,
                                               shadowColor: Colors.black,
-                                              color: (uptoDatePayment ==
+                                              color: (widget.uptoDatePayment ==
                                                       'payment up to date')
                                                   ? Colors.green
                                                   : Colors.red,
@@ -509,7 +379,7 @@ class _CoverageState extends State<CoveragePage> {
                                                 padding:
                                                     const EdgeInsets.all(10.0),
                                                 child: Center(
-                                                  child: Text(uptoDatePayment!),
+                                                  child: Text(widget.uptoDatePayment),
                                                 ),
                                               )),
                                         ),
@@ -629,7 +499,7 @@ class _CoverageState extends State<CoveragePage> {
                     ), //Card
                   )), //Center
 
-        floatingActionButton: (statusCodePolicyDetails == 5000)
+        floatingActionButton: (widget.statusCodePolicyDetails == 5000)
             ? SpeedDial(icon: Icons.add, children: [
                 // SpeedDialChild(
                 //   child: const Icon(Icons.subscriptions),

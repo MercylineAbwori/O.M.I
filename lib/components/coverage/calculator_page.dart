@@ -102,37 +102,38 @@ class _CalculatorPageState extends State<CalculatorPage> {
     print('Sum INsured : ${SumInsured}');
     print('Depandants : ${dependants}');
     print('Packages: ${Packages}');
-    // if (formkey.currentState!.validate()) {
-    //   // Form is valid, proceed with your logic here
-    //   // For this example, we will simply print the email
-    // }
-    if (Packages != []) {
-      await calculatePremium(SumInsured, dependants, Packages);
+    if (formkey.currentState!.validate()) {
+      //   // Form is valid, proceed with your logic here
+      //   // For this example, we will simply print the email
 
-      if (_statusCode == 5000) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => CoverageTablePage(
-                    userId: widget.userId,
-                    userName: widget.userName,
-                    phone: widget.phone,
-                    email: widget.email,
-                    tableData: tableData,
-                    annualPremium: annualPremium,
-                    basicPremium: annualPremium,
-                    dailyPremium: dailyPremium,
-                    monthlyPremium: monthlyPremium,
-                    totalPremium: totalPremium,
-                    weeklyPremium: weeklyPremium,
-                    title: widget.message,
-                    message: widget.message,
-                    readStatus: widget.message,
-                    sumInsured: sumInsured,
-                    notificationListId: widget.notificationIdList,
-                    count: widget.count,
-                  )),
-        );
+      if (Packages != []) {
+        await calculatePremium(SumInsured, dependants, Packages);
+
+        if (_statusCode == 5000) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CoverageTablePage(
+                      userId: widget.userId,
+                      userName: widget.userName,
+                      phone: widget.phone,
+                      email: widget.email,
+                      tableData: tableData,
+                      annualPremium: annualPremium,
+                      basicPremium: annualPremium,
+                      dailyPremium: dailyPremium,
+                      monthlyPremium: monthlyPremium,
+                      totalPremium: totalPremium,
+                      weeklyPremium: weeklyPremium,
+                      title: widget.message,
+                      message: widget.message,
+                      readStatus: widget.message,
+                      sumInsured: sumInsured,
+                      notificationListId: widget.notificationIdList,
+                      count: widget.count,
+                    )),
+          );
+        }
       }
     }
   }

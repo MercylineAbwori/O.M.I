@@ -33,14 +33,6 @@ class BeneficiaryScreen extends StatefulWidget {
 
   final bool buttonClaimStatus;
 
-  //Policy Details
-
-  final String nextPayment;
-  final String paymentPeriod;
-  final String policyNumber;
-  late num paymentAmount;
-  final num sumInsured;
-
   final List<dynamic> tableData;
 
   final List<dynamic> rowsBenefits;
@@ -51,6 +43,20 @@ class BeneficiaryScreen extends StatefulWidget {
   final String profilePic;
 
   final num count;
+
+  //Policy Details
+
+  final String nextPayment;
+  final String paymentPeriod;
+  final String policyNumber;
+  late num paymentAmount;
+  final num sumInsured;
+  final num statusCodePolicyDetails;
+
+  final String claimApplicationActive;
+  final num paymentAmountUptoDate;
+  final String qualifiesForCompensation;
+  final String uptoDatePayment;
 
   BeneficiaryScreen(
       {super.key,
@@ -67,6 +73,7 @@ class BeneficiaryScreen extends StatefulWidget {
       required this.paymentPeriod,
       required this.policyNumber,
       required this.sumInsured,
+      required this.statusCodePolicyDetails,
       required this.tableData,
       required this.rowsBenefits,
       required this.rowsSumIsured,
@@ -74,7 +81,11 @@ class BeneficiaryScreen extends StatefulWidget {
       required this.profilePic,
       required this.message,
       required this.title,
-      required this.count});
+      required this.count,
+      required this.claimApplicationActive,
+      required this.paymentAmountUptoDate,
+      required this.qualifiesForCompensation,
+      required this.uptoDatePayment});
 
   @override
   _BeneficiaryScreenState createState() => _BeneficiaryScreenState();
@@ -280,12 +291,17 @@ class _BeneficiaryScreenState extends State<BeneficiaryScreen> {
                             paymentPeriod: widget.paymentPeriod,
                             policyNumber: widget.policyNumber,
                             sumInsured: widget.sumInsured,
-                            count: widget.count!,
+                            statusCodePolicyDetails: widget.statusCodePolicyDetails,
+                            count: widget.count,
                             tableData: widget.tableData,
                             rowsBenefits: widget.rowsBenefits,
                             rowsSumIsured: widget.rowsSumIsured,
                             claimListData: widget.claimListData,
-                            profilePic: widget.profilePic);
+                            profilePic: widget.profilePic,
+                            claimApplicationActive: widget.claimApplicationActive,
+                            paymentAmountUptoDate: widget.paymentAmountUptoDate,
+                            qualifiesForCompensation: widget.qualifiesForCompensation,
+                            uptoDatePayment: widget.uptoDatePayment,);
                       },
                     ));
                   },

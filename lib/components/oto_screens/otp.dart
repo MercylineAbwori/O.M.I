@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
+
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:one_million_app/components/forgot_password.dart';
+import 'package:one_million_app/components/forgot_password_form.dart';
 import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/model/registration_otp_verify.dart';
 import 'package:one_million_app/shared/constants.dart';
@@ -28,6 +29,7 @@ class OtpPage extends StatefulWidget {
 //policy Details Modal
 
 class _OtpState extends State<OtpPage> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String _statusMessageResult = '';
 
   TextEditingController otpController = TextEditingController();
@@ -45,6 +47,8 @@ class _OtpState extends State<OtpPage> {
   String _buttonText = 'Verify';
   bool isLoading = false;
 
+  num? _statusCodeOTPVerify;
+
   Future<List<UserRegistrationOTPVerifyModal>?> sendOTPVerify(
       _userId, _otp) async {
     try {
@@ -57,27 +61,17 @@ class _OtpState extends State<OtpPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
+      
       var obj = jsonDecode(response.body);
 
-      var _statusCodeOTP;
 
       obj.forEach((key, value) {
-        _statusCodeOTP = obj["result"]["code"];
+        _statusCodeOTPVerify = obj["result"]["code"];
         _statusMessageResult = obj["result"]["message"];
       });
 
-      // final snackBar = SnackBar(
-      //   content: Text(_statusMessageResult),
-      //   action: SnackBarAction(
-      //     label: 'Undo',
-      //     onPressed: () {
-      //       // Some code to undo the change.
-      //     },
-      //   ),
-      // );
 
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-       // Show a simple toast message
+      
           Fluttertoast.showToast(
             msg: _statusMessageResult,
             toastLength: Toast.LENGTH_SHORT,
@@ -88,21 +82,13 @@ class _OtpState extends State<OtpPage> {
             fontSize: 16.0,
           );
 
-      if (_statusCodeOTP == 5000) {
+      if (_statusCodeOTPVerify == 5000) {
+        _isButtonDisabled = false;
+          _buttonText = 'Verify';
         throw Exception('OTP verified successfully');
       } else {
-        // final snackBar = SnackBar(
-        //   content: Text('Ann Error has occured, please check your OTP number'),
-        //   action: SnackBarAction(
-        //     label: 'Undo',
-        //     onPressed: () {
-        //       // Some code to undo the change.
-        //     },
-        //   ),
-        // );
 
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
+        // Show a simple toast message
           Fluttertoast.showToast(
             msg: 'Error has occured, please check your OTP number',
             toastLength: Toast.LENGTH_SHORT,
@@ -112,6 +98,8 @@ class _OtpState extends State<OtpPage> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
+          _isButtonDisabled = false;
+          _buttonText = 'Verify';
         throw Exception(
             'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
@@ -133,41 +121,57 @@ class _OtpState extends State<OtpPage> {
 
       Future.delayed(const Duration(seconds: 5), () async {
         // if (formKey.currentState!.validate()) {
-        // Form is valid, proceed with your logic here
-        // For this example, we will simply print the email
+          // Form is valid, proceed with your logic here
+          // For this example, we will simply print the email
 
-        var otp = valueOneController.text +
-            '' +
-            valueTwoController.text +
-            '' +
-            valueThreeController.text +
-            '' +
-            valueFourController.text +
-            '' +
-            valueFiveController.text +
-            '' +
-            valueSixController.text;
+          var otp = valueOneController.text +
+              '' +
+              valueTwoController.text +
+              '' +
+              valueThreeController.text +
+              '' +
+              valueFourController.text +
+              '' +
+              valueFiveController.text +
+              '' +
+              valueSixController.text;
 
-        
+          log('oTP: ${otp}');
 
-        await sendOTPVerify(widget.userId, otp);
+          await sendOTPVerify(widget.userId, otp);
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return ForgotPassword(phone: widget.phone);
-            },
-          ),
-        );
+          log('${_statusCodeOTPVerify}');
 
-        Future.delayed(const Duration(seconds: 3), () {
-          setState(() {
-            isLoading = false;
+          if (_statusCodeOTPVerify == 5000) {
+            
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return ForgotPasswordEnterPin(phoneNo: widget.phone);
+                },
+              ),
+            );
+          }
+
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
           });
-        });
-
+          
+          // Show a simple toast message
+          Fluttertoast.showToast(
+            msg: _statusMessageResult,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         // }
+        // 23
         setState(() {
           _isButtonDisabled = false;
           _buttonText = 'Verify';

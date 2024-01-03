@@ -7,81 +7,73 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:one_million_app/components/oto_screens/otp.dart';
+import 'package:one_million_app/components/signin/login_screen.dart';
+import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/model/login_model.dart';
 import 'package:one_million_app/core/model/registration_model.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
 
-class ForgotPasswordPhone extends StatefulWidget {
-  const ForgotPasswordPhone({super.key});
+class ForgotPasswordEnterPin extends StatefulWidget {
+  final String phoneNo;
+  const ForgotPasswordEnterPin({super.key, required this.phoneNo});
 
   @override
-  _ForgotPasswordPhoneState createState() => _ForgotPasswordPhoneState();
+  _ForgotPasswordEnterPinState createState() => _ForgotPasswordEnterPinState();
 }
 
-class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
-   GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  TextEditingController phoneController = TextEditingController();
+class _ForgotPasswordEnterPinState extends State<ForgotPasswordEnterPin> {
 
-  var _country = countries.firstWhere((element) => element.code == 'KE');
 
-  String? _phoneErrorText;
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
-  bool passwordVisiblePin = false;
-  bool passwordVisibleConfirmPin = false;
+  TextEditingController pinController = TextEditingController();
+  TextEditingController pinConfirmController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    passwordVisiblePin = true;
-    passwordVisibleConfirmPin = true;
-  }
+  String? _pinErrorText;
 
-  late String _statusMessage;
+  String? _confirmPinErrorText;
+
   num? _statusCode;
-  late String _otp;
-  late num _userId;
+  String? _statusMessage;
 
-  String? phoneNo;
-
-  //OTP
-  Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
+  //RESET PASSWORD
+  Future<List<UserLoginModal>?> PostResetPassword(
+    _msisdn,
+    _pin,
+  ) async {
     try {
-      var url = Uri.parse(ApiConstants.baseUrl + ApiConstants.sendOTPEndpoint);
+      var url =
+          Uri.parse(ApiConstants.baseUrl + ApiConstants.resetPasswordEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({
         "msisdn": _msisdn,
+        "pin": _pin,
       });
 
       final response = await http.post(url, headers: headers, body: body);
 
-      var obj = jsonDecode(response.body);
+      // print('Responce Status Code : ${response.statusCode}');
+      log('Responce Body : ${response.body}');
 
-      
-      var userId;
+      var obj = jsonDecode(response.body);
 
       obj.forEach((key, value) {
         _statusCode = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
-        _otp = obj["result"]["data"]["otp"];
-        userId = obj["result"]["data"]["userDetails"]["userId"];
       });
 
-      setState(() {
-        _userId = userId;
-      });
+      if (response.statusCode == 5000) {
 
-      if (_statusCode == 5000) {
-        // log("Body : ${obj}");
-        // log("OTP: ${_otp}");
-        // await sendOTPVerify(_userId, _otp);
         _isButtonDisabled = false;
           _buttonText = 'Submit';
+
       } else {
         _isButtonDisabled = false;
           _buttonText = 'Submit';
         throw Exception(
-            'Unexpected OTP error occured! Status code ${response.statusCode}');
+            'Unexpected Reset Password error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
       print("Error: $e");
@@ -91,6 +83,7 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
       // log(e.toString());
     }
   }
+
 
   bool _isButtonDisabled = false;
   String _buttonText = 'Submit';
@@ -108,28 +101,29 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
         // Form is valid, proceed with your logic here
         // For this example, we will simply print the email
 
-        
 
-        await sendOTP(phoneNo);
+        // Form is valid, proceed with your logic here
+      // For this example, we will simply print the email
+      print('Pin: ${pinController.text}');
+      print('Confirm Pin: ${pinConfirmController.text}');
 
-        if(_statusCode == 5000){
+      await PostResetPassword(
+        widget.phoneNo,
+        pinController.text,
+      );
 
-        
+      if(_statusCode == 5000){
 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
-              return OtpPage(
-                phone: phoneNo!,
-                userId: _userId,
-                otp: _otp,
+              return LoginScreen(
               );
             },
           ),
-        );
-
-        }
+        ); 
+      }
 
         Future.delayed(const Duration(seconds: 3), () {
           setState(() {
@@ -137,20 +131,8 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
           });
         });
 
-        // final snackBar = SnackBar(
-        //   content: Text(_statusMessage),
-        //   action: SnackBarAction(
-        //     label: 'Undo',
-        //     onPressed: () {
-        //       // Some code to undo the change.
-        //     },
-        //   ),
-        // );
-
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        // Show a simple toast message
         Fluttertoast.showToast(
-          msg: _statusMessage,
+          msg: _statusMessage!,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -158,6 +140,8 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+
+        
         // }
         setState(() {
           _isButtonDisabled = false;
@@ -167,6 +151,18 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
     }
   }
 
+  bool passwordVisiblePin = false;
+  bool passwordVisibleConfirmPin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordVisiblePin = true;
+    passwordVisibleConfirmPin = true;
+  }
+ 
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,7 +170,6 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
       backgroundColor: Color(0xfff7f6fb),
       body: SafeArea(
         child: Form(
-          key: formkey,
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             child: Column(
@@ -218,7 +213,7 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
                   height: 10,
                 ),
                 const Text(
-                  "Enter your phone number",
+                  "Enter your pin",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -237,72 +232,107 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
                   ),
                   child: Column(
                     children: [
+
                       Padding(
-                        padding: const EdgeInsets.only(
-                            left: 15.0, right: 15.0, top: 15, bottom: 0),
-                        child: IntlPhoneField(
-                            disableLengthCheck: true,
-                            keyboardType: TextInputType.phone,
-                            textInputAction: TextInputAction.next,
-                            cursorColor: kPrimaryColor,
-                            controller: phoneController,
-                            onSaved: (phone) {},
+                          padding: const EdgeInsets.only(
+                              left: 15.0, right: 15.0, top: 15, bottom: 0),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            // obscureText: true,
+                            obscureText: passwordVisiblePin,
+                            controller: pinController,
                             decoration: InputDecoration(
-                              labelText: 'Phone Number',
-                              hintText: 'Enter phone number',
+                              border: myinputborder(),
+                              labelText: 'Pin',
+                              hintText: 'Enter secure pin',
                               prefixIcon: const Padding(
                                 padding: EdgeInsets.all(defaultPadding),
-                                child: Icon(
-                                  Icons.phone,
-                                  color: kPrimaryColor,
-                                ),
+                                child: Icon(Icons.lock, color: kPrimaryColor),
                               ),
-                              border: myinputborder(),
-                              // enabledBorder: myinputborder(),
-                              // focusedBorder: myfocusborder(),
+                              suffixIcon: IconButton(
+                                icon: Icon(passwordVisiblePin
+                                    ? Icons.visibility
+                                    : Icons.visibility_off),
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      passwordVisiblePin = !passwordVisiblePin;
+                                    },
+                                  );
+                                },
+                              ),
+                              errorText: _pinErrorText,
                             ),
-                            onChanged: (phone) {
-                                phoneNo = phone.completeNumber;
-                                // Remove leading '0' and enforce a length of 9
-                                String sanitizedNumber =
-                                    phone.completeNumber.startsWith('0')
-                                        ? phone.completeNumber.substring(1)
-                                        : phone.completeNumber;
-
-                                
-                              },
-                            initialCountryCode: 'KE',
                             validator: (value) {
-                              var _countryLImit = countries.firstWhere(
-                                  (element) =>
-                                      element.code == value!.countryISOCode);
-        
-                              print(_countryLImit.maxLength);
-                              if (value!.number.isEmpty) {
+                              if (value!.isEmpty) {
                                 setState(() {
-                                  _phoneErrorText = "* Required";
+                                  _pinErrorText = "* Required";
                                 });
-                              } else if (value.number.length >=
-                                      _country.minLength &&
-                                  value.number.length <= _country.maxLength) {
+                              }
+                              // else if (value.length < 4) {
+                              //   _pinErrorText = "Password should be atleast 4 characters";
+                              // }
+                              else if (value.length > 4) {
                                 setState(() {
-                                  // Run anything here
+                                  _pinErrorText = "Password should not be greater than 4 characters";
                                 });
                               } else {
                                 setState(() {
-                                  _phoneErrorText = null;
+                                  _pinErrorText = null;
                                 });
                               }
-                            },
-                            onCountryChanged: (country) => _country = country,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                              FilteringTextInputFormatter.deny(RegExp('^0+')),
-                            ]),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
+                            }, //Function to check validation
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15.0, right: 15.0, top: 15, bottom: 0),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            obscureText: passwordVisiblePin,
+                            controller: pinConfirmController,
+                            decoration: InputDecoration(
+                              border: myinputborder(),
+                              labelText: 'Confirm Pin',
+                              hintText: 'Repeat the pin to confirm',
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(defaultPadding),
+                                child: Icon(Icons.lock, color: kPrimaryColor),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(passwordVisibleConfirmPin
+                                    ? Icons.visibility
+                                    : Icons.visibility_off),
+                                onPressed: () {
+                                  setState(
+                                    () {
+                                      passwordVisibleConfirmPin =
+                                          !passwordVisibleConfirmPin;
+                                    },
+                                  );
+                                },
+                              ),
+                              errorText: _confirmPinErrorText,
+                            ),
+                            validator: (value) {
+                              if (value == pinController) {
+                                setState(() {
+                                  _confirmPinErrorText = "Does not match the Pin";
+                                });
+                              } else {
+                                setState(() {
+                                  _confirmPinErrorText = null;
+                                });
+                              }
+                            }, //Function to check validation
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 22,
+                        ),
+                      
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

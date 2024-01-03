@@ -157,16 +157,16 @@ class _SignUpFormState extends State<SignUpForm> {
         // );
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        // Show a simple toast message
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         _isButtonDisabled = false;
         _buttonText = 'Sign Up';
       } else {
@@ -182,16 +182,16 @@ class _SignUpFormState extends State<SignUpForm> {
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        // Show a simple toast message
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
 
         _isButtonDisabled = false;
         _buttonText = 'Sign Up';
@@ -250,13 +250,14 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-
-   //promoCode to pass
+  //promoCode to pass
   Future<List<promoCodePassModal>?> sendPromoCode(userId, promoCodeCode) async {
     try {
-      var url = Uri.parse(ApiConstantsPromoCode.baseUrl + ApiConstantsPromoCode.promocodeEndpoint);
+      var url = Uri.parse(ApiConstantsPromoCode.baseUrl +
+          ApiConstantsPromoCode.promocodeEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({"userId": userId, "promotionCode": promoCodeCode});
+      final body =
+          jsonEncode({"userId": userId, "promotionCode": promoCodeCode});
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -284,7 +285,6 @@ class _SignUpFormState extends State<SignUpForm> {
     }
   }
 
-
   Future<void> _submitForm() async {
     if (!_isButtonDisabled) {
       setState(() {
@@ -294,31 +294,31 @@ class _SignUpFormState extends State<SignUpForm> {
       // Perform the action that the button triggers here
 
       Future.delayed(const Duration(seconds: 5), () async {
-        // if (formkey.currentState!.validate()) {
-        // Form is valid, proceed with your logic here
-        // For this example, we will simply print the email
+        if (formkey.currentState!.validate()) {
+          // Form is valid, proceed with your logic here
+          // For this example, we will simply print the email
 
-        await addUsers(
-            nameController.text,
-            emailController.text,
-            phoneNo,
-            dateOfBirthController.text,
-            dropdownValue,
-            pinConfirmController.text,
-            pinController.text);
+          await addUsers(
+              nameController.text,
+              emailController.text,
+              phoneNo,
+              dateOfBirthController.text,
+              dropdownValue,
+              pinConfirmController.text,
+              pinController.text);
 
-        // final snackBar = SnackBar(
-        //   content: Text(_statusMessage),
-        //   action: SnackBarAction(
-        //     label: 'Undo',
-        //     onPressed: () {
-        //       // Some code to undo the change.
-        //     },
-        //   ),
-        // );
+          // final snackBar = SnackBar(
+          //   content: Text(_statusMessage),
+          //   action: SnackBarAction(
+          //     label: 'Undo',
+          //     onPressed: () {
+          //       // Some code to undo the change.
+          //     },
+          //   ),
+          // );
 
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-         // Show a simple toast message
+          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          // Show a simple toast message
           Fluttertoast.showToast(
             msg: _statusMessage,
             toastLength: Toast.LENGTH_SHORT,
@@ -329,33 +329,35 @@ class _SignUpFormState extends State<SignUpForm> {
             fontSize: 16.0,
           );
 
-        // // print('Status Message: ${_statusMessage}');
+          // // print('Status Message: ${_statusMessage}');
 
-        if (_statusCodeother == 5000) {
-          if(promotionCodeController.text.isEmpty){
-            await sendPromoCode(userId, promotionCodeController.text);
+          if (_statusCodeother == 5000) {
+            if (promotionCodeController.text.isNotEmpty) {
+              await sendPromoCode(userId, promotionCodeController.text);
+            }
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return OtpSignPage(
+                  userId: userId,
+                  name: nameController.text,
+                  email: emailController.text,
+                  date: dateOfBirthController.text,
+                  phoneNo: phoneController.text,
+                  gender: dropdownValue!,
+                  pin: pinController.text,
+                  Confirm: pinConfirmController.text,
+                  promotionCode: promotionCodeController.text,
+                  otp: (otp).toString(),
+                );
+              },
+            ));
+            }
+            setState(() {
+              _isButtonDisabled = false;
+              _buttonText = 'Sign Up';
+            });
           }
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return OtpSignPage(
-                userId: userId,
-                name: nameController.text,
-                email: emailController.text,
-                date: dateOfBirthController.text,
-                phoneNo: phoneController.text,
-                gender: dropdownValue!,
-                pin: pinController.text,
-                Confirm: pinConfirmController.text,
-                promotionCode: promotionCodeController.text,
-                otp: (otp).toString(),
-              );
-            },
-          ));
-          setState(() {
-            _isButtonDisabled = false;
-            _buttonText = 'Sign Up';
-          });
-        }
+        
       });
     }
   }
@@ -552,6 +554,7 @@ class _SignUpFormState extends State<SignUpForm> {
                         padding: const EdgeInsets.only(
                             left: 15.0, right: 15.0, top: 15, bottom: 0),
                         child: IntlPhoneField(
+                            disableLengthCheck: true,
                             keyboardType: TextInputType.phone,
                             textInputAction: TextInputAction.next,
                             cursorColor: kPrimaryColor,

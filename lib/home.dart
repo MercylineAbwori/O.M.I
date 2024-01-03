@@ -32,9 +32,10 @@ class HomePage extends StatefulWidget {
   final String promotionCode;
   final bool buttonClaimStatus;
 
-//   final String uptoDatePayment;
-//   final String claimApplicationActive;
-//  final String qualifiesForCompensation;
+  final String claimApplicationActive;
+  final num paymentAmountUptoDate;
+  final String qualifiesForCompensation;
+  final String uptoDatePayment;
 
   final List<dynamic> claimListData;
   final String profilePic;
@@ -44,6 +45,7 @@ class HomePage extends StatefulWidget {
   final String policyNumber;
   final num sumInsured;
   final num paymentAmount;
+  final num statusCodePolicyDetails;
   final num count;
 
   HomePage(
@@ -56,9 +58,10 @@ class HomePage extends StatefulWidget {
       required this.message,
       required this.readStatus,
       required this.notificationIdList,
-      // required this.uptoDatePayment,
-      // required this.claimApplicationActive,
-      // required this.qualifiesForCompensation,
+      required this.uptoDatePayment,
+      required this.claimApplicationActive,
+      required this.qualifiesForCompensation,
+      required this.paymentAmountUptoDate,
       required this.promotionCode,
       required this.buttonClaimStatus,
       required this.claimListData,
@@ -68,6 +71,7 @@ class HomePage extends StatefulWidget {
       required this.policyNumber,
       required this.profilePic,
       required this.sumInsured,
+      required this.statusCodePolicyDetails,
       required this.count});
 
   @override
@@ -103,83 +107,11 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  late String uptoDatePayment = '';
-  late String claimApplicationActive;
-  late num paymentAmount;
-  late String qualifiesForCompensation;
-
-  //Up to date payment status Payment
-  Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
-    userId,
-  ) async {
-    try {
-      var url = Uri.parse(
-          ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        // "userId": userId,
-        "userId": userId,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      var obj = jsonDecode(response.body);
-
-      var _statusCodeUpToDatePayment;
-      var _uptoDatePayment;
-      var _claimApplicationActive;
-      var _paymentAmount;
-      var _qualifiesForCompensation;
-
-      obj.forEach((key, value) {
-        _statusCodeUpToDatePayment = obj["result"]["code"];
-
-        // var uptodatedPaymentData = obj["result"];
-        // // log('Up to date data : $uptodatedPaymentData');
-        _uptoDatePayment = obj["result"]["data"]["uptoDatePayment"];
-        _claimApplicationActive =
-            obj["result"]["data"]["claimApplicationActive"];
-        _paymentAmount = obj["result"]["data"]["paymentAmount"];
-        _qualifiesForCompensation =
-            obj["result"]["data"]["qualifiesForCompensation"];
-      });
-
-      setState(() {
-        uptoDatePayment = _uptoDatePayment;
-        claimApplicationActive = _claimApplicationActive;
-        paymentAmount = _paymentAmount;
-        qualifiesForCompensation = _qualifiesForCompensation;
-      });
-
-      log('Upt to date Payment: ${uptoDatePayment}');
-      log('Claim Application Active: ${claimApplicationActive}');
-      log('Payment Amount: ${paymentAmount}');
-      log('Qualifies For Compentsation: ${qualifiesForCompensation}');
-
-      if (_statusCodeUpToDatePayment == 5000) {
-        throw Exception('UP TO DATE successfully');
-      } else {
-        throw Exception(
-            'Unexpected UP TO DATE error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
-
   @override
   void initState() {
     super.initState();
 
-    setState(() {
-      uptodatePayment(widget.userId);
-
-      print('Uptodate : ${uptoDatePayment}');
-    });
+    setState(() {});
   }
 
   late bool _showCartBadge;
@@ -327,8 +259,8 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              (uptoDatePayment != null &&
-                                      uptoDatePayment.trim() != "")
+                              (widget.uptoDatePayment != null &&
+                                      widget.uptoDatePayment.trim() != "")
                                   ? TextButton(
                                       onPressed: () {
                                         Navigator.push(
@@ -347,14 +279,14 @@ class _HomePageState extends State<HomePage> {
                                       child: Card(
                                         elevation: 5,
                                         shadowColor: Colors.black,
-                                        color: (uptoDatePayment ==
+                                        color: (widget.uptoDatePayment ==
                                                 'payment up to date')
                                             ? Colors.green
                                             : Colors.red,
                                         child: Padding(
                                           padding: const EdgeInsets.all(10.0),
                                           child: Center(
-                                            child: Text(uptoDatePayment),
+                                            child: Text(widget.uptoDatePayment),
                                           ),
                                         ),
                                       ),
@@ -460,7 +392,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               CircleAvatar(
-                                radius: 30,
+                                radius: 25,
                                 backgroundColor: kPrimaryColor,
                                 child: Icon(
                                   Icons.payment,
@@ -468,8 +400,9 @@ class _HomePageState extends State<HomePage> {
                                   size: 30,
                                 ),
                               ),
-                              SizedBox(height: 3,),
-                              
+                              SizedBox(
+                                height: 3,
+                              ),
                               Center(
                                 child: Text(
                                   'Pay',
@@ -504,6 +437,8 @@ class _HomePageState extends State<HomePage> {
                                       paymentPeriod: widget.paymentPeriod,
                                       policyNumber: widget.policyNumber,
                                       sumInsured: widget.sumInsured,
+                                      statusCodePolicyDetails:
+                                          widget.statusCodePolicyDetails,
                                       tableData: [],
                                       rowsBenefits: [],
                                       rowsSumIsured: [],
@@ -512,17 +447,23 @@ class _HomePageState extends State<HomePage> {
                                       readStatus: widget.readStatus,
                                       message: widget.message,
                                       title: widget.title,
-                                      count: widget.count);
+                                      count: widget.count,
+                                      claimApplicationActive:
+                                          widget.claimApplicationActive,
+                                      paymentAmountUptoDate:
+                                          widget.paymentAmountUptoDate,
+                                      qualifiesForCompensation:
+                                          widget.qualifiesForCompensation,
+                                      uptoDatePayment: widget.uptoDatePayment);
                                 },
                               ),
                             );
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            
                             children: [
                               CircleAvatar(
-                                radius: 30,
+                                radius: 25,
                                 backgroundColor: kPrimaryColor,
                                 child: Icon(
                                   Icons.people,
@@ -530,11 +471,11 @@ class _HomePageState extends State<HomePage> {
                                   size: 35,
                                 ),
                               ),
-                              SizedBox(height: 3,),
-                              
+                              SizedBox(
+                                height: 3,
+                              ),
                               Center(
                                 child: Text(
-                                  
                                   'Dependants',
                                   style: TextStyle(
                                       fontSize: 10, color: Colors.black),
@@ -561,18 +502,17 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               CircleAvatar(
-                                radius: 30,
+                                radius: 25,
                                 backgroundColor: kPrimaryColor,
-                              
                                 child: Icon(
                                   Icons.file_download,
                                   color: Colors.white,
                                   size: 35,
                                 ),
                               ),
-
-                              SizedBox(height: 3,),
-                              
+                              SizedBox(
+                                height: 3,
+                              ),
                               Center(
                                 child: Text(
                                   'Documents',
@@ -594,7 +534,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               CircleAvatar(
-                                radius: 30,
+                                radius: 25,
                                 backgroundColor: kPrimaryColor,
                                 child: Icon(
                                   Icons.share,
@@ -602,8 +542,9 @@ class _HomePageState extends State<HomePage> {
                                   size: 35,
                                 ),
                               ),
-                              SizedBox(height: 3,),
-                              
+                              SizedBox(
+                                height: 3,
+                              ),
                               Center(
                                 child: Text(
                                   'Share',
@@ -625,7 +566,7 @@ class _HomePageState extends State<HomePage> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     CircleAvatar(
-                                      radius: 30,
+                                      radius: 25,
                                       backgroundColor: kPrimaryColor,
                                       child: Icon(
                                         Icons.folder,
@@ -656,7 +597,7 @@ class _HomePageState extends State<HomePage> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     CircleAvatar(
-                                      radius: 30,
+                                      radius: 25,
                                       backgroundColor: kPrimaryColor,
                                       child: Icon(
                                         Icons.folder,
@@ -678,7 +619,6 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                       ),
-                      
                     ],
                   )),
                 ),

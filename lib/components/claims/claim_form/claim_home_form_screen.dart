@@ -821,6 +821,7 @@ class _ClaimFormState extends State<ClaimForm>
                                                               const EdgeInsets
                                                                   .all(10.0),
                                                           child: IntlPhoneField(
+                                                            disableLengthCheck: true,
                                                             keyboardType:
                                                                 TextInputType
                                                                     .phone,
