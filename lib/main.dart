@@ -32,6 +32,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Palette.kToDark
         
       ),
+
+      //TODO Bottom navigation to be constant. Check your bookmarks
       home: MyHomePage(),
 
       // home: AccorditionPage(),

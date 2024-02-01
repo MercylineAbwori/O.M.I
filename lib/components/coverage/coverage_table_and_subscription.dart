@@ -454,7 +454,9 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                   const SizedBox(height: 20),
                                 ],
                               ),
-                            ))),
+                            )
+                          )
+                        ),
                         const SizedBox(height: 10),
                         Card(
                           elevation: 10,

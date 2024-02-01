@@ -1,5 +1,5 @@
 class ApiConstants {
-  static String baseUrl = 'https://one-million-insurance-6601b43b6024.herokuapp.com/insurance';
+  static String baseUrl = 'https://one-million-insurances-029b1536819f.herokuapp.com/insurance';
   static String registrationEndpoint = '/createProfile';
   static String sendOTPEndpoint = '/otp';
   static String sendOTPVerify = '/verifyOtp';

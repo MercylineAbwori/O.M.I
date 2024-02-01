@@ -375,7 +375,7 @@ class _ClaimFormState extends State<ClaimForm>
           ),
         ),
         body: (widget.claimApplicationActive !=
-                    "You will be eligiable to apply for claims after 60 days of registartion") ||
+                    "You will be eligiable to apply for claims after 60 days of registartion") &&
                 (widget.qualifiesForCompensation ==
                     "Your payment is not upto date ,you are not eligiable for claim application")
             ? DefaultTabController(

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_form_review.dart';
 import 'package:one_million_app/components/claims/claim_form/claim_home_form_screen.dart';
@@ -499,7 +500,7 @@ class _ClaimHomePageState extends State<ClaimHomePage>
         ),
       ),
       floatingActionButton: (widget.claimApplicationActive !=
-                    "You will be eligiable to apply for claims after 60 days of registartion") ||
+                    "You will be eligiable to apply for claims after 60 days of registartion") &&
                 (widget.qualifiesForCompensation ==
                     "Your payment is not upto date ,you are not eligiable for claim application")
       ? 
@@ -507,6 +508,26 @@ class _ClaimHomePageState extends State<ClaimHomePage>
       FloatingActionButton(
         
         onPressed: () {
+          (widget.qualifiesForCompensation ==
+                    "Your payment is not upto date ,you are not eligiable for claim application")?
+          Fluttertoast.showToast(
+            msg: widget.claimApplicationActive,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          ):
+          Fluttertoast.showToast(
+            msg: widget.qualifiesForCompensation,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -526,7 +547,29 @@ class _ClaimHomePageState extends State<ClaimHomePage>
       ):
       FloatingActionButton(
         
-        onPressed: null,
+        onPressed:() {
+          (widget.qualifiesForCompensation ==
+                    "Your payment is not upto date ,you are not eligiable for claim application")?
+          Fluttertoast.showToast(
+            msg: widget.claimApplicationActive,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          ):
+          Fluttertoast.showToast(
+            msg: widget.qualifiesForCompensation,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+
+        },
         child: const Icon(Icons.add),
       )
     );

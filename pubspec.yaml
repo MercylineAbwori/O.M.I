@@ -73,7 +73,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/logos/O.M.I logo.png"
+  image_path: "assets/images/signup.png"
   adaptive_icon_background: "#fffffff"
   # adaptive_icon_foreground: "assets/logos/O.M.I logo.png"
 

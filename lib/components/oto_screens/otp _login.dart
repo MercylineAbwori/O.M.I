@@ -49,7 +49,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String _statusMessage;
-  num? _statusCode;
+  num? statusVerifyOTPCode;
 
   //User Details
   late String _email;
@@ -139,11 +139,15 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       var obj = jsonDecode(response.body);
 
-      var _statusCodeOTP;
+      var _statusCodeVerifyOTP;
 
       obj.forEach((key, value) {
-        _statusCodeOTP = obj["result"]["code"];
+        _statusCodeVerifyOTP = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
+      });
+
+      setState(() {
+        statusVerifyOTPCode = _statusCodeVerifyOTP;
       });
 
       // final snackBar = SnackBar(
@@ -168,7 +172,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
             fontSize: 16.0,
           );
 
-      if (_statusCodeOTP == 5000) {
+      if (statusVerifyOTPCode == 5000) {
         throw Exception('OTP verified successfully');
       } else {
         // final snackBar = SnackBar(
@@ -296,25 +300,22 @@ class _OtpLoginState extends State<OtpLoginPage> {
       final response = await http.post(url, headers: headers, body: body);
 
       // print('Responce Status Code : ${response.statusCode}');
-      log('Responce Count Body  : ${response.body}');
+      
 
       var obj = jsonDecode(response.body);
 
       var _statusCodeGetNotification;
+      var counted;
 
       obj.forEach((key, value) {
         _statusCodeGetNotification = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
-        count = obj["result"]["data"];
+        counted = obj["result"]["data"];
 
-        var objs = obj["result"]["data"];
+      });
 
-        for (var item in objs) {
-          message.add(item["message"]);
-          title.add(item["type"]);
-          readStatus.add(item["readStatus"]);
-          notificationIdList.add(item["id"]);
-        }
+      setState(() {
+        count = counted;
       });
 
       if (_statusCodeGetNotification == 5000) {
@@ -324,7 +325,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
             'Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
       }
     } catch (e) {
-      print("Error: $e");
+      print("Notification Error: $e");
       if (e is http.ClientException) {
         print("Response Body: ${e.message}");
       }
@@ -542,7 +543,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
         _buttonText = 'Loading...';
       }); // Perform the action that the button triggers here
 
-      Future.delayed(const Duration(seconds: 5), () async {
+      Future.delayed(const Duration(seconds: 10), () async {
         // if (formKey.currentState!.validate()) {
         // Form is valid, proceed with your logic here
         // For this example, we will simply print the email
@@ -577,61 +578,62 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
         await sendOTPVerify(widget.userId, otp);
 
-        if (_statusMessage == "Request processed Successfully") {
-          await getNotification(
-            widget.userId,
-          );
+        if(statusVerifyOTPCode == 5000) {
+          log('message');
+          // await getNotification(
+          //   widget.userId,
+          // );
 
-          await getNotificationCount(
-            widget.userId,
-          );
+          // await getNotificationCount(
+          //   widget.userId,
+          // );
 
-          await defaultClaim(widget.userId, widget.promotionCode);
+          // await defaultClaim(widget.userId, widget.promotionCode);
 
-          await getPolicyDetails(
-            widget.userId,
-          );
+          // await getPolicyDetails(
+          //   widget.userId,
+          // );
 
-          await getProfile(
-            widget.userId,
-          );
+          // await getProfile(
+          //   widget.userId,
+          // );
 
-          await listClaim(
-            widget.userId,
-          );
+          // await listClaim(
+          //   widget.userId,
+          // );
 
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return CommonUIPage(
-                  userId: widget.userId,
-                  name: widget.name,
-                  msisdn: widget.phoneNo,
-                  email: widget.email,
-                  readStatus: readStatus,
-                  title: title,
-                  message: message,
-                  notificationIdList: notificationIdList,
-                  promotionCode: widget.promotionCode,
-                  buttonClaimStatus: buttonStatus,
-                  nextPayment: nextPayment,
-                  paymentAmount: paymentAmount,
-                  paymentPeriod: paymentPeriod,
-                  policyNumber: policyNumber,
-                  sumInsured: sumInsured,
-                  statusCodePolicyDetails: statusCodePolicyDetails,
-                  claimApplicationActive: claimApplicationActive!,
-                  paymentAmountUptoDate: paymentAmountUptoDate!,
-                  qualifiesForCompensation: qualifiesForCompensation!,
-                  uptoDatePayment: uptoDatePayment!,
-                  count: count!,
-                  tableData: [],
-                  rowsBenefits: [],
-                  rowsSumIsured: [],
-                  claimListData: claimlistData,
-                  profilePic: profilePic);
-              // profilePic: profilePic);
-            },
-          ));
+          // Navigator.push(context, MaterialPageRoute(
+          //   builder: (context) {
+          //     return CommonUIPage(
+          //         userId: widget.userId,
+          //         name: widget.name,
+          //         msisdn: widget.phoneNo,
+          //         email: widget.email,
+          //         readStatus: readStatus,
+          //         title: title,
+          //         message: message,
+          //         notificationIdList: notificationIdList,
+          //         promotionCode: widget.promotionCode,
+          //         buttonClaimStatus: buttonStatus,
+          //         nextPayment: nextPayment,
+          //         paymentAmount: paymentAmount,
+          //         paymentPeriod: paymentPeriod,
+          //         policyNumber: policyNumber,
+          //         sumInsured: sumInsured,
+          //         statusCodePolicyDetails: statusCodePolicyDetails,
+          //         claimApplicationActive: claimApplicationActive!,
+          //         paymentAmountUptoDate: paymentAmountUptoDate!,
+          //         qualifiesForCompensation: qualifiesForCompensation!,
+          //         uptoDatePayment: uptoDatePayment!,
+          //         count: count!,
+          //         tableData: [],
+          //         rowsBenefits: [],
+          //         rowsSumIsured: [],
+          //         claimListData: claimlistData,
+          //         profilePic: profilePic);
+          //     // profilePic: profilePic);
+          //   },
+          // ));
         }
 
         Future.delayed(const Duration(seconds: 3), () {

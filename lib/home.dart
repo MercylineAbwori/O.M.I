@@ -81,6 +81,7 @@ class HomePage extends StatefulWidget {
 //policy Details Modal
 
 class _HomePageState extends State<HomePage> {
+
   // padding constants
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
@@ -620,7 +621,8 @@ class _HomePageState extends State<HomePage> {
                               ),
                       ),
                     ],
-                  )),
+                  )
+                  ),
                 ),
               ),
 
