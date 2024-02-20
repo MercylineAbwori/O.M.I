@@ -236,41 +236,40 @@ class _LoginPageState extends State<LoginPage> {
         _buttonText = 'Loading...';
       }); // Perform the action that the button triggers here
 
-      Future.delayed(const Duration(seconds: 5), () async {
+      Future.delayed(const Duration(seconds: 6), () async {
         if (formKey.currentState!.validate()) {
-        // Form is valid, proceed with your logic here
-        // For this example, we will simply print the email
+          // Form is valid, proceed with your logic here
+          // For this example, we will simply print the email
 
-        await PostLogin(phoneNo, pinController.text);
+          await PostLogin(phoneNo, pinController.text);
 
-        print('Phone: ${phoneNo}');
-        print('Pin: ${pinController.text}');
+          print('Phone: ${phoneNo}');
+          print('Pin: ${pinController.text}');
 
-        if (_statusMessage == "Request processed Successfully") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return OtpLoginPage(
-                    userId: _userId!,
-                    name: _name!,
-                    email: _email!,
-                    message: message,
-                    phoneNo: phoneController.text,
-                    pin: pinController.text,
-                    promotionCode: '',
-                    otp: _otp!);
-              },
-            ),
-          );
-        }
+          if (_statusMessage == "Request processed Successfully") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return OtpLoginPage(
+                      userId: _userId!,
+                      name: _name!,
+                      email: _email!,
+                      message: message,
+                      phoneNo: phoneController.text,
+                      pin: pinController.text,
+                      promotionCode: '',
+                      otp: _otp!);
+                },
+              ),
+            );
+          }
 
-        Future.delayed(const Duration(seconds: 3), () {
-          setState(() {
-            isLoading = false;
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
           });
-        });
-
         }
         setState(() {
           _isButtonDisabled = false;
@@ -434,9 +433,7 @@ class _LoginPageState extends State<LoginPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return ForgotPasswordPhone(
-                                  
-                                );
+                                return ForgotPasswordPhone();
                               },
                             ),
                           );

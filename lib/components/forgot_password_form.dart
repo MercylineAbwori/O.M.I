@@ -337,21 +337,12 @@ class _ForgotPasswordEnterPinState extends State<ForgotPasswordEnterPin> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _isButtonDisabled ? null : _submitForm,
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            // shape:
-                            //     MaterialStateProperty.all<RoundedRectangleBorder>(
-                            //   RoundedRectangleBorder(
-                            //     borderRadius: BorderRadius.circular(24.0),
-                            //   ),
-                            // ),
-                          ),
+                          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
                           child: Padding(
                             padding: EdgeInsets.all(14.0),
                             child: Text(
                               _buttonText,
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16, color: Colors.white),
                             ),
                           ),
                         ),

@@ -46,7 +46,6 @@ class OtpLoginPage extends StatefulWidget {
 }
 
 class _OtpLoginState extends State<OtpLoginPage> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late String _statusMessage;
   num? statusVerifyOTPCode;
@@ -162,15 +161,15 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       // ScaffoldMessenger.of(context).showSnackBar(snackBar);
       // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+      Fluttertoast.showToast(
+        msg: _statusMessage,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.grey,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
       if (statusVerifyOTPCode == 5000) {
         throw Exception('OTP verified successfully');
@@ -187,15 +186,15 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
         // ScaffoldMessenger.of(context).showSnackBar(snackBar);
         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: 'Error has occured, please check your OTP number',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        Fluttertoast.showToast(
+          msg: 'Error has occured, please check your OTP number',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception(
             'Unexpected verify OTP error occured! Status code ${response.statusCode}');
       }
@@ -292,15 +291,14 @@ class _OtpLoginState extends State<OtpLoginPage> {
   num? count;
   Future<List<NotificationModal>?> getNotificationCount(userId) async {
     try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationCountEndpoint);
+      var url = Uri.parse(
+          ApiConstants.baseUrl + ApiConstants.notificationCountEndpoint);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({"userId": userId});
 
       final response = await http.post(url, headers: headers, body: body);
 
       // print('Responce Status Code : ${response.statusCode}');
-      
 
       var obj = jsonDecode(response.body);
 
@@ -311,7 +309,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
         _statusCodeGetNotification = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
         counted = obj["result"]["data"];
-
       });
 
       setState(() {
@@ -395,9 +392,10 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       var obj = jsonDecode(response.body);
 
+      log('Policy Details: ${response.body}');
+
       obj.forEach((key, value) {
         statusCodePolicyDetails = obj["result"]["code"];
-
         paymentAmount = obj["result"]["data"]["paymentAmount"];
         paymentPeriod = obj["result"]["data"]["paymentPeriod"];
         policyNumber = obj["result"]["data"]["policyNumber"];
@@ -433,16 +431,21 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
       final response = await http.post(url, headers: headers, body: body);
 
-      print('Profile Responce Body: ${response.body}');
-
       var obj = jsonDecode(response.body);
 
       var _statusCodeGetProfile;
+      var _profilePic;
 
       obj.forEach((key, value) {
         _statusCodeGetProfile = obj["result"]["code"];
-        profilePic = obj["result"]["data"];
+        _profilePic = obj["result"]["data"]["url"];
       });
+
+      setState(() {
+        profilePic = _profilePic;
+      });
+
+      log('pic : $profilePic');
 
       if (_statusCodeGetProfile == 5000) {
         throw Exception('Get Profile successfully');
@@ -459,13 +462,12 @@ class _OtpLoginState extends State<OtpLoginPage> {
     }
   }
 
-
   String? claimApplicationActive;
   num? paymentAmountUptoDate;
   String? qualifiesForCompensation;
   String? uptoDatePayment;
 
-    //Up to date payment status Payment
+  //Up to date payment status Payment
   Future<List<UptodatePaymentStatusModal>?> uptodatePayment(
     userId,
   ) async {
@@ -481,6 +483,8 @@ class _OtpLoginState extends State<OtpLoginPage> {
       final response = await http.post(url, headers: headers, body: body);
 
       var obj = jsonDecode(response.body);
+
+      print('Uptodate Responce Body: ${response.body}');
 
       var _statusCodeUpToDatePayment;
       var _uptoDatePayment;
@@ -527,10 +531,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
       // log(e.toString());
     }
   }
-  
-
-
-
 
   bool _isButtonDisabled = false;
   String _buttonText = 'Verify';
@@ -578,62 +578,61 @@ class _OtpLoginState extends State<OtpLoginPage> {
 
         await sendOTPVerify(widget.userId, otp);
 
-        if(statusVerifyOTPCode == 5000) {
-          log('message');
-          // await getNotification(
-          //   widget.userId,
-          // );
+        if (statusVerifyOTPCode == 5000) {
+          await getNotification(
+            widget.userId,
+          );
 
-          // await getNotificationCount(
-          //   widget.userId,
-          // );
+          await getNotificationCount(
+            widget.userId,
+          );
 
-          // await defaultClaim(widget.userId, widget.promotionCode);
+          await defaultClaim(widget.userId, widget.promotionCode);
 
-          // await getPolicyDetails(
-          //   widget.userId,
-          // );
+          await getPolicyDetails(
+            widget.userId,
+          );
 
-          // await getProfile(
-          //   widget.userId,
-          // );
+          await getProfile(
+            widget.userId,
+          );
 
-          // await listClaim(
-          //   widget.userId,
-          // );
+          await listClaim(
+            widget.userId,
+          );
 
-          // Navigator.push(context, MaterialPageRoute(
-          //   builder: (context) {
-          //     return CommonUIPage(
-          //         userId: widget.userId,
-          //         name: widget.name,
-          //         msisdn: widget.phoneNo,
-          //         email: widget.email,
-          //         readStatus: readStatus,
-          //         title: title,
-          //         message: message,
-          //         notificationIdList: notificationIdList,
-          //         promotionCode: widget.promotionCode,
-          //         buttonClaimStatus: buttonStatus,
-          //         nextPayment: nextPayment,
-          //         paymentAmount: paymentAmount,
-          //         paymentPeriod: paymentPeriod,
-          //         policyNumber: policyNumber,
-          //         sumInsured: sumInsured,
-          //         statusCodePolicyDetails: statusCodePolicyDetails,
-          //         claimApplicationActive: claimApplicationActive!,
-          //         paymentAmountUptoDate: paymentAmountUptoDate!,
-          //         qualifiesForCompensation: qualifiesForCompensation!,
-          //         uptoDatePayment: uptoDatePayment!,
-          //         count: count!,
-          //         tableData: [],
-          //         rowsBenefits: [],
-          //         rowsSumIsured: [],
-          //         claimListData: claimlistData,
-          //         profilePic: profilePic);
-          //     // profilePic: profilePic);
-          //   },
-          // ));
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return CommonUIPage(
+                  userId: widget.userId,
+                  name: widget.name,
+                  msisdn: widget.phoneNo,
+                  email: widget.email,
+                  readStatus: readStatus,
+                  title: title,
+                  message: message,
+                  notificationIdList: notificationIdList,
+                  promotionCode: widget.promotionCode,
+                  buttonClaimStatus: buttonStatus,
+                  nextPayment: nextPayment,
+                  paymentAmount: paymentAmount,
+                  paymentPeriod: paymentPeriod,
+                  policyNumber: policyNumber,
+                  sumInsured: sumInsured,
+                  statusCodePolicyDetails: statusCodePolicyDetails,
+                  claimApplicationActive: claimApplicationActive!,
+                  paymentAmountUptoDate: paymentAmountUptoDate!,
+                  qualifiesForCompensation: qualifiesForCompensation!,
+                  uptoDatePayment: uptoDatePayment!,
+                  count: count!,
+                  tableData: [],
+                  rowsBenefits: [],
+                  rowsSumIsured: [],
+                  claimListData: claimlistData,
+                  profilePic: profilePic);
+              // profilePic: profilePic);
+            },
+          ));
         }
 
         Future.delayed(const Duration(seconds: 3), () {
@@ -643,15 +642,15 @@ class _OtpLoginState extends State<OtpLoginPage> {
         });
 
         // Show a simple toast message
-          Fluttertoast.showToast(
-            msg: _statusMessage,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         // }
         setState(() {
           _isButtonDisabled = false;
@@ -738,8 +737,6 @@ class _OtpLoginState extends State<OtpLoginPage> {
                 ),
                 child: Column(
                   children: [
-                    
-
                     // TODO
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

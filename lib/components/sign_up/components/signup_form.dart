@@ -351,13 +351,12 @@ class _SignUpFormState extends State<SignUpForm> {
                 );
               },
             ));
-            }
-            setState(() {
-              _isButtonDisabled = false;
-              _buttonText = 'Sign Up';
-            });
           }
-        
+          setState(() {
+            _isButtonDisabled = false;
+            _buttonText = 'Sign Up';
+          });
+        }
       });
     }
   }
@@ -536,7 +535,7 @@ class _SignUpFormState extends State<SignUpForm> {
                             },
                             validator: (value) =>
                                 value == null ? "* Required" : null,
-                            items: <String>['Female', 'Male']
+                            items: <String>['female', 'male']
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
