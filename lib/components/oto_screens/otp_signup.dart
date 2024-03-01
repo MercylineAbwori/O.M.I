@@ -348,18 +348,15 @@ class _OtpSignState extends State<OtpSignPage> {
                           padding: EdgeInsets.all(14.0),
                           child: Text(
                             _buttonText,
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                            color: kPrimaryWhiteColor
+                            
+                            ),
                           ),
                         ),
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          // shape:
-                          //     MaterialStateProperty.all<RoundedRectangleBorder>(
-                          //   RoundedRectangleBorder(
-                          //     borderRadius: BorderRadius.circular(24.0),
-                          //   ),
-                          // ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPrimaryColor,
                         ),
                       ),
                     )

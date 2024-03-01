@@ -276,12 +276,15 @@ class _OtpState extends State<OtpPage> {
                           padding: EdgeInsets.all(14.0),
                           child: Text(
                             _buttonText,
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                            color: kPrimaryWhiteColor
+                            
+                            ),
                           ),
                         ),
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPrimaryColor,
                         ),
                       ),
                     )

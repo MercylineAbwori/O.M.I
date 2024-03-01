@@ -453,11 +453,13 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _isButtonDisabled ? null : _submitForm,
                   child: Text(
                     _buttonText,
+                    style: TextStyle(color: kPrimaryWhiteColor),
                   ),
                 ),
               ),
               const SizedBox(height: defaultPadding),
               AlreadyHaveAnAccountCheck(
+                login: true,
                 press: () {
                   Navigator.push(
                     context,

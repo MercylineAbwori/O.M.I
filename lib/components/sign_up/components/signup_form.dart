@@ -749,9 +749,11 @@ class _SignUpFormState extends State<SignUpForm> {
                         height: 50,
                         width: 250,
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
                           onPressed: _isButtonDisabled ? null : _submitForm,
                           child: Text(
                             _buttonText,
+                            style: TextStyle(color: kPrimaryWhiteColor),
                           ),
                         ),
                       ),
