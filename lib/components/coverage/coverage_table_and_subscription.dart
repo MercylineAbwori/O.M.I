@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 import 'package:badges/badges.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:badges/badges.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class CoverageTablePage extends StatefulWidget {
   final num userId;
@@ -115,6 +118,10 @@ class _CoverageTableState extends State<CoverageTablePage> {
     paymentAmount,
   ) async {
     try {
+      log("Sum Insured : $sumInsured");
+      log("userId : $userId");
+      log("payment Period: $paymentPeriod");
+      log("payment amount: $paymentAmount");
       var url = Uri.parse(
           ApiConstants.baseUrl + ApiConstants.coverageSelectionEndpoint);
       final headers = {'Content-Type': 'application/json'};
@@ -140,10 +147,30 @@ class _CoverageTableState extends State<CoverageTablePage> {
       });
 
       if (_statusCodeSubscription == 5000) {
+        log('Responce Body : ${response.body}');
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception('Subscribed successfully');
       } else {
+        log('Responce Body : ${response.body}');
+        Fluttertoast.showToast(
+          msg: _statusMessage,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         throw Exception(
-            'Unexpected Subscribed error occured! Status code ${response.statusCode}');
+            'Unexpected Subscribed error occured! Status code ${_statusCodeSubscription}');
       }
     } catch (e) {
       print("Error: $e");
@@ -267,7 +294,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                     message: widget.message,
                                     notificationListId:
                                         widget.notificationListId,
-                                        count: widget.count,
+                                    count: widget.count,
                                   );
                                 },
                               ),
@@ -289,13 +316,13 @@ class _CoverageTableState extends State<CoverageTablePage> {
                             MaterialPageRoute(
                               builder: (context) {
                                 return NotificationPage(
-                                  userId: widget.userId,
-                                  readStatus: widget.readStatus,
-                                  title: widget.title,
-                                  message: widget.message,
-                                  notificationListId: widget.notificationListId,
-                                  count: widget.count
-                                );
+                                    userId: widget.userId,
+                                    readStatus: widget.readStatus,
+                                    title: widget.title,
+                                    message: widget.message,
+                                    notificationListId:
+                                        widget.notificationListId,
+                                    count: widget.count);
                               },
                             ),
                           );
@@ -393,7 +420,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                           widget.readStatus,
                                                       notificationIdList: widget
                                                           .notificationListId,
-                                                          count: widget.count,
+                                                      count: widget.count,
                                                     )));
                                       },
                                       child: Text(
@@ -454,9 +481,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                   const SizedBox(height: 20),
                                 ],
                               ),
-                            )
-                          )
-                        ),
+                            ))),
                         const SizedBox(height: 10),
                         Card(
                           elevation: 10,
@@ -688,11 +713,11 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                 //           FontWeight.bold),
                                                 // ),
                                                 child: Text(
-                                                    'Weekly Premium',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
+                                                  'Weekly Premium',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
                                                 padding:
                                                     const EdgeInsets.all(12),
                                               ),
@@ -773,11 +798,11 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                 //           FontWeight.bold),
                                                 // ),
                                                 child: Text(
-                                                    'Daily Premium',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
+                                                  'Daily Premium',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
                                                 padding:
                                                     const EdgeInsets.all(12),
                                               ),
@@ -785,14 +810,14 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                                 height: 12,
                                               ),
                                               Container(
-                                                  child: Text(
-                                                    'Ksh ${(widget.dailyPremium).toString()}',
-                                                    style: TextStyle(
-                                                        color: kPrimaryColor,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
+                                                child: Text(
+                                                  'Ksh ${(widget.dailyPremium).toString()}',
+                                                  style: TextStyle(
+                                                      color: kPrimaryColor,
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                                 ),
+                                              ),
                                             ],
                                           ),
                                         )

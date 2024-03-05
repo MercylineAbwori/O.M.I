@@ -128,7 +128,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       title: widget.message,
                       message: widget.message,
                       readStatus: widget.message,
-                      sumInsured: sumInsured,
+                      sumInsured: int.parse(SumInsured),
                       notificationListId: widget.notificationIdList,
                       count: widget.count,
                     )),

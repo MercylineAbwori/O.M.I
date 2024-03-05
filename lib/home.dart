@@ -95,6 +95,8 @@ class _HomePageState extends State<HomePage> {
   bool? checkboxValue = false;
   bool? checkedValue = false;
 
+  int itemCount = 0;
+
   // This function is triggered when a checkbox is checked or unchecked
   Future<void> _itemChange(num notificationId) async {
     await ApiService().sendMarkAsRead(widget.userId, notificationId);
@@ -111,7 +113,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    setState(() {});
+    setState(() {
+      itemCount = widget.title.length > 5 ? 5 : widget.title.length;
+    });
+
+    
   }
 
   late bool _showCartBadge;
@@ -239,21 +245,23 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Hello " + widget.userName,
+                              "Welcome, ",
                               style: const TextStyle(
                                   fontSize: 20,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 5),
-                            const Text(
-                              'Happy to see you back! ',
+                            Text(
+                              widget.userName,
+                              style: const TextStyle(
+                                  fontSize: 15,),
                               // style: GoogleFonts.bebasNeue(fontSize: 72),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 20),
                       Center(
                         child: Container(
                           child: Column(
@@ -278,6 +286,7 @@ class _HomePageState extends State<HomePage> {
                                       },
                                       child: Card(
                                         elevation: 5,
+                                        
                                         shadowColor: Colors.black,
                                         color: (widget.uptoDatePayment ==
                                                 'payment up to date')
@@ -715,7 +724,7 @@ class _HomePageState extends State<HomePage> {
                                     ListView.separated(
                                       shrinkWrap: true,
                                       padding: const EdgeInsets.all(8),
-                                      itemCount: 5,
+                                      itemCount: itemCount,
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Card(

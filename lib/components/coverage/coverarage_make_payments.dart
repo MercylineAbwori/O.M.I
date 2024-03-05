@@ -84,12 +84,16 @@ class _MakePaymentsState extends State<MakePayments> {
     phoneNo,
   ) async {
     try {
+      
+
       var url =
           Uri.parse(ApiConstants.baseUrl + ApiConstants.mpesaPaymentEndpoint);
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(
-        
-          {"amount": (amount).toString(), "userId": userId, "phoneNumber": phoneNo});
+      final body = jsonEncode({
+        "amount": (amount).toString(),
+        "userId": userId,
+        "phoneNumber": phoneNo
+      });
 
       final response = await http.post(url, headers: headers, body: body);
 
@@ -172,7 +176,6 @@ class _MakePaymentsState extends State<MakePayments> {
             isLoading = false;
           });
         });
-        
 
         // final snackBar = SnackBar(
         //   content: Text(_statusMessage),
