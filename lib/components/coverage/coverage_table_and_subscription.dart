@@ -85,6 +85,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
   String? dropdownValue;
 
   late String _statusMessage;
+  late num _statusCode;
 
   //Rows from back
 
@@ -144,6 +145,10 @@ class _CoverageTableState extends State<CoverageTablePage> {
       obj.forEach((key, value) {
         _statusCodeSubscription = obj["result"]["code"];
         _statusMessage = obj["result"]["message"];
+      });
+
+      setState(() {
+        _statusCode = _statusCodeSubscription;
       });
 
       if (_statusCodeSubscription == 5000) {
@@ -507,8 +512,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                           'Annualy',
                                           widget.annualPremium);
 
-                                      if (_statusMessage ==
-                                          "Request processed Successfully") {
+                                      if (_statusCode == 5000) {
                                         Navigator.push(context,
                                             MaterialPageRoute(
                                           builder: (context) {
@@ -586,8 +590,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                           'Monthly',
                                           widget.monthlyPremium);
 
-                                      if (_statusMessage ==
-                                          "Request processed Successfully") {
+                                      if (_statusCode == 5000) {
                                         Navigator.push(context,
                                             MaterialPageRoute(
                                           builder: (context) {
@@ -665,8 +668,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                           'Weekly',
                                           widget.weeklyPremium);
 
-                                      if (_statusMessage ==
-                                          "Request processed Successfully") {
+                                      if (_statusCode == 5000) {
                                         Navigator.push(context,
                                             MaterialPageRoute(
                                           builder: (context) {
@@ -750,8 +752,7 @@ class _CoverageTableState extends State<CoverageTablePage> {
                                           'Daily',
                                           widget.dailyPremium);
 
-                                      if (_statusMessage ==
-                                          "Request processed Successfully") {
+                                      if (_statusCode == 5000) {
                                         Navigator.push(context,
                                             MaterialPageRoute(
                                           builder: (context) {

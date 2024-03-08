@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:one_million_app/common_ui.dart';
 import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
@@ -81,6 +82,9 @@ class _OtpLoginState extends State<OtpLoginPage> {
   late String _statusMessageother = '';
   num? _statusCodeother;
   late String otp;
+
+  String? _firstMessage;
+  String? _firstTitle;
 
 //OTP
   Future<List<UserRegistrationModal>?> sendOTP(_msisdn) async {
@@ -273,7 +277,13 @@ class _OtpLoginState extends State<OtpLoginPage> {
         }
       });
 
+      setState(() {
+        _firstTitle = title[0];
+        _firstMessage = message[0];
+      });
+
       if (_statusCodeGetNotification == 5000) {
+        showNotification();
         throw Exception('Notification message retrieved successfully');
       } else {
         throw Exception(
@@ -615,7 +625,7 @@ class _OtpLoginState extends State<OtpLoginPage> {
                   promotionCode: widget.promotionCode,
                   buttonClaimStatus: buttonStatus,
                   nextPayment: nextPayment,
-                  paymentAmount: paymentAmount,
+                  paymentAmount: paymentAmountUptoDate!,
                   paymentPeriod: paymentPeriod,
                   policyNumber: policyNumber,
                   sumInsured: sumInsured,
@@ -755,17 +765,13 @@ class _OtpLoginState extends State<OtpLoginPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        
                         onPressed: _isButtonDisabled ? null : _submitForm,
                         child: Padding(
                           padding: EdgeInsets.all(14.0),
                           child: Text(
                             _buttonText,
                             style: TextStyle(
-                              fontSize: 16,
-                            color: kPrimaryWhiteColor
-                            
-                            ),
+                                fontSize: 16, color: kPrimaryWhiteColor),
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -799,6 +805,47 @@ class _OtpLoginState extends State<OtpLoginPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  showNotification() async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    // const IOSInitializationSettings initializationSettingsIOS =
+    //     IOSInitializationSettings(
+    //   requestSoundPermission: false,
+    //   requestBadgePermission: false,
+    //   requestAlertPermission: false,
+    // );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      // iOS: initializationSettingsIOS,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    AndroidNotificationChannel channel = const AndroidNotificationChannel(
+      'high channel',
+      'Very important notification!!',
+      description: 'the first notification',
+      importance: Importance.max,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      1,
+      _firstTitle,
+      _firstMessage,
+      NotificationDetails(
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description),
       ),
     );
   }

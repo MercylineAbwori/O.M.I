@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
 import 'package:one_million_app/shared/constants.dart';
 
@@ -9,9 +10,12 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState(); 
 } 
 class _MyHomePageState extends State<MyHomePage> { 
+
+
   @override 
   void initState() { 
     super.initState(); 
+    // checkForUpdate();
     Timer(Duration(seconds: 3), 
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
@@ -21,6 +25,28 @@ class _MyHomePageState extends State<MyHomePage> {
       ) 
     ); 
   } 
+
+  // Future<void> checkForUpdate() async {
+  //   print('checking for Update');
+  //   InAppUpdate.checkForUpdate().then((info) {
+  //     setState(() {
+  //       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+  //         print('update available');
+  //         update();
+  //       }
+  //     });
+  //   }).catchError((e) {
+  //     print(e.toString());
+  //   });
+  // }
+
+  // void update() async {
+  //   print('Updating');
+  //   await InAppUpdate.startFlexibleUpdate();
+  //   InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
+  //     print(e.toString());
+  //   });
+  // }
   @override 
   Widget build(BuildContext context) { 
     return Scaffold( 
