@@ -39,56 +39,55 @@ class PolicyDetailsListNotifier extends StateNotifier<policyDetailsModel> {
 
     log("Data : ${_data}");
 
-    var createdAt = _data.map((result) => result["createdAt"]).toList();
-    var dependants = _data.map((result) => result["dependants"]).toList();
-    var id = _data.map((result) => result["id"]).toList();
-    var paymentAmount = _data.map((result) => result["paymentAmount"]).toList();
-    var paymentPeriod = _data.map((result) => result["paymentPeriod"]).toList();
-    var policyNumber = _data.map((result) => result["policyNumber"]).toList();
-    var sumInsured = _data.map((result) => result["sumInsured"]).toList();
-    var updatedAt = _data.map((result) => result["updatedAt"]).toList();
+    var createdAt = _data["createdAt"];
+    var dependants = _data["dependants"];
+    var id = _data["id"];
+    var paymentAmount = _data["paymentAmount"];
+    var paymentPeriod = _data["paymentPeriod"];
+    var policyNumber = _data["policyNumber"];
+    var sumInsured = _data["sumInsured"];
+    var updatedAt = _data["updatedAt"];
 
-    //userDetails:
+   // userDetails:
 
     var userDetailscreatedAt =
-        _data.map((result) => result["userDetails"]["createdAt"]).toList();
+        _data["userDetails"]["createdAt"];
     var userDetailsemail =
-        _data.map((result) => result["userDetails"]["email"]).toList();
+        _data["userDetails"]["email"];
     var userDetailsgender =
-        _data.map((result) => result["userDetails"]["gender"]).toList();
+        _data["userDetails"]["gender"];
     var userDetailsmsisdn =
-        _data.map((result) => result["userDetails"]["msisdn"]).toList();
+        _data["userDetails"]["msisdn"];
     var userDetailsname =
-        _data.map((result) => result["userDetails"]["name"]).toList();
+        _data["userDetails"]["name"];
     var userDetailspin =
-        _data.map((result) => result["userDetails"]["pin"]).toList();
+        _data["userDetails"]["pin"];
     var userDetailsupdatedAt =
-        _data.map((result) => result["userDetails"]["updatedAt"]).toList();
+        _data["userDetails"]["updatedAt"];
     var userDetailsuserId =
-        _data.map((result) => result["userDetails"]["userId"]).toList();
+        _data["userDetails"]["userId"];
 
-    for (var i = 0; i < _data.length; i++) {
       loadedItems.add(policyDetailsItem(
-          createdAt: createdAt[i],
-          dependants: dependants[i],
-          id: id[i],
-          paymentAmount: paymentAmount[i],
-          paymentPeriod: paymentPeriod[i],
-          policyNumber: policyNumber[i],
-          sumInsured: sumInsured[i],
-          updatedAt: updatedAt[i],
+          createdAt: createdAt,
+          dependants: dependants,
+          id: id,
+          paymentAmount: paymentAmount,
+          paymentPeriod: paymentPeriod,
+          policyNumber: policyNumber,
+          sumInsured: sumInsured,
+          updatedAt: updatedAt,
 
           //userDetails:
 
-          userDetailscreatedAt: userDetailscreatedAt[i],
-          userDetailsemail: userDetailsemail[i],
-          userDetailsgender: userDetailsgender[i],
-          userDetailsmsisdn: userDetailsmsisdn[i],
-          userDetailsname: userDetailsname[i],
-          userDetailspin: userDetailspin[i],
-          userDetailsupdatedAt: userDetailsupdatedAt[i],
-          userDetailsuserId: userDetailsuserId[i]));
-    }
+          userDetailscreatedAt: userDetailscreatedAt,
+          userDetailsemail: userDetailsemail,
+          userDetailsgender: userDetailsgender,
+          userDetailsmsisdn: userDetailsmsisdn,
+          userDetailsname: userDetailsname,
+          userDetailspin: userDetailspin,
+          userDetailsupdatedAt: userDetailsupdatedAt,
+          userDetailsuserId: userDetailsuserId));
+    
 
     addPolicyDetailsItems(loadedItems);
   }

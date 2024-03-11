@@ -40,7 +40,7 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
     passwordVisibleConfirmPin = true;
   }
 
-  late String _statusMessage;
+  // late String _statusMessage;
   num? statusCode;
 
   Future<void> loadStatusCode() async {
@@ -52,8 +52,29 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
       });
     }
   }
-  late String _otp;
-  late num _userId;
+
+  num? userId;
+  String? name;
+  String? email;
+  String? phone_no;
+  String? profilePic;
+
+  loadUserData() async {
+    var _userId = await LocalStorage().getUserRegNo();
+    var _name = await LocalStorage().getUserName();
+    var _email = await LocalStorage().getEmail();
+    var _phone_no = await LocalStorage().getPhoneNo();
+    var _profilePic = await LocalStorage().getProfilePicture();
+    if (_userId != null) {
+      setState(() {
+        userId = _userId;
+        name = _name;
+        email = _email;
+        phone_no = _phone_no;
+        profilePic = _profilePic;
+      });
+    }
+  }
 
   String? phoneNo;
 
@@ -77,6 +98,7 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
 
         await ApiService().sendOTP(phoneNo);
         await loadStatusCode();
+        await loadUserData();
 
         if (statusCode != null) {
             if (statusCode == 5000) {
@@ -84,8 +106,7 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
                 builder: (context) {
                   return OtpPage(
                     phone: phoneNo!,
-                    userId: _userId,
-                    otp: _otp,
+                    userId: userId!,
                   );
                 }
               ));
@@ -110,15 +131,15 @@ class _ForgotPasswordPhoneState extends State<ForgotPasswordPhone> {
         });
 
         // Show a simple toast message
-        Fluttertoast.showToast(
-          msg: _statusMessage,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+        // Fluttertoast.showToast(
+        //   msg: _statusMessage,
+        //   toastLength: Toast.LENGTH_SHORT,
+        //   gravity: ToastGravity.BOTTOM,
+        //   timeInSecForIosWeb: 1,
+        //   backgroundColor: Colors.grey,
+        //   textColor: Colors.white,
+        //   fontSize: 16.0,
+        // );
         // }
         setState(() {
           _isButtonDisabled = false;

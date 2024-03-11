@@ -17,12 +17,10 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 class OtpPage extends StatefulWidget {
   final String phone;
   final num userId;
-  final String otp;
 
   const OtpPage({
     super.key,
     required this.phone,
-    required this.otp,
     required this.userId
   });
 

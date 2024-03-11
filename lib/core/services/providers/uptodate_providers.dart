@@ -39,12 +39,10 @@ class UpToDateListNotifier extends StateNotifier<upToDateListModel> {
 
     log("Data UpToDate : $_data");
 
-    var claimApplicationActive =
-        _data.map((result) => result["claimApplicationActive"]);
-    var paymentAmount = _data.map((result) => result["paymentAmount"]);
-    var qualifiesForCompensation =
-        _data.map((result) => result["qualifiesForCompensation"]);
-    var uptoDatePayment = _data.map((result) => result["uptoDatePayment"]);
+    var claimApplicationActive = _data["claimApplicationActive"];
+    var paymentAmount = _data["paymentAmount"];
+    var qualifiesForCompensation = _data["qualifiesForCompensation"];
+    var uptoDatePayment = _data["uptoDatePayment"];
 
     loadedItems.add(upToDateListItem(
         claimApplicationActive: claimApplicationActive,

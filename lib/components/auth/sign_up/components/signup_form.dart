@@ -43,6 +43,7 @@ class SignUpForm extends StatefulWidget {
 class _SignUpFormState extends State<SignUpForm> {
   bool _isButtonDisabled = false;
   String _buttonText = 'Sign Up';
+  bool isLoading = false;
 
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
@@ -98,7 +99,6 @@ class _SignUpFormState extends State<SignUpForm> {
   num? statusCode;
 
   num userId = 1;
-  late String otp;
   late String _msisdn;
 
   late String promotionCode = '';
@@ -165,12 +165,11 @@ class _SignUpFormState extends State<SignUpForm> {
                       pin: pinController.text,
                       Confirm: pinConfirmController.text,
                       promotionCode: promotionCodeController.text,
-                      otp: (otp).toString(),
                     );
                   },
                 ));
               }
-            } else {
+        } else {
               QuickAlert.show(
                   context: context,
                   type: QuickAlertType.error,
@@ -181,13 +180,18 @@ class _SignUpFormState extends State<SignUpForm> {
                   });
               Navigator.pop(context);
           }
+          Future.delayed(const Duration(seconds: 3), () {
+            setState(() {
+              isLoading = false;
+            });
+          });
+        }
 
           
           setState(() {
             _isButtonDisabled = false;
             _buttonText = 'Sign Up';
           });
-        }
       });
     }
   }
@@ -513,9 +517,9 @@ class _SignUpFormState extends State<SignUpForm> {
                                 _pinErrorText = "* Required";
                               });
                             }
-                            // else if (value.length < 4) {
-                            //   _pinErrorText = "Password should be atleast 4 characters";
-                            // }
+                            else if (value.length < 4) {
+                              _pinErrorText = "Password should be atleast 4 characters";
+                            }
                             else if (value.length > 4) {
                               setState(() {
                                 _pinErrorText =

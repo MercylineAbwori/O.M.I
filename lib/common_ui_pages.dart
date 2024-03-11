@@ -45,7 +45,10 @@ class _CommonUIPageState extends ConsumerState<CommonUIPage> {
   @override
   void initState() {
     super.initState();
-    bodywidgets = DefaultPage();
+    bodywidgets = DefaultList(userId: widget.userId,
+                    name: widget.name,
+                    email: widget.email,
+                    phoneNo: widget.phoneNo,);
 
     // // Reload
     ref.read(notificationCountListProvider.notifier).fetchNotificationCount();
@@ -108,12 +111,12 @@ class _CommonUIPageState extends ConsumerState<CommonUIPage> {
               leading: const Icon(Icons.home_max),
               title: const Text('Home '),
               onTap: () {
-                // setState(()
-                //   // Navigator.pop(context);
-                //   bodywidgets = SalesSummaryList();
-                // });
                 setState(() {
-                  bodywidgets = DefaultPage();
+                  bodywidgets = DefaultList(userId: widget.userId,
+                    name: widget.name,
+                    email: widget.email,
+                    phoneNo: widget.phoneNo,);
+                  Navigator.pop(context); 
                 });
               },
             ),
@@ -131,6 +134,7 @@ class _CommonUIPageState extends ConsumerState<CommonUIPage> {
               onTap: () {
                 setState(() {
                   bodywidgets = NotificationList();
+                  Navigator.pop(context); 
                 });
               },
             ),
@@ -148,6 +152,7 @@ class _CommonUIPageState extends ConsumerState<CommonUIPage> {
               onTap: () {
                 setState(() {
                   bodywidgets = ClaimList();
+                  Navigator.pop(context); 
                 });
               },
             ),
@@ -187,6 +192,7 @@ class _CommonUIPageState extends ConsumerState<CommonUIPage> {
                     email: widget.email,
                     phoneNo: widget.phoneNo,
                   );
+                  Navigator.pop(context); 
                 });
               },
             ),

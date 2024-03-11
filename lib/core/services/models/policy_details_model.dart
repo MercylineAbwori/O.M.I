@@ -26,7 +26,7 @@ class policyDetailsItem {
   final num id;
   final num paymentAmount;
   final String paymentPeriod;
-  final num policyNumber;
+  final String policyNumber;
   final num sumInsured;
   final String updatedAt;
 

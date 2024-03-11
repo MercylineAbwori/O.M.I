@@ -24,7 +24,6 @@ class OtpSignPage extends StatefulWidget {
   final String pin;
   final String Confirm;
   final String promotionCode;
-  final String otp;
 
   const OtpSignPage(
       {super.key,
@@ -36,8 +35,7 @@ class OtpSignPage extends StatefulWidget {
       required this.gender,
       required this.pin,
       required this.Confirm,
-      required this.promotionCode,
-      required this.otp});
+      required this.promotionCode});
 
   @override
   State<OtpSignPage> createState() => _OtpSignState();
