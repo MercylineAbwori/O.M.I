@@ -4,12 +4,10 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:one_million_app/components/coverage/calculator_page.dart';
-import 'package:one_million_app/components/coverage/coverarage_make_payments.dart';
+import 'package:one_million_app/components/coverage/calculator_form.dart';
+import 'package:one_million_app/components/coverage/coverage_make_payments.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/policy_details.dart';
-import 'package:one_million_app/core/model/uptodate_payment_status.dart';
 
 import 'package:one_million_app/shared/constants.dart';
 
@@ -41,29 +39,29 @@ class CoveragePage extends StatefulWidget {
   final num sumInsured;
   final num statusCodePolicyDetails;
 
-  CoveragePage(
-      {Key? key,
-      required this.userId,
-      required this.userName,
-      required this.phone,
-      required this.email,
-      required this.tableData,
-      required this.message,
-      required this.title,
-      required this.readStatus,
-      required this.notificationIdList,
-      required this.count,
-      required this.claimApplicationActive,
-      required this.paymentAmountUptoDate,
-      required this.qualifiesForCompensation,
-      required this.uptoDatePayment,
-      required this.nextPayment,
-      required this.paymentAmount,
-      required this.paymentPeriod,
-      required this.policyNumber,
-      required this.sumInsured,
-      required this.statusCodePolicyDetails,})
-      : super(key: key);
+  CoveragePage({
+    Key? key,
+    required this.userId,
+    required this.userName,
+    required this.phone,
+    required this.email,
+    required this.tableData,
+    required this.message,
+    required this.title,
+    required this.readStatus,
+    required this.notificationIdList,
+    required this.count,
+    required this.claimApplicationActive,
+    required this.paymentAmountUptoDate,
+    required this.qualifiesForCompensation,
+    required this.uptoDatePayment,
+    required this.nextPayment,
+    required this.paymentAmount,
+    required this.paymentPeriod,
+    required this.policyNumber,
+    required this.sumInsured,
+    required this.statusCodePolicyDetails,
+  }) : super(key: key);
 
   @override
   State<CoveragePage> createState() => _CoverageState();
@@ -123,18 +121,11 @@ class _CoverageState extends State<CoveragePage> {
     'Daily',
   ];
 
-  
-
-
-  
   // Policy Details
 
-  
   @override
   void initState() {
     super.initState();
-
-  
   }
 
   @override
@@ -184,15 +175,7 @@ class _CoverageState extends State<CoveragePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return NotificationPage(
-                                      userId: widget.userId,
-                                      readStatus: widget.readStatus,
-                                      title: widget.title,
-                                      message: widget.message,
-                                      notificationListId:
-                                          widget.notificationIdList,
-                                      count: widget.count,
-                                    );
+                                    return NotificationList();
                                   },
                                 ),
                               );
@@ -212,15 +195,7 @@ class _CoverageState extends State<CoveragePage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return NotificationPage(
-                                    userId: widget.userId,
-                                    readStatus: widget.readStatus,
-                                    title: widget.title,
-                                    message: widget.message,
-                                    notificationListId:
-                                        widget.notificationIdList,
-                                    count: widget.count,
-                                  );
+                                  return NotificationList();
                                 },
                               ),
                             );
@@ -283,7 +258,8 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              (widget.paymentAmountUptoDate).toString(),
+                                              (widget.paymentAmountUptoDate)
+                                                  .toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -364,8 +340,8 @@ class _CoverageState extends State<CoveragePage> {
                                                     builder: (context) =>
                                                         MakePayments(
                                                           userId: widget.userId,
-                                                          premiumSelected:
-                                                              widget.paymentAmountUptoDate,
+                                                          premiumSelected: widget
+                                                              .paymentAmountUptoDate,
                                                         )));
                                           },
                                           child: Card(
@@ -379,7 +355,8 @@ class _CoverageState extends State<CoveragePage> {
                                                 padding:
                                                     const EdgeInsets.all(10.0),
                                                 child: Center(
-                                                  child: Text(widget.uptoDatePayment),
+                                                  child: Text(
+                                                      widget.uptoDatePayment),
                                                 ),
                                               )),
                                         ),

@@ -15,7 +15,7 @@ class ApiConstants {
 
 
   static String beneficiaryEndpoint = '/beneficiary';
-static String beneficiaryLimitEndpoint = '/increaseBeneficiaryLimit';
+  static String beneficiaryLimitEndpoint = '/increaseBeneficiaryLimit';
 
   static String uploadDocumentEndpoint = '/uploadDocument';
   static String mpesaPaymentEndpoint = '/lipa-na-mpesa';

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:one_million_app/color_palette.dart';
-import 'package:one_million_app/shared/constants.dart';
+import 'package:one_million_app/shared/color_palette.dart';
 import 'package:one_million_app/splash_screen.dart';
 import 'package:responsive_framework/breakpoint.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
-import 'package:upgrader/upgrader.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 void main() async {
 
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 

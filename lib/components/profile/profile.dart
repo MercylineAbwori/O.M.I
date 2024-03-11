@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
@@ -9,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:one_million_app/components/notification/notification.dart';
+import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/fetch_document.model.dart';
-import 'package:one_million_app/core/model/notification_model.dart';
+import 'package:one_million_app/core/local_storage.dart';
 import 'package:one_million_app/core/model/upload_document_model.dart';
+import 'package:one_million_app/core/services/models/fetch_profile_model.dart';
+import 'package:one_million_app/core/services/providers/fetch_profile_providers.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -22,39 +25,32 @@ import 'package:async/async.dart';
 import 'package:badges/badges.dart';
 import 'package:badges/badges.dart' as badges;
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   final num userId;
-  final String userName;
-  final String phone;
+  final String name;
   final String email;
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
-  final List<num> notificationIdList;
-  final String profilePic;
-
-  final num count;
-
-  const ProfileScreen(
-      {Key? key,
-      required this.userId,
-      required this.userName,
-      required this.phone,
+  final String phoneNo;
+  const ProfileScreen({super.key, 
+  required this.userId,
+      required this.name,
       required this.email,
-      required this.message,
-      required this.notificationIdList,
-      required this.profilePic,
-      required this.readStatus,
-      required this.title,
-      required this.count})
-      : super(key: key);
+      required this.phoneNo,});
+
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() {
+    return _ProfileScreenState();
+  }
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final ImagePicker _picker = ImagePicker();
   File? _imageProfile;
+
+  num? count = 1;
+
+  String _data = '';
+  var _isLoading = true;
+  String? error;
 
   Future getImageProfilePicture(ImageSource source) async {
     try {
@@ -81,54 +77,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return File(imagePath).copy(image.path);
   }
 
-  Future<List<UploadFileModal>?> pickerFiles(userId, documentName, file) async {
-    try {
-      var request = http.MultipartRequest(
-          'POST',
-          Uri.parse(
-              ApiConstants.baseUrl + ApiConstants.uploadDocumentEndpoint));
 
-      // open a bytestream
-      var stream = http.ByteStream(DelegatingStream.typed(file.openRead()));
-      // get file length
-      var length = await file.length();
-
-      // multipart that takes file
-      var multipartFile = http.MultipartFile('file', stream, length,
-          filename: basename(file.path));
-
-      request.fields.addAll(
-          {"userId": json.encode(userId), "documentName": documentName});
-      // request.fields["documentName"] = documentName;
-      // request.fields["userId"] = userId.toString();
-
-      // add file to multipart
-      request.files.add(multipartFile);
-
-      var response = await request.send();
-      var responced = await http.Response.fromStream(response);
-
-      final responseData = json.decode(responced.body);
-
-      print('rESPONCE bODY : $responseData');
-
-      // log('The Request Payload : ${request.files}');
-    } on PlatformException catch (e) {
-      // log('Unsupported operation' + e.toString());
-    } catch (e) {
-      // log(e.toString());
-    }
-
-    setState(() {});
-  }
+  String? profilePic;
 
   @override
   void initState() {
     super.initState();
+
+    // // Reload shops
+    ref.read(profilePicProvider.notifier).fetchprofilePic();
   }
+
+  late profilePicModel availableData;
 
   @override
   Widget build(BuildContext context) {
+    availableData = ref.watch(profilePicProvider);
+
+    setState(() {
+      _data = availableData.profile_url;
+      _isLoading = availableData.isLoading;
+
+      profilePic = _data;
+
+      log("Profile : $profilePic");
+    });
+
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
@@ -151,72 +125,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           actions: <Widget>[
             Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            
-            child: (widget.count != 0)
-                ? badges.Badge(
-                    position: BadgePosition.topEnd(top: 0, end: 3),
-                    badgeContent: Text(
-                      (widget.count).toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.message,
-                        color: kPrimaryColor,
-                        size: 30,
-                      ),
-                      // the method which is called
-                      // when button is pressed
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return NotificationPage(
-                                userId: widget.userId,
-                                readStatus: widget.readStatus,
-                                title: widget.title,
-                                message: widget.message,
-                                notificationListId: widget.notificationIdList,
-                                count: widget.count,
-
-                              );
-                            },
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                child: (count != 0)
+                    ? badges.Badge(
+                        position: BadgePosition.topEnd(top: 0, end: 3),
+                        badgeContent: Text(
+                          (count).toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.message,
+                            color: kPrimaryColor,
+                            size: 30,
                           ),
-                        );
-                      },
-                    ),
-                  )
-                : IconButton(
-                    icon: const Icon(
-                      Icons.message,
-                      color: kPrimaryColor,
-                      size: 30,
-                    ),
-                    // the method which is called
-                    // when button is pressed
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return NotificationPage(
-                              userId: widget.userId,
-                              readStatus: widget.readStatus,
-                              title: widget.title,
-                              message: widget.message,
-                              notificationListId: widget.notificationIdList,
-                              count: widget.count,
+                          // the method which is called
+                          // when button is pressed
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return NotificationList();
+                                },
+                              ),
                             );
                           },
                         ),
-                      );
-                    },
-                  ),
-          ),
-        )
+                      )
+                    : IconButton(
+                        icon: const Icon(
+                          Icons.message,
+                          color: kPrimaryColor,
+                          size: 30,
+                        ),
+                        // the method which is called
+                        // when button is pressed
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NotificationList();
+                              },
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            )
           ]),
       body: SingleChildScrollView(
         child: Padding(
@@ -224,10 +182,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              
+
               CircleAvatar(
                 radius: 70,
-                
                 child: _imageProfile != null
                     ? Image.file(
                         _imageProfile!,
@@ -235,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 250,
                         fit: BoxFit.cover,
                       )
-                    : (widget.profilePic == '')
+                    : (profilePic == '')
                         ? Image.asset(
                             'assets/icons/profile_icons/profile.jpg',
                             width: 300,
@@ -243,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fit: BoxFit.cover,
                           )
                         : Image.network(
-                            widget.profilePic,
+                            profilePic!,
                             width: 300,
                             height: 250,
                             fit: BoxFit.cover,
@@ -273,7 +230,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Icons.camera_alt_outlined,
                             size: 20,
                             color: Colors.black,
-                          )))),
+                          )
+                        )
+                      )
+                    ),
 
               SizedBox(
                   height: 40.0,
@@ -283,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fixedSize: const Size(200, 40)),
                     onPressed: () async {
                       // await pickerFiles(widget.userId, 'Front National ID', _imageFrontId);
-                      await pickerFiles(
+                      await ApiService().pickerFiles(
                           widget.userId,
                           // 'Front National ID',
                           'profile',
@@ -295,13 +255,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fontSize: 12.0,
                       ),
                     ),
-                  )),
+                  )
+              ),
               const SizedBox(height: 20),
-              itemProfile('Name', widget.userName, CupertinoIcons.person),
+              itemProfile('Name', widget.name!, CupertinoIcons.person),
               const SizedBox(height: 10),
-              itemProfile('Phone', widget.phone, CupertinoIcons.phone),
+              itemProfile('Phone', widget.phoneNo, CupertinoIcons.phone),
               const SizedBox(height: 10),
-              itemProfile('Email', widget.email, CupertinoIcons.mail),
+              itemProfile('Email', widget.email!, CupertinoIcons.mail),
               const SizedBox(
                 height: 20,
               ),

@@ -1,799 +1,739 @@
-import 'dart:convert';
-import 'dart:developer';
+// import 'dart:convert';
+// import 'dart:developer';
 
-import 'package:badges/badges.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:one_million_app/components/beneficiary/add_beneficiary_screen.dart';
-import 'package:one_million_app/components/coverage/coverarage_make_payments.dart';
-import 'package:one_million_app/components/notification/notification.dart';
-import 'package:one_million_app/components/onbording_screens/already_have_an_account_acheck.dart';
-import 'package:one_million_app/components/profile/profile.dart';
-import 'package:one_million_app/components/upload_files/upload_files.dart';
-import 'package:one_million_app/core/constant_service.dart';
-import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/default_claim.dart';
-import 'package:one_million_app/core/model/initiate_claim.dart';
-import 'package:one_million_app/core/model/uptodate_payment_status.dart';
-import 'package:one_million_app/shared/constants.dart';
-import 'package:http/http.dart' as http;
-import 'package:badges/badges.dart' as badges;
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+// import 'package:one_million_app/components/auth/onbording_screens/already_have_an_account_acheck.dart';
+// import 'package:one_million_app/components/beneficiary/beneficiary_form_add.dart';
+// import 'package:one_million_app/components/coverage/coverage_make_payments.dart';
+// import 'package:one_million_app/components/notification/notification.dart';
+// import 'package:one_million_app/components/upload_documents/upload_documents.dart';
+// import 'package:one_million_app/core/constant_service.dart';
+// import 'package:one_million_app/core/constant_urls.dart';
+// import 'package:one_million_app/core/local_storage.dart';
+// import 'package:one_million_app/core/model/default_claim.dart';
+// import 'package:one_million_app/core/services/models/notification_model.dart';
+// import 'package:one_million_app/core/services/models/uptodate_model.dart';
+// import 'package:one_million_app/core/services/providers/notification_provider.dart';
+// import 'package:one_million_app/core/services/providers/uptodate_providers.dart';
+// import 'package:one_million_app/shared/constants.dart';
+// import 'package:http/http.dart' as http;
 
-class HomePage extends StatefulWidget {
-  final String userName;
-  final num userId;
-  final String phone;
-  final String email;
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
-  final List<num> notificationIdList;
+// class DefaultList extends ConsumerStatefulWidget {
+//   const DefaultList({super.key});
 
-  final String promotionCode;
-  final bool buttonClaimStatus;
+//   @override
+//   ConsumerState<DefaultList> createState() {
+//     return _DefaultListState();
+//   }
+// }
 
-  final String claimApplicationActive;
-  final num paymentAmountUptoDate;
-  final String qualifiesForCompensation;
-  final String uptoDatePayment;
+// class _DefaultListState extends ConsumerState<DefaultList> {
+//   List<notificationListItem> _data = [];
+//   var _isLoading = true;
+//   String? error;
 
-  final List<dynamic> claimListData;
-  final String profilePic;
+//   List<upToDateListItem> _dataUpToDate = [];
+//   var _isLoadingUpToDate = true;
+//   String? errorUpToDate;
 
-  final String nextPayment;
-  final String paymentPeriod;
-  final String policyNumber;
-  final num sumInsured;
-  final num paymentAmount;
-  final num statusCodePolicyDetails;
-  final num count;
+//   num _selectedIndex = 0;
 
-  HomePage(
-      {super.key,
-      required this.userId,
-      required this.userName,
-      required this.phone,
-      required this.email,
-      required this.title,
-      required this.message,
-      required this.readStatus,
-      required this.notificationIdList,
-      required this.uptoDatePayment,
-      required this.claimApplicationActive,
-      required this.qualifiesForCompensation,
-      required this.paymentAmountUptoDate,
-      required this.promotionCode,
-      required this.buttonClaimStatus,
-      required this.claimListData,
-      required this.nextPayment,
-      required this.paymentAmount,
-      required this.paymentPeriod,
-      required this.policyNumber,
-      required this.profilePic,
-      required this.sumInsured,
-      required this.statusCodePolicyDetails,
-      required this.count});
+//   late List<String> message = [];
+//   late List<String> title = [];
+//   late List<String> readStatus = [];
+//   late List<num> notificationIdList = [];
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+//   late notificationListModel availableData;
+//   late upToDateListModel availableUpToDate;
 
-//policy Details Modal
+//   bool buttonStatus = true;
 
-class _HomePageState extends State<HomePage> {
-  // padding constants
-  final double horizontalPadding = 40;
-  final double verticalPadding = 25;
+//   num? userId;
+//   String? name;
+//   String? email;
+//   String? phone_no;
 
-  int selectedPageIndex = 0;
+//   //default Claim
+//   Future defaultClaim(userId, promotionCode) async {
+//     try {
+//       var url = Uri.parse(
+//           ApiConstants.baseUrl + ApiConstants.defaultPolicyPayEndpoint);
+//       final headers = {'Content-Type': 'application/json'};
+//       final body =
+//           jsonEncode({"userId": userId, "promotionCode": promotionCode});
 
-  int _currentIndex = 0;
-  final List _children = [];
+//       final response = await http.post(url, headers: headers, body: body);
 
-  int count = 0;
+//       var obj = jsonDecode(response.body);
 
-  bool? checkboxValue = false;
-  bool? checkedValue = false;
+//       var _statusCodeDefaultClaim;
+//       var _statusMessage;
+//       var _buttonStatus;
 
-  int itemCount = 0;
+//       obj.forEach((key, value) {
+//         _statusCodeDefaultClaim = obj["result"]["code"];
+//         _statusMessage = obj["statusMessage"];
 
-  // This function is triggered when a checkbox is checked or unchecked
-  Future<void> _itemChange(num notificationId) async {
-    await ApiService().sendMarkAsRead(widget.userId, notificationId);
-    setState(() {});
-  }
+//         _buttonStatus = obj["result"]["data"];
+//       });
 
-  // This function is triggered when a checkbox is checked or unchecked
-  Future<void> _itemChangeMarkAll() async {
-    await ApiService().sendMarkAsAll(widget.userId);
-    setState(() {});
-  }
+//       setState(() {
+//         buttonStatus = _buttonStatus;
+//       });
 
-  @override
-  void initState() {
-    super.initState();
+//       if (_statusCodeDefaultClaim == 5000) {
+//         throw Exception('Promotion Code successfully');
+//       } else {
+//         throw Exception(
+//             'Unexpected Promotion Code error occured! Status code ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print("Error: $e");
+//       if (e is http.ClientException) {
+//         print("Response Body: ${e.message}");
+//       }
+//       // log(e.toString());
+//     }
+//   }
 
-    setState(() {
-      itemCount = widget.title.length > 5 ? 5 : widget.title.length;
-    });
+//   String promotionCode = "";
 
-    
-  }
+//   Future<void> loadUserData() async {
+//     await ApiService().defaultClaim(userId, '');
+//     var _userId = await LocalStorage().getUserRegNo();
+//     var _name = await LocalStorage().getUserName();
+//     var _email = await LocalStorage().getEmail();
+//     var _phone_no = await LocalStorage().getPhoneNo();
+//     if (_userId != null) {
+//       setState(() {
+//         userId = _userId;
+//         name = _name;
+//         email = _email;
+//         phone_no = _phone_no;
+//         log('Button Status: $buttonStatus');
+//       });
+//     }
+//   }
 
-  late bool _showCartBadge;
-  Color color = Colors.red;
-  @override
-  Widget build(BuildContext context) {
-    // print('Uptodate : ${uptoDatePayment}');
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.white, actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            child: (widget.count != 0)
-                ? badges.Badge(
-                    position: BadgePosition.topEnd(top: 0, end: 3),
-                    badgeContent: Text(
-                      (widget.count).toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.message,
-                        color: kPrimaryColor,
-                        size: 30,
-                      ),
-                      // the method which is called
-                      // when button is pressed
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return NotificationPage(
-                                userId: widget.userId,
-                                readStatus: widget.readStatus,
-                                title: widget.title,
-                                message: widget.message,
-                                notificationListId: widget.notificationIdList,
-                                count: widget.count,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : IconButton(
-                    icon: const Icon(
-                      Icons.message,
-                      color: kPrimaryColor,
-                      size: 30,
-                    ),
-                    // the method which is called
-                    // when button is pressed
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return NotificationPage(
-                              userId: widget.userId,
-                              readStatus: widget.readStatus,
-                              title: widget.title,
-                              message: widget.message,
-                              notificationListId: widget.notificationIdList,
-                              count: widget.count,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        )
-      ]
+//   String? claimApplicationActive;
+//   num? paymentAmountUptoDate;
+//   String? qualifiesForCompensation;
+//   String? uptoDatePayment;
 
-          // actions: <Widget>[
-          //   // notification icon
-          //   Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: IconButton(
-          //       iconSize: 30,
-          //       icon: const Icon(
-          //         Icons.notifications,
-          //         color: kPrimaryColor,
-          //       ),
-          //       // the method which is called
-          //       // when button is pressed
-          //       onPressed: () {
-          //         Navigator.push(
-          //           context,
-          //           MaterialPageRoute(
-          //             builder: (context) {
-          //               return NotificationPage(
-          //                 userId: widget.userId,
-          //                 readStatus: widget.readStatus,
-          //                 title: widget.title,
-          //                 message: widget.message,
-          //                 notificationListId: widget.notificationIdList,
-          //               );
-          //             },
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ],
-          ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
+//   @override
+//   void initState() {
+//     super.initState();
+//     // // Reload shops
+//     ref.read(notificationListListProvider.notifier).fetchNotificationList();
 
-              // welcome home
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Welcome, ",
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              widget.userName,
-                              style: const TextStyle(
-                                  fontSize: 15,),
-                              // style: GoogleFonts.bebasNeue(fontSize: 72),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Center(
-                        child: Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              (widget.uptoDatePayment != null &&
-                                      widget.uptoDatePayment.trim() != "")
-                                  ? TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return MakePayments(
-                                                userId: widget.userId,
-                                                premiumSelected:
-                                                    widget.paymentAmount,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: Card(
-                                        elevation: 5,
-                                        
-                                        shadowColor: Colors.black,
-                                        color: (widget.uptoDatePayment ==
-                                                'payment up to date')
-                                            ? Colors.green
-                                            : Colors.red,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Center(
-                                            child: Text(widget.uptoDatePayment),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return MakePayments(
-                                                userId: widget.userId,
-                                                premiumSelected:
-                                                    widget.paymentAmount,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      },
-                                      child: Card(
-                                        elevation: 5,
-                                        shadowColor: Colors.black,
-                                        color: Colors.red,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Center(
-                                            child: Text('Not Covered'),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+//     // // Reload shops
+//     ref.read(upToDateListProvider.notifier).fetchUpToDate();
+//   }
 
-              const SizedBox(height: 10),
+//   // late productsListModel availableData;
 
-              //Divider
+//   @override
+//   Widget build(BuildContext context) {
+//     availableData = ref.watch(notificationListListProvider);
+//     availableUpToDate = ref.watch(upToDateListProvider);
 
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),
-                child: Divider(
-                  thickness: 1,
-                  color: Color.fromARGB(255, 204, 204, 204),
-                ),
-              ),
+//     setState(() {
+//       _data = availableData.notification_list;
+//       _isLoading = availableData.isLoading;
 
-              const SizedBox(height: 20),
+//       _dataUpToDate = availableUpToDate.uptodate_data;
+//       _isLoadingUpToDate = availableUpToDate.isLoading;
 
-              //Home title
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: const Text(
-                  "Quick Actions",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+//       for (var i = 0; i < _dataUpToDate.length; i++) {
+//         claimApplicationActive = _dataUpToDate[i].claimApplicationActive;
+//         paymentAmountUptoDate = _dataUpToDate[i].paymentAmount;
+//         qualifiesForCompensation = _dataUpToDate[i].qualifiesForCompensation;
+//         uptoDatePayment = _dataUpToDate[i].uptoDatePayment;
+//       }
 
-              const SizedBox(height: 10),
+//       for (var i = 0; i < _data.length; i++) {
+//         readStatus.add(_data[i].readStatus);
+//       }
+//       ;
+//     });
 
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Card(
-                  elevation: 5,
-                  shadowColor: Colors.black,
-                  child: Center(
-                      child: GridView.count(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    primary: false,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    childAspectRatio: (280 / 280),
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return MakePayments(
-                                    userId: widget.userId,
-                                    premiumSelected: widget.paymentAmount,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CircleAvatar(
-                                radius: 25,
-                                backgroundColor: kPrimaryColor,
-                                child: Icon(
-                                  Icons.payment,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Pay',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return BeneficiaryScreen(
-                                      userId: widget.userId,
-                                      name: widget.userName,
-                                      msisdn: widget.phone,
-                                      email: widget.email,
-                                      promotionCode: widget.promotionCode,
-                                      notificationIdList:
-                                          widget.notificationIdList,
-                                      buttonClaimStatus:
-                                          widget.buttonClaimStatus,
-                                      nextPayment: widget.nextPayment,
-                                      paymentAmount: widget.paymentAmount,
-                                      paymentPeriod: widget.paymentPeriod,
-                                      policyNumber: widget.policyNumber,
-                                      sumInsured: widget.sumInsured,
-                                      statusCodePolicyDetails:
-                                          widget.statusCodePolicyDetails,
-                                      tableData: [],
-                                      rowsBenefits: [],
-                                      rowsSumIsured: [],
-                                      claimListData: widget.claimListData,
-                                      profilePic: widget.profilePic,
-                                      readStatus: widget.readStatus,
-                                      message: widget.message,
-                                      title: widget.title,
-                                      count: widget.count,
-                                      claimApplicationActive:
-                                          widget.claimApplicationActive,
-                                      paymentAmountUptoDate:
-                                          widget.paymentAmountUptoDate,
-                                      qualifiesForCompensation:
-                                          widget.qualifiesForCompensation,
-                                      uptoDatePayment: widget.uptoDatePayment);
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CircleAvatar(
-                                radius: 25,
-                                backgroundColor: kPrimaryColor,
-                                child: Icon(
-                                  Icons.people,
-                                  color: Colors.white,
-                                  size: 35,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Dependants',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return UploadFiles(userId: widget.userId);
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CircleAvatar(
-                                radius: 25,
-                                backgroundColor: kPrimaryColor,
-                                child: Icon(
-                                  Icons.file_download,
-                                  color: Colors.white,
-                                  size: 35,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Documents',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () async {
-                            await ApiService().generatePromo(widget.userId);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CircleAvatar(
-                                radius: 25,
-                                backgroundColor: kPrimaryColor,
-                                child: Icon(
-                                  Icons.share,
-                                  color: Colors.white,
-                                  size: 35,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Share',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: (widget.buttonClaimStatus == false)
-                            ? TextButton(
-                                onPressed: null,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 25,
-                                      backgroundColor: kPrimaryColor,
-                                      child: Icon(
-                                        Icons.folder,
-                                        color: Colors.white,
-                                        size: 35,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 3,
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        'Default Claims',
-                                        style: TextStyle(
-                                            fontSize: 10, color: Colors.black),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : TextButton(
-                                onPressed: () async {
-                                  await ApiService().claimDefault(
-                                      widget.userId, widget.promotionCode);
-                                },
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 25,
-                                      backgroundColor: kPrimaryColor,
-                                      child: Icon(
-                                        Icons.folder,
-                                        color: kPrimaryColor,
-                                        size: 35,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        'Default Claims',
-                                        style: TextStyle(
-                                            fontSize: 10, color: Colors.black),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      ),
-                    ],
-                  )),
-                ),
-              ),
+//     Widget content = const Center(
+//       child: Text('No data yet',
+//           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+//     );
+//     Widget contentUptoDate = const Center(
+//       child: Text('No data yet',
+//           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+//     );
 
-              const SizedBox(height: 10),
+//     if (_isLoading) {
+//       content = const Center(
+//         child: CircularProgressIndicator(),
+//       );
+//     }
 
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Recent Activities",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Colors.black,
-                      ),
-                    ),
-                    ViewAll(
-                      press: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return NotificationPage(
-                                userId: widget.userId,
-                                readStatus: widget.readStatus,
-                                title: widget.title,
-                                message: widget.message,
-                                notificationListId: widget.notificationIdList,
-                                count: widget.count,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+//     if (_isLoadingUpToDate) {
+//       contentUptoDate = const Center(
+//         child: CircularProgressIndicator(),
+//       );
+//     }
 
-              const SizedBox(height: 10),
+//     if (error != null) {
+//       content = Center(
+//         child: Text(error!),
+//       );
+//     }
 
-              Container(
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        (widget.message.isEmpty)
-                            ? const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Card(
-                                  elevation: 5,
-                                  shadowColor: Colors.black,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(40.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.info,
-                                            size: 100,
-                                            color: kPrimaryColor,
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(
-                                            'You have no activities',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
-                                            // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                          ),
-                                          SizedBox(height: 20),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    ListView.separated(
-                                      shrinkWrap: true,
-                                      padding: const EdgeInsets.all(8),
-                                      itemCount: itemCount,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Card(
-                                            color: Colors.white,
-                                            borderOnForeground: true,
-                                            elevation: 6,
-                                            child: ListTile(
-                                              leading:
-                                                  Icon(Icons.notifications),
-                                              title: Text(
-                                                widget.title[index],
-                                                style:
-                                                    (widget.readStatus[index] ==
-                                                            'Unread')
-                                                        ? TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )
-                                                        : TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                          ),
-                                              ),
-                                              subtitle: Text(
-                                                widget.message[index],
-                                                style:
-                                                    (widget.readStatus[index] ==
-                                                            'Unread')
-                                                        ? TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )
-                                                        : TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                          ),
-                                              ),
-                                              onTap: () async {
-                                                await ApiService().sendMarkAsRead(
-                                                    widget.userId,
-                                                    widget.notificationIdList[
-                                                        index]);
-                                              },
-                                            ));
-                                      },
-                                      separatorBuilder:
-                                          (BuildContext context, int index) =>
-                                              const Divider(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//     if (error != null) {
+//       contentUptoDate = Center(
+//         child: Text(error!),
+//       );
+//     }
 
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-}
+//     if (_data.isEmpty) {
+//       content = const Padding(
+//         padding: EdgeInsets.all(8.0),
+//         child: Card(
+//           elevation: 5,
+//           shadowColor: Colors.black,
+//           child: Center(
+//             child: Padding(
+//               padding: EdgeInsets.all(40.0),
+//               child: Column(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 crossAxisAlignment: CrossAxisAlignment.center,
+//                 children: [
+//                   Icon(
+//                     Icons.info,
+//                     size: 100,
+//                     color: kPrimaryColor,
+//                   ),
+//                   SizedBox(height: 20),
+//                   Text(
+//                     'You have no activities',
+//                     style: TextStyle(
+//                         fontSize: 20,
+//                         color: Colors.black,
+//                         fontWeight: FontWeight.bold),
+//                     // style: GoogleFonts.bebasNeue(fontSize: 72),
+//                   ),
+//                   SizedBox(height: 20),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ),
+//       );
+//     } else {
+//       var itemCount = _data.length > 5 ? 5 : _data.length;
+//       content = Container(
+//         child: Column(
+//           children: [
+//             SizedBox(
+//               height: 10,
+//             ),
+            
+//             ListView.separated(
+//               shrinkWrap: true,
+//               padding: const EdgeInsets.all(8),
+//               itemCount: itemCount,
+//               itemBuilder: (BuildContext context, int index) {
+//                 return Card(
+//                     color: Colors.white,
+//                     borderOnForeground: true,
+//                     elevation: 6,
+//                     child: ListTile(
+//                       leading: Icon(Icons.notifications),
+//                       title: Text(
+//                         _data[index].type,
+//                         style: (_data[index].readStatus == 'Unread')
+//                             ? TextStyle(
+//                                 fontWeight: FontWeight.bold,
+//                               )
+//                             : TextStyle(
+//                                 fontWeight: FontWeight.normal,
+//                               ),
+//                       ),
+//                       subtitle: Text(
+//                         _data[index].message,
+//                         style: (_data[index].readStatus == 'Unread')
+//                             ? TextStyle(
+//                                 fontWeight: FontWeight.bold,
+//                               )
+//                             : TextStyle(
+//                                 fontWeight: FontWeight.normal,
+//                               ),
+//                       ),
+//                       onTap: () async {
+//                         await ApiService()
+//                             .sendMarkAsRead(userId, _data[index].id);
+//                       },
+//                     ));
+//               },
+//               separatorBuilder: (BuildContext context, int index) =>
+//                   const Divider(),
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: kPrimaryColor,
+//         centerTitle: true,
+//       ),
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const SizedBox(height: 20),
+
+//               // welcome home
+//               Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 20),
+//                 child: Padding(
+//                   padding: const EdgeInsets.all(10.0),
+//                   child: Row(
+//                     children: [
+//                       Container(
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               "Welcome, ",
+//                               style: const TextStyle(
+//                                   fontSize: 20,
+//                                   color: Colors.black,
+//                                   fontWeight: FontWeight.bold),
+//                             ),
+//                             const SizedBox(height: 5),
+//                             Text(
+//                               "name!",
+//                               style: const TextStyle(
+//                                 fontSize: 15,
+//                               ),
+//                               // style: GoogleFonts.bebasNeue(fontSize: 72),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       const SizedBox(width: 20),
+//                       Center(
+//                         child: Container(
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               (uptoDatePayment != null &&
+//                                       uptoDatePayment!.trim() != "")
+//                                   ? TextButton(
+//                                       onPressed: () {
+//                                         Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                             builder: (context) {
+//                                               return MakePayments(
+//                                                 userId: userId!,
+//                                                 premiumSelected:
+//                                                     paymentAmountUptoDate!,
+//                                               );
+//                                             },
+//                                           ),
+//                                         );
+//                                       },
+//                                       child: Card(
+//                                         elevation: 5,
+//                                         shadowColor: Colors.black,
+//                                         color: (uptoDatePayment ==
+//                                                 'payment up to date')
+//                                             ? Colors.green
+//                                             : Colors.red,
+//                                         child: Padding(
+//                                           padding: const EdgeInsets.all(10.0),
+//                                           child: Center(
+//                                             child: Text(uptoDatePayment!),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     )
+//                                   : TextButton(
+//                                       onPressed: () {
+//                                         Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                             builder: (context) {
+//                                               return MakePayments(
+//                                                 userId: userId!,
+//                                                 premiumSelected: paymentAmountUptoDate!,
+//                                               );
+//                                             },
+//                                           ),
+//                                         );
+//                                       },
+//                                       child: Card(
+//                                         elevation: 5,
+//                                         shadowColor: Colors.black,
+//                                         color: Colors.red,
+//                                         child: Padding(
+//                                           padding: const EdgeInsets.all(10.0),
+//                                           child: Center(
+//                                             child: Text('Not Covered'),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     )
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+
+//               const SizedBox(height: 10),
+
+//               //Divider
+
+//               const Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 30.0),
+//                 child: Divider(
+//                   thickness: 1,
+//                   color: Color.fromARGB(255, 204, 204, 204),
+//                 ),
+//               ),
+
+//               const SizedBox(height: 20),
+
+//               //Home title
+//               Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 10),
+//                 child: const Text(
+//                   "Quick Actions",
+//                   style: TextStyle(
+//                     fontWeight: FontWeight.bold,
+//                     fontSize: 17,
+//                     color: Colors.black,
+//                   ),
+//                 ),
+//               ),
+
+//               const SizedBox(height: 10),
+
+//               Padding(
+//                 padding: EdgeInsets.all(8.0),
+//                 child: Card(
+//                   elevation: 5,
+//                   shadowColor: Colors.black,
+//                   child: Center(
+//                       child: GridView.count(
+//                     scrollDirection: Axis.vertical,
+//                     shrinkWrap: true,
+//                     primary: false,
+//                     padding: const EdgeInsets.all(20),
+//                     crossAxisSpacing: 10,
+//                     mainAxisSpacing: 10,
+//                     crossAxisCount: 3,
+//                     childAspectRatio: (280 / 280),
+//                     children: <Widget>[
+//                       Container(
+//                         padding: const EdgeInsets.all(8),
+//                         child: TextButton(
+//                           onPressed: () {
+//                             Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) {
+//                                   return MakePayments(
+//                                     userId: userId!,
+//                                     premiumSelected: paymentAmountUptoDate!,
+//                                   );
+//                                 },
+//                               ),
+//                             );
+//                           },
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.stretch,
+//                             children: [
+//                               CircleAvatar(
+//                                 radius: 25,
+//                                 backgroundColor: kPrimaryColor,
+//                                 child: Icon(
+//                                   Icons.payment,
+//                                   color: Colors.white,
+//                                   size: 30,
+//                                 ),
+//                               ),
+//                               SizedBox(
+//                                 height: 3,
+//                               ),
+//                               Center(
+//                                 child: Text(
+//                                   'Pay',
+//                                   style: TextStyle(
+//                                       fontSize: 10, color: Colors.black),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.all(8),
+//                         child: TextButton(
+//                           onPressed: () {
+//                             Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) {
+//                                   return BeneficiaryFormPage();
+//                                 },
+//                               ),
+//                             );
+//                           },
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.stretch,
+//                             children: [
+//                               CircleAvatar(
+//                                 radius: 25,
+//                                 backgroundColor: kPrimaryColor,
+//                                 child: Icon(
+//                                   Icons.people,
+//                                   color: Colors.white,
+//                                   size: 35,
+//                                 ),
+//                               ),
+//                               SizedBox(
+//                                 height: 3,
+//                               ),
+//                               Center(
+//                                 child: Text(
+//                                   'Dependants',
+//                                   style: TextStyle(
+//                                       fontSize: 10, color: Colors.black),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.all(8),
+//                         child: TextButton(
+//                           onPressed: () {
+//                             Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) {
+//                                   return UploadFiles(userId: userId!);
+//                                 },
+//                               ),
+//                             );
+//                           },
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.stretch,
+//                             children: [
+//                               CircleAvatar(
+//                                 radius: 25,
+//                                 backgroundColor: kPrimaryColor,
+//                                 child: Icon(
+//                                   Icons.file_download,
+//                                   color: Colors.white,
+//                                   size: 35,
+//                                 ),
+//                               ),
+//                               SizedBox(
+//                                 height: 3,
+//                               ),
+//                               Center(
+//                                 child: Text(
+//                                   'Documents',
+//                                   style: TextStyle(
+//                                       fontSize: 10, color: Colors.black),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.all(8),
+//                         child: TextButton(
+//                           onPressed: () async {
+//                             await ApiService().generatePromo(userId);
+//                           },
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.stretch,
+//                             children: [
+//                               CircleAvatar(
+//                                 radius: 25,
+//                                 backgroundColor: kPrimaryColor,
+//                                 child: Icon(
+//                                   Icons.share,
+//                                   color: Colors.white,
+//                                   size: 35,
+//                                 ),
+//                               ),
+//                               SizedBox(
+//                                 height: 3,
+//                               ),
+//                               Center(
+//                                 child: Text(
+//                                   'Share',
+//                                   style: TextStyle(
+//                                       fontSize: 10, color: Colors.black),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.all(8),
+//                         child: (buttonStatus == false)
+//                             ? TextButton(
+//                                 onPressed: null,
+//                                 child: Column(
+//                                   crossAxisAlignment:
+//                                       CrossAxisAlignment.stretch,
+//                                   children: [
+//                                     CircleAvatar(
+//                                       radius: 25,
+//                                       backgroundColor: kPrimaryColor,
+//                                       child: Icon(
+//                                         Icons.folder,
+//                                         color: Colors.white,
+//                                         size: 35,
+//                                       ),
+//                                     ),
+//                                     SizedBox(
+//                                       height: 3,
+//                                     ),
+//                                     Center(
+//                                       child: Text(
+//                                         'Default Claims',
+//                                         style: TextStyle(
+//                                             fontSize: 10, color: Colors.black),
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               )
+//                             : TextButton(
+//                                 onPressed: () async {
+//                                   await ApiService()
+//                                       .claimDefault(userId, promotionCode);
+//                                 },
+//                                 child: Column(
+//                                   crossAxisAlignment:
+//                                       CrossAxisAlignment.stretch,
+//                                   children: [
+//                                     CircleAvatar(
+//                                       radius: 25,
+//                                       backgroundColor: kPrimaryColor,
+//                                       child: Icon(
+//                                         Icons.folder,
+//                                         color: kPrimaryColor,
+//                                         size: 35,
+//                                       ),
+//                                     ),
+//                                     SizedBox(
+//                                       height: 5,
+//                                     ),
+//                                     Center(
+//                                       child: Text(
+//                                         'Default Claims',
+//                                         style: TextStyle(
+//                                             fontSize: 10, color: Colors.black),
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                       ),
+//                     ],
+//                   )),
+//                 ),
+//               ),
+
+//               const SizedBox(height: 10),
+
+//               Padding(
+//                 padding: EdgeInsets.symmetric(horizontal: 10),
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   children: [
+//                     const Text(
+//                       "Recent Activities",
+//                       style: TextStyle(
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 17,
+//                         color: Colors.black,
+//                       ),
+//                     ),
+//                     ViewAll(
+//                       press: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) {
+//                               return NotificationList();
+//                             },
+//                           ),
+//                         );
+//                       },
+//                     ),
+//                   ],
+//                 ),
+//               ),
+
+//               const SizedBox(height: 10),
+
+//               Container(
+//                 child: Center(
+//                   child: SingleChildScrollView(
+//                     child: Column(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [content],
+//                     ),
+//                   ),
+//                 ),
+//               )
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// // Helper class
+// class Utils {
+//   static String getFormattedDateSimple(int time) {
+//     DateFormat newFormat = DateFormat("MMMM dd yyyy");
+//     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+//   }
+
+//   static String getFormattedDateSimpleMonthAddDate(int time) {
+//     DateFormat newFormat = DateFormat("MMMM dd");
+//     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+//   }
+
+//   static String getFormattedDateSimpleMonthAddDateLess(int time) {
+//     DateFormat newFormat = DateFormat("MMM dd");
+//     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+//   }
+
+//   static String getFormattedDateSimpleFilter(int time) {
+//     DateFormat newFormat = DateFormat("yyyy-MM-dd");
+//     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+//   }
+
+//   static String getFormattedDateSimpleToday(int time) {
+//     DateFormat newFormat = DateFormat("dd MMMM");
+//     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+//   }
+// }

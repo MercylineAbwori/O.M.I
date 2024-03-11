@@ -65,6 +65,7 @@ dependencies:
   in_app_update: ^4.2.2
   upgrader: ^9.0.0
   flutter_local_notifications: ^16.3.3
+  flutter_riverpod: ^2.4.10
   
 
 dev_dependencies:

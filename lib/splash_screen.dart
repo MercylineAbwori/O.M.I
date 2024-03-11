@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:one_million_app/components/onbording_screens/welcome_screen.dart';
+import 'package:one_million_app/common_ui_pages.dart';
+import 'package:one_million_app/components/auth/onbording_screens/welcome_screen.dart';
 import 'package:one_million_app/shared/constants.dart';
+
 
 class MyHomePage extends StatefulWidget { 
   @override 
@@ -19,7 +21,8 @@ class _MyHomePageState extends State<MyHomePage> {
     Timer(Duration(seconds: 3), 
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
-        (context) =>  
+        (context) => 
+        // CommonUIPage()
          const WelcomeScreen()
         ) 
       ) 

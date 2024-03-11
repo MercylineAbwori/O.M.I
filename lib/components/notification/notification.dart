@@ -1,57 +1,54 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:one_million_app/core/constant_service.dart';
-import 'package:one_million_app/core/constant_urls.dart';
-import 'package:one_million_app/core/model/notification_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:one_million_app/core/local_storage.dart';
+import 'package:one_million_app/core/services/models/notification_model.dart';
+import 'package:one_million_app/core/services/providers/notification_provider.dart';
 import 'package:one_million_app/shared/constants.dart';
 
-class NotificationPage extends StatefulWidget {
-  final num userId;
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
-  final List<num> notificationListId;
-  final num count;
-  const NotificationPage(
-      {super.key,
-      required this.userId,
-      required this.title,
-      required this.message,
-      required this.readStatus,
-      required this.notificationListId,
-      required this.count});
+class NotificationList extends ConsumerStatefulWidget {
+  const NotificationList({super.key});
+
   @override
-  _NotificationPageState createState() => _NotificationPageState();
+  ConsumerState<NotificationList> createState() {
+    return _NotificationListState();
+  }
 }
 
-class _NotificationPageState extends State<NotificationPage> {
-// padding constants
-  final double horizontalPadding = 40;
-  final double verticalPadding = 25;
+class _NotificationListState extends ConsumerState<NotificationList> {
+  List<notificationListItem> _data = [];
+  var _isLoading = true;
+  String? error;
 
-  int selectedPageIndex = 0;
+  num _selectedIndex = 0;
 
-  int _currentIndex = 0;
-  final List _children = [];
+  num? userId;
 
-  int count = 0;
+  Future<void> loadUserData() async {
+    // var _userId = await LocalStorage().getUserRegNo();
+    var _userId = 1;
+    if (_userId != null) {
+      setState(() {
+        userId = _userId;
+      });
+    }
+  }
 
-  bool checkboxValue = true;
-  bool checkedValue = false;
+  @override
+  void initState() {
+    super.initState();
+    // // Reload shops
+    ref.read(notificationListListProvider.notifier).fetchNotificationList();
 
-  // // This function is triggered when a checkbox is checked or unchecked
-  // Future<void> _itemChange(num notificationId) async {
-  //   await ApiService().sendMarkAsRead(widget.userId, notificationId);
-  //   setState(() {});
-  // }
+    // _selectedIndex = widget.selectedIndex!;
+  }
 
   // This function is triggered when a checkbox is checked or unchecked
   Future<void> _itemChangeMarkAll() async {
-    await ApiService().sendMarkAsAll(widget.userId);
+    await ApiService().sendMarkAsAll(userId);
     setState(() {});
   }
 
@@ -60,251 +57,225 @@ class _NotificationPageState extends State<NotificationPage> {
   late List<String> readStatus = [];
   late List<num> notificationIdList = [];
 
-  Future<List<NotificationModal>?> getNotification(userId) async {
-    try {
-      var url =
-          Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationEndpoint);
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({"userId": userId});
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      // print('Responce Status Code : ${response.statusCode}');
-      // // log('Responce Body  : ${response.body}');
-
-      var obj = jsonDecode(response.body);
-
-      var _statusCodeGetNotification;
-
-      obj.forEach((key, value) {
-        _statusCodeGetNotification = obj["result"]["code"];
-
-        var objs = obj["result"]["data"];
-
-        for (var item in objs) {
-          message.add(item["message"]);
-          title.add(item["type"]);
-          readStatus.add(item["readStatus"]);
-          notificationIdList.add(item["id"]);
-        }
-      });
-
-      if (_statusCodeGetNotification == 5000) {
-        throw Exception('Notification message retrieved successfully');
-      } else {
-        throw Exception(
-            'Unexpected NotifIcation success error occured! Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error: $e");
-      if (e is http.ClientException) {
-        print("Response Body: ${e.message}");
-      }
-      // log(e.toString());
-    }
-  }
-
   bool isChecked = false;
+
+  late notificationListModel availableData;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
-        leading: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: IconButton(
-              iconSize: 100,
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-                size: 20,
-              ),
-              // the method which is called
-              // when button is pressed
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
+    availableData = ref.watch(notificationListListProvider);
+
+    setState(() {
+      _data = availableData.notification_list;
+      _isLoading = availableData.isLoading;
+
+      for (var i = 0; i < _data.length; i++) {
+        readStatus.add(_data[i].readStatus);
+      }
+      ;
+    });
+
+    Widget content = const Center(
+      child: Text('No data yet',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+    );
+
+    if (_isLoading) {
+      content = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (error != null) {
+      content = Center(
+        child: Text(error!),
+      );
+    }
+
+    if (_data.isEmpty) {
+      content = Container(
+        child: Center(
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(height: 20),
-
-                // welcome home
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Notifications",
-                        style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                //Divider
-
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Divider(
-                    thickness: 1,
-                    color: Color.fromARGB(255, 204, 204, 204),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const SizedBox(height: 10),
-
-                Container(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          (widget.message.isEmpty)
-                              ? const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Card(
-                                    elevation: 5,
-                                    shadowColor: Colors.black,
-                                    child: Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(40.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.info,
-                                              size: 100,
-                                              color: kPrimaryColor,
-                                            ),
-                                            SizedBox(height: 20),
-                                            Text(
-                                              'You have no activities',
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
-                                              // style: GoogleFonts.bebasNeue(fontSize: 72),
-                                            ),
-                                            SizedBox(height: 20),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  child: Column(
-                                    children: [
-                                      CheckboxListTile(
-                                        title: Text(
-                                            "Mark All As Read"), //    <-- label
-                                        value: (widget.readStatus
-                                                .contains('Unread'))
-                                            ? isChecked = false
-                                            : isChecked = true,
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            isChecked = newValue!;
-                                          });
-                                          _itemChangeMarkAll();
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        padding: const EdgeInsets.all(8),
-                                        itemCount: widget.message.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Card(
-                                              color: Colors.white,
-                                              borderOnForeground: true,
-                                              elevation: 6,
-                                              child: ListTile(
-                                                leading:
-                                                    Icon(Icons.notifications),
-                                                title: Text(
-                                                  widget.title[index],
-                                                  style: (widget.readStatus[
-                                                              index] ==
-                                                          'Unread')
-                                                      ? TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        )
-                                                      : TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                        ),
-                                                ),
-                                                subtitle: Text(
-                                                  widget.message[index],
-                                                  style: (widget.readStatus[
-                                                              index] ==
-                                                          'Unread')
-                                                      ? TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        )
-                                                      : TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                        ),
-                                                ),
-                                                onTap: () async {
-                                                  await ApiService().sendMarkAsRead(
-                                                      widget.userId,
-                                                      widget.notificationListId[
-                                                          index]);
-                                                },
-                                              ));
-                                        },
-                                        separatorBuilder:
-                                            (BuildContext context, int index) =>
-                                                const Divider(),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                        ],
+                  padding: EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 5,
+                    shadowColor: Colors.black,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.info,
+                              size: 100,
+                              color: kPrimaryColor,
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              'You have no activities',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                              // style: GoogleFonts.bebasNeue(fontSize: 72),
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      content = Container(
+        child: Column(
+          children: [
+            CheckboxListTile(
+              title: Text("Mark All As Read"), //    <-- label
+              value: (readStatus.contains('Unread'))
+                  ? isChecked = false
+                  : isChecked = true,
+              onChanged: (newValue) {
+                setState(() {
+                  isChecked = newValue!;
+                });
+                _itemChangeMarkAll();
+              },
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(8),
+              itemCount: _data.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                    color: Colors.white,
+                    borderOnForeground: true,
+                    elevation: 6,
+                    child: ListTile(
+                      leading: Icon(Icons.notifications),
+                      title: Text(
+                        _data[index].type,
+                        style: (_data[index].readStatus == 'Unread')
+                            ? TextStyle(
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                fontWeight: FontWeight.normal,
+                              ),
+                      ),
+                      subtitle: Text(
+                        _data[index].message,
+                        style: (_data[index].readStatus == 'Unread')
+                            ? TextStyle(
+                                fontWeight: FontWeight.bold,
+                              )
+                            : TextStyle(
+                                fontWeight: FontWeight.normal,
+                              ),
+                      ),
+                      onTap: () async {
+                        await ApiService()
+                            .sendMarkAsRead(userId, _data[index].id);
+                      },
+                    ));
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+
+              // welcome home
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Notifications",
+                      style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              //Divider
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                child: Divider(
+                  thickness: 1,
+                  color: Color.fromARGB(255, 204, 204, 204),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              const SizedBox(height: 10),
+
+              content
+            ],
+          ),
+        ));
+  }
+}
+
+// Helper class
+class Utils {
+  static String getFormattedDateSimple(int time) {
+    DateFormat newFormat = DateFormat("MMMM dd yyyy");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
   }
 
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+  static String getFormattedDateSimpleMonthAddDate(int time) {
+    DateFormat newFormat = DateFormat("MMMM dd");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+  }
+
+  static String getFormattedDateSimpleMonthAddDateLess(int time) {
+    DateFormat newFormat = DateFormat("MMM dd");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+  }
+
+  static String getFormattedDateSimpleFilter(int time) {
+    DateFormat newFormat = DateFormat("yyyy-MM-dd");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+  }
+
+  static String getFormattedDateSimpleToday(int time) {
+    DateFormat newFormat = DateFormat("dd MMMM");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
   }
 }
