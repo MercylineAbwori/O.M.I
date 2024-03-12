@@ -252,7 +252,7 @@ class _UploadFilesState extends State<UploadFiles>
                   ),
                   child: TabBar(
                     indicator: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(5.0),
                         color: _selectedColor),
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.black,

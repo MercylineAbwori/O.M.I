@@ -509,7 +509,12 @@ class _DefaultListState extends ConsumerState<DefaultList> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return BeneficiaryFormPage();
+                                  return BeneficiaryFormPage(
+                                    userId: widget.userId,
+                                    name: widget.name,
+                                    email: widget.email,
+                                    phoneNo: widget.phoneNo,
+                                  );
                                 },
                               ),
                             );
