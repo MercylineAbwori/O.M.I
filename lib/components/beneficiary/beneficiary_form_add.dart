@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:one_million_app/common_ui_pages.dart';
 import 'package:one_million_app/core/constant_service.dart';
 import 'package:one_million_app/core/constant_urls.dart';
@@ -13,8 +14,16 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:http/http.dart' as http;
 
 class BeneficiaryFormPage extends StatefulWidget {
+  final num userId;
+  final String name;
+  final String email;
+  final String phoneNo;
   BeneficiaryFormPage({
     super.key,
+    required this.userId,
+      required this.name,
+      required this.email,
+      required this.phoneNo,
   });
 
   @override
@@ -209,7 +218,7 @@ class _BeneficiaryFormPageState extends State<BeneficiaryFormPage> {
                         return CommonUIPage(
                             userId: widget.userId,
                             name: widget.name,
-                            phoneNo: widget.msisdn,
+                            phoneNo: widget.phoneNo,
                             email: widget.email,);
                       },
                     ));

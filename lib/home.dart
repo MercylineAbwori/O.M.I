@@ -28,10 +28,12 @@ class DefaultList extends ConsumerStatefulWidget {
   final String name;
   final String email;
   final String phoneNo;
-  const DefaultList({super.key, required this.userId,
+  const DefaultList({super.key, 
+      required this.userId,
       required this.name,
       required this.email,
-      required this.phoneNo,});
+      required this.phoneNo,
+    });
 
   @override
   ConsumerState<DefaultList> createState() {
@@ -509,7 +511,12 @@ class _DefaultListState extends ConsumerState<DefaultList> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return BeneficiaryFormPage();
+                                  return BeneficiaryFormPage(
+                                    userId: widget.userId,
+                                    name: widget.name,
+                                    email: widget.email,
+                                    phoneNo: widget.phoneNo,
+                                  );
                                 },
                               ),
                             );
