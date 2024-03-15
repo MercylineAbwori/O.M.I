@@ -15,13 +15,17 @@ import 'package:one_million_app/core/constant_urls.dart';
 import 'package:one_million_app/core/local_storage.dart';
 import 'package:one_million_app/core/model/default_claim.dart';
 import 'package:one_million_app/core/services/models/notification_model.dart';
+import 'package:one_million_app/core/services/models/notifications_counts_model.dart';
 import 'package:one_million_app/core/services/models/policy_details_model.dart';
 import 'package:one_million_app/core/services/models/uptodate_model.dart';
+import 'package:one_million_app/core/services/providers/notification_counts_providers.dart';
 import 'package:one_million_app/core/services/providers/notification_provider.dart';
 import 'package:one_million_app/core/services/providers/policy_details_providers.dart';
 import 'package:one_million_app/core/services/providers/uptodate_providers.dart';
 import 'package:one_million_app/shared/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 
 class DefaultList extends ConsumerStatefulWidget {
   final num userId;
@@ -42,6 +46,9 @@ class DefaultList extends ConsumerStatefulWidget {
 }
 
 class _DefaultListState extends ConsumerState<DefaultList> {
+
+  num? count = 0;
+
   List<notificationListItem> _data = [];
   var _isLoading = true;
   String? error;
@@ -150,17 +157,22 @@ class _DefaultListState extends ConsumerState<DefaultList> {
 
     // // Reload shops
     ref.read(policyDetailsListProvider.notifier).fetchPolicyDetails();
+
+    // // Reload
+    ref.read(notificationCountListProvider.notifier).fetchNotificationCount();
   }
 
   late notificationListModel availableData;
   late upToDateListModel availableUpToDate;
   late policyDetailsModel availablePolicyDetails;
+  late notificationCountModel availableCountData;
 
   @override
   Widget build(BuildContext context) {
     availableData = ref.watch(notificationListListProvider);
     availableUpToDate = ref.watch(upToDateListProvider);
     availablePolicyDetails = ref.watch(policyDetailsListProvider);
+    availableCountData = ref.watch(notificationCountListProvider);
 
     setState(() {
       _data = availableData.notification_list;
@@ -171,6 +183,11 @@ class _DefaultListState extends ConsumerState<DefaultList> {
 
       _dataPolicyDetails = availablePolicyDetails.policy_details_data;
       _isLoadingPolicyDetails = availablePolicyDetails.isLoading;
+
+      count = availableCountData.notification_count;
+      _isLoading = availableCountData.isLoading;
+
+      log("Count : $count");
 
       for (var i = 0; i < _dataUpToDate.length; i++) {
         claimApplicationActive = _dataUpToDate[i].claimApplicationActive;
@@ -253,7 +270,7 @@ class _DefaultListState extends ConsumerState<DefaultList> {
         ),
       );
     } else {
-      var itemCount = _data.length > 5 ? 5 : _data.length;
+      var itemCount = _data.length > 3 ? 3 : _data.length;
       content = Container(
         child: Column(
           children: [
@@ -303,6 +320,7 @@ class _DefaultListState extends ConsumerState<DefaultList> {
     }
 
     return Scaffold(
+      
       body: Stack(
           children: <Widget>[
             Column(
@@ -369,7 +387,7 @@ class _DefaultListState extends ConsumerState<DefaultList> {
                                                 MaterialPageRoute(
                                                   builder: (context) {
                                                     return MakePayments(
-                                                      userId: userId!,
+                                                      userId: widget.userId!,
                                                       premiumSelected:
                                                           paymentAmountUptoDate!,
                                                     );
@@ -399,7 +417,7 @@ class _DefaultListState extends ConsumerState<DefaultList> {
                                                 MaterialPageRoute(
                                                   builder: (context) {
                                                     return MakePayments(
-                                                      userId: userId!,
+                                                      userId: widget.userId!,
                                                       premiumSelected: paymentAmountUptoDate!,
                                                     );
                                                   },
@@ -432,333 +450,339 @@ class _DefaultListState extends ConsumerState<DefaultList> {
                     height: 20.0,
                   ),
                   
-
+      
               ],
             ),
+            
             Positioned(
               top: 120,
               right: 10,
               left: 10,
-              child: Card(
-                  elevation: 5,
-                  shadowColor: Colors.black,
-                  child: Center(
-                      child: GridView.count(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    primary: false,
-                    padding: const EdgeInsets.all(10),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    childAspectRatio: (300 / 300),
-                    children: <Widget>[
-                      //Make sales
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return MakePayments(
-                                    userId: widget.userId,
-                                    premiumSelected: paymentAmountUptoDate!,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 60,
-                                child: Card(
-                                  color: kPrimaryLightColor,
-                                  child: Icon(
-                                    CupertinoIcons.money_dollar,
-                                    color: kPrimaryColor,
-                                    
-                                    size: 35,
+              child: Column(
+                children: [
+                  Card(
+                    elevation: 5,
+                    shadowColor: Colors.black,
+                    child: Center(
+                        child: GridView.count(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      primary: false,
+                      padding: const EdgeInsets.all(10),
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      crossAxisCount: 3,
+                      childAspectRatio: (300 / 300),
+                      children: <Widget>[
+                        //Make sales
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: TextButton(
+                            
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return MakePayments(
+                                      userId: widget.userId,
+                                      premiumSelected: paymentAmountUptoDate!,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 60,
+                                  child: Card(
+                                    color: kPrimaryLightColor,
+                                    child: Icon(
+                                      CupertinoIcons.money_dollar,
+                                      color: kPrimaryColor,
+                                      
+                                      size: 35,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Pay',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
+                                SizedBox(
+                                  height: 3,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      //Add Dependants
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return BeneficiaryFormPage(
-                                    userId: widget.userId,
-                                    name: widget.name,
-                                    email: widget.email,
-                                    phoneNo: widget.phoneNo,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 60,
-                                child: Card(
-                                  color: kPrimaryLightColor,
-                                  child: Icon(
-                                    CupertinoIcons.person_2,
-                                    color: kPrimaryColor,
-                                    
-                                    size: 35,
+                                Center(
+                                  child: Text(
+                                    'Pay',
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.black),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Dependants',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return UploadFiles(userId: widget.userId);
-                                },
-                              ),
-                            );
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 60,
-                                child: Card(
-                                  color: kPrimaryLightColor,
-                                  child: Icon(
-                                    CupertinoIcons.upload_circle,
-                                    color: kPrimaryColor,
-                                    
-                                    size: 35,
+                
+                        //Add Dependants
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return BeneficiaryFormPage(
+                                      userId: widget.userId,
+                                      name: widget.name,
+                                      email: widget.email,
+                                      phoneNo: widget.phoneNo,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 60,
+                                  child: Card(
+                                    color: kPrimaryLightColor,
+                                    child: Icon(
+                                      CupertinoIcons.person_2,
+                                      color: kPrimaryColor,
+                                      
+                                      size: 35,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Documents',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
+                                SizedBox(
+                                  height: 3,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: TextButton(
-                          onPressed: () async {
-                            await ApiService().generatePromo(widget.userId);
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 60,
-                                child: Card(
-                                  color: kPrimaryLightColor,
-                                  child: Icon(
-                                    CupertinoIcons.share,
-                                    color: kPrimaryColor,
-                                    
-                                    size: 35,
+                                Center(
+                                  child: Text(
+                                    'Dependants',
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.black),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              Center(
-                                child: Text(
-                                  'Share',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.black),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: (buttonStatus == false)
-                            ? TextButton(
-                                onPressed: null,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    SizedBox(
-                                      width: 50,
-                                      height: 60,
-                                      child: Card(
-                                        color: kPrimaryLightColor,
-                                        child: Icon(
-                                          CupertinoIcons.folder_circle,
-                                          color: kPrimaryColor,
-                                          
-                                          size: 35,
+                
+                        //Documents
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return UploadFiles(userId: widget.userId);
+                                  },
+                                ),
+                              );
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 60,
+                                  child: Card(
+                                    color: kPrimaryLightColor,
+                                    child: Icon(
+                                      CupertinoIcons.upload_circle,
+                                      color: kPrimaryColor,
+                                      
+                                      size: 35,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                Center(
+                                  child: Text(
+                                    'Documents',
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                
+                        //Share
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: TextButton(
+                            onPressed: () async {
+                              await ApiService().generatePromo(widget.userId);
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 60,
+                                  child: Card(
+                                    color: kPrimaryLightColor,
+                                    child: Icon(
+                                      CupertinoIcons.share,
+                                      color: kPrimaryColor,
+                                      
+                                      size: 35,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                Center(
+                                  child: Text(
+                                    'Share',
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                
+                        // Default Claims
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: (buttonStatus == false)
+                              ? TextButton(
+                                  onPressed: null,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        width: 50,
+                                        height: 60,
+                                        child: Card(
+                                          color: kPrimaryLightColor,
+                                          child: Icon(
+                                            CupertinoIcons.folder_circle,
+                                            color: kPrimaryColor,
+                                            
+                                            size: 35,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 3,
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        'Default Claims',
-                                        style: TextStyle(
-                                            fontSize: 10, color: Colors.black),
+                                      SizedBox(
+                                        height: 3,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : TextButton(
-                                onPressed: () async {
-                                  await ApiService()
-                                      .claimDefault(widget.userId, promotionCode);
-                                },
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    SizedBox(
-                                      width: 50,
-                                      height: 60,
-                                      child: Card(
-                                        color: kPrimaryLightColor,
-                                        child: Icon(
-                                          CupertinoIcons.folder_fill,
-                                          color: kPrimaryColor,
-                                          
-                                          size: 35,
+                                      Center(
+                                        child: Text(
+                                          'Default Claims',
+                                          style: TextStyle(
+                                              fontSize: 10, color: Colors.black),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        'Default Claims',
-                                        style: TextStyle(
-                                            fontSize: 10, color: Colors.black),
+                                    ],
+                                  ),
+                                )
+                              : TextButton(
+                                  onPressed: () async {
+                                    await ApiService()
+                                        .claimDefault(widget.userId, promotionCode);
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        width: 50,
+                                        height: 60,
+                                        child: Card(
+                                          color: kPrimaryLightColor,
+                                          child: Icon(
+                                            CupertinoIcons.folder_fill,
+                                            color: kPrimaryColor,
+                                            
+                                            size: 35,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Center(
+                                        child: Text(
+                                          'Default Claims',
+                                          style: TextStyle(
+                                              fontSize: 10, color: Colors.black),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                        ),
+                      ],
+                    )),
+                  ),
+                  Container(
+                    child: Column(
+                      children: [
+                        Container(
+                    child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Recent Activities",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: Colors.black,
+                        ),
+                      ),
+                      ViewAll(
+                        press: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NotificationList();
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ],
-                  )),
-                ),
-            ),
-            Positioned(
-              top: 400,
-              right: 10,
-              left: 10,
-              child: Container(
-                child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Recent Activities",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                      color: Colors.black,
                     ),
                   ),
-                  ViewAll(
-                    press: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return NotificationList();
-                          },
+                  ),
+                  SizedBox(height: 10,),
+                        Card(
+                          child: Container(
+                            child: Center(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [content],
+                                ),
+                              ),
+                            ),
+                          )
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                 ],
-                ),
-              ),
               ),
             ),
-            Positioned(
-              top: 450,
-              right: 10,
-              left: 10,
-              child: Container(
-                child: Card(
-                  child: Container(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [content],
-                        ),
-                      ),
-                    ),
-                  )
-                ),
-              ),
-            )
           ],
         ),
       

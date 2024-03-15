@@ -66,6 +66,7 @@ dependencies:
   upgrader: ^9.0.0
   flutter_local_notifications: ^16.3.3
   flutter_riverpod: ^2.4.10
+  persistent_bottom_nav_bar: ^5.0.2
   
 
 dev_dependencies:

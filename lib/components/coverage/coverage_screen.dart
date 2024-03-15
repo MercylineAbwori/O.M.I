@@ -8,36 +8,43 @@ import 'package:one_million_app/components/coverage/calculator_form.dart';
 import 'package:one_million_app/components/coverage/coverage_make_payments.dart';
 import 'package:one_million_app/components/notification/notification.dart';
 import 'package:one_million_app/core/constant_urls.dart';
+import 'package:one_million_app/core/local_storage.dart';
+import 'package:one_million_app/core/services/models/policy_details_model.dart';
+import 'package:one_million_app/core/services/models/uptodate_model.dart';
+import 'package:one_million_app/core/services/providers/policy_details_providers.dart';
+import 'package:one_million_app/core/services/providers/uptodate_providers.dart';
 
 import 'package:one_million_app/shared/constants.dart';
 
 import 'package:badges/badges.dart';
 import 'package:badges/badges.dart' as badges;
 
-class CoveragePage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class CoveragePage extends ConsumerStatefulWidget {
   final num userId;
   final String userName;
   final String phone;
   final String email;
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
+  // final List<String> title;
+  // final List<String> message;
+  // final List<String> readStatus;
   final List<dynamic> tableData;
-  final List<num> notificationIdList;
+  // final List<num> notificationIdList;
 
-  final num count;
+  // final num count;
 
-  final String claimApplicationActive;
-  final num paymentAmountUptoDate;
-  final String qualifiesForCompensation;
-  final String uptoDatePayment;
+  // final String claimApplicationActive;
+  // final num paymentAmountUptoDate;
+  // final String qualifiesForCompensation;
+  // final String uptoDatePayment;
 
-  final String nextPayment;
-  final String paymentPeriod;
-  final String policyNumber;
-  late num paymentAmount;
-  final num sumInsured;
-  final num statusCodePolicyDetails;
+  // final String nextPayment;
+  // final String paymentPeriod;
+  // final String policyNumber;
+  // late num paymentAmount;
+  // final num sumInsured;
+  // final num statusCodePolicyDetails;
 
   CoveragePage({
     Key? key,
@@ -46,28 +53,36 @@ class CoveragePage extends StatefulWidget {
     required this.phone,
     required this.email,
     required this.tableData,
-    required this.message,
-    required this.title,
-    required this.readStatus,
-    required this.notificationIdList,
-    required this.count,
-    required this.claimApplicationActive,
-    required this.paymentAmountUptoDate,
-    required this.qualifiesForCompensation,
-    required this.uptoDatePayment,
-    required this.nextPayment,
-    required this.paymentAmount,
-    required this.paymentPeriod,
-    required this.policyNumber,
-    required this.sumInsured,
-    required this.statusCodePolicyDetails,
+    // required this.message,
+    // required this.title,
+    // required this.readStatus,
+    // required this.notificationIdList,
+    // required this.count,
+    // required this.claimApplicationActive,
+    // required this.paymentAmountUptoDate,
+    // required this.qualifiesForCompensation,
+    // required this.uptoDatePayment,
+    // required this.nextPayment,
+    // required this.paymentAmount,
+    // required this.paymentPeriod,
+    // required this.policyNumber,
+    // required this.sumInsured,
+    // required this.statusCodePolicyDetails,
   }) : super(key: key);
 
   @override
-  State<CoveragePage> createState() => _CoverageState();
+  ConsumerState<CoveragePage> createState() => _CoverageState();
 }
 
-class _CoverageState extends State<CoveragePage> {
+class _CoverageState extends ConsumerState<CoveragePage> {
+  List<upToDateListItem> _dataUpToDate = [];
+  var _isLoadingUpToDate = true;
+  String? errorUpToDate;
+
+  List<policyDetailsItem> _dataPolicyDetails = [];
+  var _isLoadingPolicyDetails = true;
+  String? errorPolicyDetails;
+
   List<String> _coverages = ['Benefits', 'Sum Insured'];
   List<dynamic> _selectedItems = [];
   List<dynamic> _selectedItemsValues = [];
@@ -79,19 +94,6 @@ class _CoverageState extends State<CoveragePage> {
   final double verticalPadding = 25;
 
   String? dropdownValue;
-
-  late String _statusMessage;
-  num? _statusCode;
-
-  //For SumIsuredSelect
-  String? _currentSumInsuredValue;
-
-//for subscrition
-  String? _currentSubcriptionValue;
-
-//premiumSelected
-
-  num? _premiumSelected;
 
   //Other Data
   // num? addStampDuty;
@@ -121,91 +123,100 @@ class _CoverageState extends State<CoveragePage> {
     'Daily',
   ];
 
+  num? statusCodePolicyDetails;
+
+  Future<void> loadUserData() async {
+    var _code = await LocalStorage().getPolicyDetailsCode();
+    if (_code != null) {
+      setState(() {
+        statusCodePolicyDetails = _code;
+
+        log("Status policy number $statusCodePolicyDetails");
+      });
+    }
+  }
+
   // Policy Details
 
   @override
   void initState() {
     super.initState();
+
+    // // Reload shops
+    ref.read(upToDateListProvider.notifier).fetchUpToDate();
+
+    // // Reload shops
+    ref.read(policyDetailsListProvider.notifier).fetchPolicyDetails();
   }
+
+  late upToDateListModel availableUpToDate;
+  late policyDetailsModel availablePolicyDetails;
+
+  String? claimApplicationActive;
+  num? paymentAmountUptoDate;
+  String? qualifiesForCompensation;
+  String? uptoDatePayment;
+
+  //Policy Details
+  late String nextPayment = '';
+  late String paymentPeriod;
+  late String policyNumber;
+  late num paymentAmount;
+  late num sumInsured;
 
   @override
   Widget build(BuildContext context) {
+    availableUpToDate = ref.watch(upToDateListProvider);
+    availablePolicyDetails = ref.watch(policyDetailsListProvider);
+
+    setState(() {
+      _dataUpToDate = availableUpToDate.uptodate_data;
+      _isLoadingUpToDate = availableUpToDate.isLoading;
+
+      _dataPolicyDetails = availablePolicyDetails.policy_details_data;
+      _isLoadingPolicyDetails = availablePolicyDetails.isLoading;
+
+      for (var i = 0; i < _dataUpToDate.length; i++) {
+        claimApplicationActive = _dataUpToDate[i].claimApplicationActive;
+        paymentAmountUptoDate = _dataUpToDate[i].paymentAmount;
+        qualifiesForCompensation = _dataUpToDate[i].qualifiesForCompensation;
+        uptoDatePayment = _dataUpToDate[i].uptoDatePayment;
+      }
+
+      for (var i = 0; i < _dataPolicyDetails.length; i++) {
+        policyNumber = _dataPolicyDetails[i].policyNumber;
+        nextPayment = '';
+        paymentPeriod = _dataPolicyDetails[i].paymentPeriod;
+        paymentAmount = _dataPolicyDetails[i].paymentAmount;
+        sumInsured = _dataPolicyDetails[i].sumInsured;
+      }
+
+      loadUserData();
+    });
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: Colors.white,
-            leading: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: IconButton(
-                  iconSize: 100,
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                  // the method which is called
-                  // when button is pressed
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+          backgroundColor: Colors.white,
+          leading: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: IconButton(
+                iconSize: 100,
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 20,
                 ),
+                // the method which is called
+                // when button is pressed
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
             ),
-            actions: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  child: (widget.count != 0)
-                      ? badges.Badge(
-                          position: BadgePosition.topEnd(top: 0, end: 3),
-                          badgeContent: Text(
-                            (widget.count).toString(),
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.message,
-                              color: kPrimaryColor,
-                              size: 30,
-                            ),
-                            // the method which is called
-                            // when button is pressed
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return NotificationList();
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : IconButton(
-                          icon: const Icon(
-                            Icons.message,
-                            color: kPrimaryColor,
-                            size: 30,
-                          ),
-                          // the method which is called
-                          // when button is pressed
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return NotificationList();
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              )
-            ]),
+          ),
+        ),
         body: SingleChildScrollView(
-            child: (widget.statusCodePolicyDetails == 5000)
+            child: (statusCodePolicyDetails == 5000)
                 ? Container(
                     /** Card Widget **/
                     child: Column(
@@ -258,7 +269,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              (widget.paymentAmountUptoDate)
+                                              (paymentAmountUptoDate)
                                                   .toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
@@ -277,7 +288,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              widget.paymentPeriod,
+                                              paymentPeriod,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -295,7 +306,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              widget.policyNumber!,
+                                              policyNumber!,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -313,7 +324,7 @@ class _CoverageState extends State<CoveragePage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              (widget.sumInsured).toString(),
+                                              (sumInsured).toString(),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.normal,
                                                   fontStyle: FontStyle.italic),
@@ -340,14 +351,14 @@ class _CoverageState extends State<CoveragePage> {
                                                     builder: (context) =>
                                                         MakePayments(
                                                           userId: widget.userId,
-                                                          premiumSelected: widget
-                                                              .paymentAmountUptoDate,
+                                                          premiumSelected:
+                                                              paymentAmountUptoDate!,
                                                         )));
                                           },
                                           child: Card(
                                               elevation: 5,
                                               shadowColor: Colors.black,
-                                              color: (widget.uptoDatePayment ==
+                                              color: (uptoDatePayment ==
                                                       'payment up to date')
                                                   ? Colors.green
                                                   : Colors.red,
@@ -355,8 +366,7 @@ class _CoverageState extends State<CoveragePage> {
                                                 padding:
                                                     const EdgeInsets.all(10.0),
                                                 child: Center(
-                                                  child: Text(
-                                                      widget.uptoDatePayment),
+                                                  child: Text(uptoDatePayment!),
                                                 ),
                                               )),
                                         ),
@@ -452,13 +462,13 @@ class _CoverageState extends State<CoveragePage> {
                                                       userName: widget.userName,
                                                       phone: widget.phone,
                                                       email: widget.email,
-                                                      title: widget.title,
-                                                      message: widget.message,
-                                                      readStatus:
-                                                          widget.readStatus,
-                                                      notificationIdList: widget
-                                                          .notificationIdList,
-                                                      count: widget.count,
+                                                      // title: widget.title,
+                                                      // message: widget.message,
+                                                      // readStatus:
+                                                      //     widget.readStatus,
+                                                      // notificationIdList: widget
+                                                      //     .notificationIdList,
+                                                      // count: widget.count,
                                                     )));
                                       },
                                       child: Text(
@@ -476,7 +486,7 @@ class _CoverageState extends State<CoveragePage> {
                     ), //Card
                   )), //Center
 
-        floatingActionButton: (widget.statusCodePolicyDetails == 5000)
+        floatingActionButton: (statusCodePolicyDetails == 5000)
             ? SpeedDial(icon: Icons.add, children: [
                 // SpeedDialChild(
                 //   child: const Icon(Icons.subscriptions),
@@ -497,11 +507,11 @@ class _CoverageState extends State<CoveragePage> {
                                   userName: widget.userName,
                                   phone: widget.phone,
                                   email: widget.email,
-                                  title: widget.title,
-                                  message: widget.message,
-                                  readStatus: widget.readStatus,
-                                  notificationIdList: widget.notificationIdList,
-                                  count: widget.count,
+                                  // title: widget.title,
+                                  // message: widget.message,
+                                  // readStatus: widget.readStatus,
+                                  // notificationIdList: widget.notificationIdList,
+                                  // count: widget.count,
                                 )));
                   },
                 ),

@@ -10,6 +10,19 @@ class LocalStorage {
 
 //Code
 
+  storePolicyDetailsCode(int code) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.setInt('setPolicyDetailsCode', code);
+  }
+  
+  getPolicyDetailsCode() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getInt('setPolicyDetailsCode') ?? 0;
+  }
+//Code
+
   storeSetOTPCode(int code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

@@ -32,12 +32,16 @@ class PolicyDetailsListNotifier extends StateNotifier<policyDetailsModel> {
     var obj = jsonDecode(response.body);
 
     var _data;
+    var _code;
 
     obj.forEach((key, value) {
       _data = obj["result"]["data"];
+      _code = obj["result"]["code"];
     });
 
     log("Data : ${_data}");
+
+    await LocalStorage().storePolicyDetailsCode(_code);
 
     var createdAt = _data["createdAt"];
     var dependants = _data["dependants"];
@@ -48,46 +52,37 @@ class PolicyDetailsListNotifier extends StateNotifier<policyDetailsModel> {
     var sumInsured = _data["sumInsured"];
     var updatedAt = _data["updatedAt"];
 
-   // userDetails:
+    // userDetails:
 
-    var userDetailscreatedAt =
-        _data["userDetails"]["createdAt"];
-    var userDetailsemail =
-        _data["userDetails"]["email"];
-    var userDetailsgender =
-        _data["userDetails"]["gender"];
-    var userDetailsmsisdn =
-        _data["userDetails"]["msisdn"];
-    var userDetailsname =
-        _data["userDetails"]["name"];
-    var userDetailspin =
-        _data["userDetails"]["pin"];
-    var userDetailsupdatedAt =
-        _data["userDetails"]["updatedAt"];
-    var userDetailsuserId =
-        _data["userDetails"]["userId"];
+    var userDetailscreatedAt = _data["userDetails"]["createdAt"];
+    var userDetailsemail = _data["userDetails"]["email"];
+    var userDetailsgender = _data["userDetails"]["gender"];
+    var userDetailsmsisdn = _data["userDetails"]["msisdn"];
+    var userDetailsname = _data["userDetails"]["name"];
+    var userDetailspin = _data["userDetails"]["pin"];
+    var userDetailsupdatedAt = _data["userDetails"]["updatedAt"];
+    var userDetailsuserId = _data["userDetails"]["userId"];
 
-      loadedItems.add(policyDetailsItem(
-          createdAt: createdAt,
-          dependants: dependants,
-          id: id,
-          paymentAmount: paymentAmount,
-          paymentPeriod: paymentPeriod,
-          policyNumber: policyNumber,
-          sumInsured: sumInsured,
-          updatedAt: updatedAt,
+    loadedItems.add(policyDetailsItem(
+        createdAt: createdAt,
+        dependants: dependants,
+        id: id,
+        paymentAmount: paymentAmount,
+        paymentPeriod: paymentPeriod,
+        policyNumber: policyNumber,
+        sumInsured: sumInsured,
+        updatedAt: updatedAt,
 
-          //userDetails:
+        //userDetails:
 
-          userDetailscreatedAt: userDetailscreatedAt,
-          userDetailsemail: userDetailsemail,
-          userDetailsgender: userDetailsgender,
-          userDetailsmsisdn: userDetailsmsisdn,
-          userDetailsname: userDetailsname,
-          userDetailspin: userDetailspin,
-          userDetailsupdatedAt: userDetailsupdatedAt,
-          userDetailsuserId: userDetailsuserId));
-    
+        userDetailscreatedAt: userDetailscreatedAt,
+        userDetailsemail: userDetailsemail,
+        userDetailsgender: userDetailsgender,
+        userDetailsmsisdn: userDetailsmsisdn,
+        userDetailsname: userDetailsname,
+        userDetailspin: userDetailspin,
+        userDetailsupdatedAt: userDetailsupdatedAt,
+        userDetailsuserId: userDetailsuserId));
 
     addPolicyDetailsItems(loadedItems);
   }

@@ -17,39 +17,39 @@ class _MyHomePageState extends State<MyHomePage> {
   @override 
   void initState() { 
     super.initState(); 
-    // checkForUpdate();
+    checkForUpdate();
     Timer(Duration(seconds: 3), 
     ()=>Navigator.pushReplacement(context, 
       MaterialPageRoute(builder: 
         (context) => 
-        CommonUIPage(userId: 1, name: "Mercyline Achieng", email: "mercylineachieng99@gmail.com", phoneNo: "+254723017215")
-        //  const WelcomeScreen()
+        // CommonUIPage(userId: 1, name: "Mercyline Achieng", email: "mercylineachieng99@gmail.com", phoneNo: "+254723017215")
+         const WelcomeScreen()
         ) 
       ) 
     ); 
   } 
 
-  // Future<void> checkForUpdate() async {
-  //   print('checking for Update');
-  //   InAppUpdate.checkForUpdate().then((info) {
-  //     setState(() {
-  //       if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-  //         print('update available');
-  //         update();
-  //       }
-  //     });
-  //   }).catchError((e) {
-  //     print(e.toString());
-  //   });
-  // }
+  Future<void> checkForUpdate() async {
+    print('checking for Update');
+    InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+          print('update available');
+          update();
+        }
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
+  }
 
-  // void update() async {
-  //   print('Updating');
-  //   await InAppUpdate.startFlexibleUpdate();
-  //   InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
-  //     print(e.toString());
-  //   });
-  // }
+  void update() async {
+    print('Updating');
+    await InAppUpdate.startFlexibleUpdate();
+    InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
+      print(e.toString());
+    });
+  }
   @override 
   Widget build(BuildContext context) { 
     return Scaffold( 

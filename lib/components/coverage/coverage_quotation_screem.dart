@@ -30,10 +30,10 @@ class CoverageTable extends ConsumerStatefulWidget {
 
   num? sumInsured;
 
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
-  final List<num> notificationListId;
+  // final List<String> title;
+  // final List<String> message;
+  // final List<String> readStatus;
+  // final List<num> notificationListId;
 
   // //Other Data
   // final num? addStampDuty;
@@ -44,7 +44,7 @@ class CoverageTable extends ConsumerStatefulWidget {
   final num? totalPremium;
   final num? weeklyPremium;
 
-  final num count;
+  // final num count;
 
   CoverageTable(
       {super.key,
@@ -59,12 +59,13 @@ class CoverageTable extends ConsumerStatefulWidget {
       required this.monthlyPremium,
       required this.totalPremium,
       required this.weeklyPremium,
-      required this.message,
-      required this.readStatus,
-      required this.title,
+      // required this.message,
+      // required this.readStatus,
+      // required this.title,
       required this.sumInsured,
-      required this.notificationListId,
-      required this.count});
+      // required this.notificationListId,
+      // required this.count
+      });
 
   @override
   ConsumerState<CoverageTable> createState() {
@@ -249,80 +250,7 @@ class _CoverageTableState extends ConsumerState<CoverageTable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 20,
-                ),
-                // the method which is called
-                // when button is pressed
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            // notification icon
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: (widget.count != 0)
-                    ? badges.Badge(
-                        position: BadgePosition.topEnd(top: 0, end: 3),
-                        badgeContent: Text(
-                          (widget.count).toString(),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.message,
-                            color: kPrimaryColor,
-                            size: 30,
-                          ),
-                          // the method which is called
-                          // when button is pressed
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return NotificationList();
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : IconButton(
-                        icon: const Icon(
-                          Icons.message,
-                          color: kPrimaryColor,
-                          size: 30,
-                        ),
-                        // the method which is called
-                        // when button is pressed
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return NotificationList();
-                              },
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            )
-          ],
-        ),
+        
         body: SingleChildScrollView(
             child: (widget.tableData.isEmpty)
                 ? Container(
@@ -405,13 +333,13 @@ class _CoverageTableState extends ConsumerState<CoverageTable> {
                                                       userName: widget.userName,
                                                       phone: widget.phone,
                                                       email: widget.email,
-                                                      title: widget.title,
-                                                      message: widget.message,
-                                                      readStatus:
-                                                          widget.readStatus,
-                                                      notificationIdList: widget
-                                                          .notificationListId,
-                                                      count: widget.count,
+                                                      // title: widget.title,
+                                                      // message: widget.message,
+                                                      // readStatus:
+                                                      //     widget.readStatus,
+                                                      // notificationIdList: widget
+                                                      //     .notificationListId,
+                                                      // count: widget.count,
                                                     )));
                                       },
                                       child: Text(
@@ -842,11 +770,11 @@ class _CoverageTableState extends ConsumerState<CoverageTable> {
                                   userName: widget.userName,
                                   phone: widget.phone,
                                   email: widget.email,
-                                  title: widget.title,
-                                  message: widget.message,
-                                  readStatus: widget.readStatus,
-                                  notificationIdList: widget.notificationListId,
-                                  count: widget.count,
+                                  // title: widget.title,
+                                  // message: widget.message,
+                                  // readStatus: widget.readStatus,
+                                  // notificationIdList: widget.notificationListId,
+                                  // count: widget.count,
                                 )));
                   },
                 ),

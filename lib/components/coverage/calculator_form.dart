@@ -17,22 +17,23 @@ class CalculatorPage extends ConsumerStatefulWidget {
   final String userName;
   final String phone;
   final String email;
-  final List<String> title;
-  final List<String> message;
-  final List<String> readStatus;
-  final List<num> notificationIdList;
-  final num count;
+  // final List<String> title;
+  // final List<String> message;
+  // final List<String> readStatus;
+  // final List<num> notificationIdList;
+  // final num count;
   const CalculatorPage(
       {super.key,
       required this.userId,
       required this.userName,
       required this.phone,
       required this.email,
-      required this.message,
-      required this.readStatus,
-      required this.title,
-      required this.notificationIdList,
-      required this.count});
+      // required this.message,
+      // required this.readStatus,
+      // required this.title,
+      // required this.notificationIdList,
+      // required this.count
+      });
 
   
   @override
@@ -130,12 +131,12 @@ class _CalculatorPageState extends ConsumerState<CalculatorPage> {
                       monthlyPremium: monthlyPremium,
                       totalPremium: totalPremium,
                       weeklyPremium: weeklyPremium,
-                      title: widget.message,
-                      message: widget.message,
-                      readStatus: widget.message,
+                      // title: widget.message,
+                      // message: widget.message,
+                      // readStatus: widget.message,
                       sumInsured: int.parse(SumInsured),
-                      notificationListId: widget.notificationIdList,
-                      count: widget.count,
+                      // notificationListId: widget.notificationIdList,
+                      // count: widget.count,
                     )),
           );
         }

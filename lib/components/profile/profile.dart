@@ -104,78 +104,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: IconButton(
-                iconSize: 30,
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                ),
-                // the method which is called
-                // when button is pressed
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: (count != 0)
-                    ? badges.Badge(
-                        position: BadgePosition.topEnd(top: 0, end: 3),
-                        badgeContent: Text(
-                          (count).toString(),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.message,
-                            color: kPrimaryColor,
-                            size: 30,
-                          ),
-                          // the method which is called
-                          // when button is pressed
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return NotificationList();
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : IconButton(
-                        icon: const Icon(
-                          Icons.message,
-                          color: kPrimaryColor,
-                          size: 30,
-                        ),
-                        // the method which is called
-                        // when button is pressed
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return NotificationList();
-                              },
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            )
-          ]),
+      
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
