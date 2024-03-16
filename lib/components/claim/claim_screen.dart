@@ -95,71 +95,9 @@ class _ClaimListState extends ConsumerState<ClaimList> {
       }
     });
 
-    Widget content = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        elevation: 5,
-        shadowColor: Colors.black,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.info,
-                  size: 100,
-                  color: kPrimaryColor,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'You have no claim',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                  // style: GoogleFonts.bebasNeue(fontSize: 72),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Use the CREATE A CLAIM button to create a new form',
-                  style: TextStyle(fontSize: 15, color: Colors.black),
-                  // style: GoogleFonts.bebasNeue(fontSize: 72),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
-                      fixedSize: const Size(200, 40)),
-                  onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return ClaimForm(
-                    //         userId: widget.userId,
-                    //         claimApplicationActive:
-                    //             widget.claimApplicationActive,
-                    //         paymentAmount: widget.paymentAmountUptoDate,
-                    //         qualifiesForCompensation:
-                    //             widget.qualifiesForCompensation,
-                    //         uptoDatePayment: widget.uptoDatePayment,
-                    //       );
-                    //     },
-                    //   ),
-                    // );
-                    // _showDia// log();
-                  },
-                  child: Text(
-                    "Create a new Claim".toUpperCase(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    Widget content = const Center(
+      child: Text('No data yet',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
     );
     Widget contentUptoDate = const Center(
       child: Text('No data yet',
@@ -276,6 +214,74 @@ class _ClaimListState extends ConsumerState<ClaimList> {
           ),
         ],
       );
+    }else{
+      content = Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 5,
+        shadowColor: Colors.black,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.info,
+                  size: 100,
+                  color: kPrimaryColor,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'You have no claim',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                  // style: GoogleFonts.bebasNeue(fontSize: 72),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Use the CREATE A CLAIM button to create a new form',
+                  style: TextStyle(fontSize: 15, color: Colors.black),
+                  // style: GoogleFonts.bebasNeue(fontSize: 72),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: kPrimaryColor,
+                      fixedSize: const Size(200, 40)),
+                  onPressed: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return ClaimForm(
+                    //         userId: widget.userId,
+                    //         claimApplicationActive:
+                    //             widget.claimApplicationActive,
+                    //         paymentAmount: widget.paymentAmountUptoDate,
+                    //         qualifiesForCompensation:
+                    //             widget.qualifiesForCompensation,
+                    //         uptoDatePayment: widget.uptoDatePayment,
+                    //       );
+                    //     },
+                    //   ),
+                    // );
+                    // _showDia// log();
+                  },
+                  child: Text(
+                    "Create a new Claim".toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
     }
 
     if (_dataUpToDate.isNotEmpty) {
@@ -351,10 +357,6 @@ class _ClaimListState extends ConsumerState<ClaimList> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          centerTitle: true,
-        ),
         body: SingleChildScrollView(
           child: Container(
             child: Column(

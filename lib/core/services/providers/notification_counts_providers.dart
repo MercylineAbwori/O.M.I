@@ -48,8 +48,8 @@ class NotificationCountListNotifier
     state.isLoading = true;
     state.error = '';
 
-    // num userId = await LocalStorage().getUserRegNo();
-    num userId = 1;
+    num userId = await LocalStorage().getUserRegNo();
+    // num userId = 1;
     var url =
         Uri.parse(ApiConstants.baseUrl + ApiConstants.notificationCountEndpoint);
     final headers = {'Content-Type': 'application/json'};

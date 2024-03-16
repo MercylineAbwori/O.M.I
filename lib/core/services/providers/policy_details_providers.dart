@@ -39,50 +39,21 @@ class PolicyDetailsListNotifier extends StateNotifier<policyDetailsModel> {
       _code = obj["result"]["code"];
     });
 
-    log("Data : ${_data}");
+    log("Data : ${obj}");
 
-    await LocalStorage().storePolicyDetailsCode(_code);
-
-    var createdAt = _data["createdAt"];
     var dependants = _data["dependants"];
-    var id = _data["id"];
     var paymentAmount = _data["paymentAmount"];
     var paymentPeriod = _data["paymentPeriod"];
     var policyNumber = _data["policyNumber"];
     var sumInsured = _data["sumInsured"];
-    var updatedAt = _data["updatedAt"];
 
-    // userDetails:
-
-    var userDetailscreatedAt = _data["userDetails"]["createdAt"];
-    var userDetailsemail = _data["userDetails"]["email"];
-    var userDetailsgender = _data["userDetails"]["gender"];
-    var userDetailsmsisdn = _data["userDetails"]["msisdn"];
-    var userDetailsname = _data["userDetails"]["name"];
-    var userDetailspin = _data["userDetails"]["pin"];
-    var userDetailsupdatedAt = _data["userDetails"]["updatedAt"];
-    var userDetailsuserId = _data["userDetails"]["userId"];
-
+   
     loadedItems.add(policyDetailsItem(
-        createdAt: createdAt,
         dependants: dependants,
-        id: id,
         paymentAmount: paymentAmount,
         paymentPeriod: paymentPeriod,
         policyNumber: policyNumber,
-        sumInsured: sumInsured,
-        updatedAt: updatedAt,
-
-        //userDetails:
-
-        userDetailscreatedAt: userDetailscreatedAt,
-        userDetailsemail: userDetailsemail,
-        userDetailsgender: userDetailsgender,
-        userDetailsmsisdn: userDetailsmsisdn,
-        userDetailsname: userDetailsname,
-        userDetailspin: userDetailspin,
-        userDetailsupdatedAt: userDetailsupdatedAt,
-        userDetailsuserId: userDetailsuserId));
+        sumInsured: sumInsured,));
 
     addPolicyDetailsItems(loadedItems);
   }
@@ -93,8 +64,8 @@ class PolicyDetailsListNotifier extends StateNotifier<policyDetailsModel> {
     state.isLoading = true;
     state.error = '';
 
-    // num userId = await LocalStorage().getUserRegNo();
-    num userId = 1;
+    num userId = await LocalStorage().getUserRegNo();
+    // num userId = 1;
 
     var url =
         Uri.parse(ApiConstants.baseUrl + ApiConstants.policyDetailsEndpoint);

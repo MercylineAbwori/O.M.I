@@ -113,27 +113,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 40),
 
               CircleAvatar(
-                radius: 70,
-                child: _imageProfile != null
-                    ? Image.file(
-                        _imageProfile!,
-                        width: 300,
-                        height: 250,
-                        fit: BoxFit.cover,
-                      )
-                    : (profilePic == '')
-                        ? Image.asset(
-                            'assets/icons/profile_icons/profile.jpg',
-                            width: 300,
-                            height: 250,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.network(
-                            profilePic!,
-                            width: 300,
-                            height: 250,
-                            fit: BoxFit.cover,
-                          ),
+                radius: 60,
+                backgroundImage: AssetImage('assets/icons/profile_icons/profile.jpg')
+                // _imageProfile != null
+                // ? FileImage(_imageProfile!)
+                // : (profilePic == '')
+                // ? AssetImage('assets/icons/profile_icons/profile.jpg')
+                // : NetworkImage(profilePic!)
+                      
               ),
               InkWell(
                   onTap: () {
@@ -182,6 +169,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       "Submit Profile Picture",
                       style: TextStyle(
                         fontSize: 12.0,
+                        color: Colors.white
                       ),
                     ),
                   )

@@ -165,6 +165,32 @@ class LocalStorage {
     return prefs.remove('count');
   }
 
+  //User Reg No
+
+  storeUserRegistrationNo(int user_reg_no) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.setInt('userRegNo', user_reg_no);
+  }
+  
+  getUserRegistrationNo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getInt('userRegNo') ?? 0;
+  }
+
+  updateUserRegistrationNo(int user_reg_no) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.setInt('userRegNo', user_reg_no);
+  }
+
+  removeUserRegistrationNo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.remove('userRegNo');
+  }
+
 
   //User Reg No
 

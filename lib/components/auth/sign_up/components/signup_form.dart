@@ -98,7 +98,8 @@ class _SignUpFormState extends State<SignUpForm> {
   late String _statusMessage = '';
   num? statusCode;
 
-  num userId = 1;
+  // num userId = 1;
+  num? userId;
   late String _msisdn;
 
   late String promotionCode = '';
@@ -109,6 +110,16 @@ class _SignUpFormState extends State<SignUpForm> {
       setState(() {
         statusCode = _statusCode;
         log('Status OTP Code : $statusCode');
+      });
+    }
+  }
+
+  Future<void> loadUserIDCode() async {
+    var _userId = await LocalStorage().getUserRegistrationNo();
+    if (_userId != null) {
+      setState(() {
+        userId = _userId;
+        log('USER ID FROM REGISTRATION : $userId');
       });
     }
   }
@@ -147,38 +158,40 @@ class _SignUpFormState extends State<SignUpForm> {
           );
 
           await loadStatusCode();
+          await loadUserIDCode();
 
           if (statusCode != null) {
-              if (statusCode == 5000) {
-                if (promotionCodeController.text.isNotEmpty) {
-                  await ApiService().sendPromoCode(userId, promotionCodeController.text);
-                }
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return OtpSignPage(
-                      userId: userId,
-                      name: nameController.text,
-                      email: emailController.text,
-                      date: dateOfBirthController.text,
-                      phoneNo: phoneController.text,
-                      gender: dropdownValue!,
-                      pin: pinController.text,
-                      Confirm: pinConfirmController.text,
-                      promotionCode: promotionCodeController.text,
-                    );
-                  },
-                ));
+            if (statusCode == 5000) {
+              if (promotionCodeController.text.isNotEmpty) {
+                await ApiService()
+                    .sendPromoCode(userId, promotionCodeController.text);
               }
-        } else {
-              QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.error,
-                  text: "Something went wrong, try again ..",
-                  confirmBtnText: 'Correct',
-                  onConfirmBtnTap: () async {
-                    Navigator.pop(context);
-                  });
-              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return OtpSignPage(
+                    userId: userId!,
+                    name: nameController.text,
+                    email: emailController.text,
+                    date: dateOfBirthController.text,
+                    phoneNo: phoneController.text,
+                    gender: dropdownValue!,
+                    pin: pinController.text,
+                    Confirm: pinConfirmController.text,
+                    promotionCode: promotionCodeController.text,
+                  );
+                },
+              ));
+            }
+          } else {
+            QuickAlert.show(
+                context: context,
+                type: QuickAlertType.error,
+                text: "Something went wrong, try again ..",
+                confirmBtnText: 'Correct',
+                onConfirmBtnTap: () async {
+                  Navigator.pop(context);
+                });
+            Navigator.pop(context);
           }
           Future.delayed(const Duration(seconds: 3), () {
             setState(() {
@@ -187,11 +200,10 @@ class _SignUpFormState extends State<SignUpForm> {
           });
         }
 
-          
-          setState(() {
-            _isButtonDisabled = false;
-            _buttonText = 'Sign Up';
-          });
+        setState(() {
+          _isButtonDisabled = false;
+          _buttonText = 'Sign Up';
+        });
       });
     }
   }
@@ -516,11 +528,10 @@ class _SignUpFormState extends State<SignUpForm> {
                               setState(() {
                                 _pinErrorText = "* Required";
                               });
-                            }
-                            else if (value.length < 4) {
-                              _pinErrorText = "Password should be atleast 4 characters";
-                            }
-                            else if (value.length > 4) {
+                            } else if (value.length < 4) {
+                              _pinErrorText =
+                                  "Password should be atleast 4 characters";
+                            } else if (value.length > 4) {
                               setState(() {
                                 _pinErrorText =
                                     "Password should not be greater than 4 characters";
@@ -584,7 +595,8 @@ class _SignUpFormState extends State<SignUpForm> {
                         height: 50,
                         width: 250,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor),
                           onPressed: _isButtonDisabled ? null : _submitForm,
                           child: Text(
                             _buttonText,

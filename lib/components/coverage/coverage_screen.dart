@@ -196,24 +196,6 @@ class _CoverageState extends ConsumerState<CoveragePage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          leading: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: IconButton(
-                iconSize: 100,
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 20,
-                ),
-                // the method which is called
-                // when button is pressed
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
         ),
         body: SingleChildScrollView(
             child: (statusCodePolicyDetails == 5000)
@@ -473,6 +455,7 @@ class _CoverageState extends ConsumerState<CoveragePage> {
                                       },
                                       child: Text(
                                         "Select Coverage Options".toUpperCase(),
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                     ),
                                     const SizedBox(height: 20),

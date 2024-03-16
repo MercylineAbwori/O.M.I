@@ -59,8 +59,8 @@ class UpToDateListNotifier extends StateNotifier<upToDateListModel> {
     state.isLoading = true;
     state.error = '';
 
-    // num userId = await LocalStorage().getUserRegNo();
-    num userId = 1;
+    num userId = await LocalStorage().getUserRegNo();
+    // num userId = 1;
     var url =
         Uri.parse(ApiConstants.baseUrl + ApiConstants.uptoDatePaymentEndpoint);
     final headers = {'Content-Type': 'application/json'};

@@ -274,10 +274,10 @@ class ApiService {
       var obj = jsonDecode(response.body);
 
       var mswes;
-      var _statusCode = obj["result"]["code"];
-      var _statusMessage = obj["result"]["message"];
-      var _userId = obj["result"]["data"]["userId"];
-      var _msisdn = obj["result"]["data"]["msisdn"];
+      var _statusCode;
+      var _statusMessage;
+      var _userId;
+      var _msisdn;
 
       obj.forEach((key, value) {
         _statusCode = obj["result"]["code"];
@@ -287,10 +287,12 @@ class ApiService {
       });
 
       log('msfyeuef : $_msisdn');
+      log("USER ID $_userId");
 
       if (_statusCode == 5000) {
         await sendOTP((_msisdn).toString());
         await LocalStorage().storeRegistrationCode(_statusCode);
+        await LocalStorage().storeUserRegistrationNo(_userId);
         // Show a simple toast message
         Fluttertoast.showToast(
           msg: _statusMessage,
@@ -1020,7 +1022,6 @@ class ApiService {
     }
   }
 
-
   Future<List<UploadFileModal>?> pickerFiles(userId, documentName, file) async {
     try {
       var request = http.MultipartRequest(
@@ -1058,7 +1059,6 @@ class ApiService {
     } catch (e) {
       // log(e.toString());
     }
-
   }
 
   ///Share app with promocode
